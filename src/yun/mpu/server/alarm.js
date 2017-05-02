@@ -94,7 +94,7 @@ serial.on('data', function (data) {
     status.update('intruder', data.charAt(2) === 'I');
     status.update('pa', data.charAt(3) === 'P');
   }
-  broadcast(data.toString());
+  broadcast(data);
 });
 
 wss.on('connection', function (ws) {
