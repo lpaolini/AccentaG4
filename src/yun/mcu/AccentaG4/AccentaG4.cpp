@@ -21,7 +21,7 @@ AccentaG4::AccentaG4(uint8_t rxPin, uint8_t txPin,
 
 void AccentaG4::begin() {
 	serial.begin(BUS_SPEED);
-	txLast = millis();
+	tx.last = millis();
 }
 
 void AccentaG4::end() {
@@ -30,22 +30,22 @@ void AccentaG4::end() {
 
 void AccentaG4::sendKey(char key) {
     switch (key) {
-      case '0': txQueue.push(K_0); break;
-      case '1': txQueue.push(K_1); break;
-      case '2': txQueue.push(K_2); break;
-      case '3': txQueue.push(K_3); break;
-      case '4': txQueue.push(K_4); break;
-      case '5': txQueue.push(K_5); break;
-      case '6': txQueue.push(K_6); break;
-      case '7': txQueue.push(K_7); break;
-      case '8': txQueue.push(K_8); break;
-      case '9': txQueue.push(K_9); break;
-      case 'c': txQueue.push(K_CHIME); break;
-      case 'o': txQueue.push(K_OMIT); break;
-      case 'x': txQueue.push(K_CANCEL); break;
-      case 'p': txQueue.push(K_PROGRAM); break;
-      case 'v': txQueue.push(K_CONFIRM); break;
-      case 's': txQueue.push(K_SOS); break;
+      case '0': tx.queue.push(K_0); break;
+      case '1': tx.queue.push(K_1); break;
+      case '2': tx.queue.push(K_2); break;
+      case '3': tx.queue.push(K_3); break;
+      case '4': tx.queue.push(K_4); break;
+      case '5': tx.queue.push(K_5); break;
+      case '6': tx.queue.push(K_6); break;
+      case '7': tx.queue.push(K_7); break;
+      case '8': tx.queue.push(K_8); break;
+      case '9': tx.queue.push(K_9); break;
+      case 'c': tx.queue.push(K_CHIME); break;
+      case 'o': tx.queue.push(K_OMIT); break;
+      case 'x': tx.queue.push(K_CANCEL); break;
+      case 'p': tx.queue.push(K_PROGRAM); break;
+      case 'v': tx.queue.push(K_CONFIRM); break;
+      case 's': tx.queue.push(K_SOS); break;
       case '?': queryStatus(); break;    
     }
 }
@@ -94,7 +94,7 @@ void AccentaG4::readBusMessages() {
 					}
 					break;
 				default:
-					break; // ignore other commands
+					break; // ignore other messages
 			}
 		}
 	}
@@ -146,12 +146,12 @@ void AccentaG4::getLcdStatus() {
 
 void AccentaG4::sendCommands() {
 	// send keypad commands
-	if (txQueue.count() && millis() - txLast > K_DELAY_MS) { // throttle tx
-		char key = txQueue.pop();
+	if (tx.queue.count() && millis() - tx.last > K_DELAY_MS) { // throttle tx
+		char key = tx.queue.pop();
 		serial.write9(K_COMMAND | 0x100); // K cmd: emulate MARK parity
 		serial.write9(key & 0xff); // key: emulate SPACE parity
 		serial.write9((K_COMMAND + key) & 0xff); // checksum: emulate SPACE parity
-		txLast = millis();
+		tx.last = millis();
 	}
 }
 

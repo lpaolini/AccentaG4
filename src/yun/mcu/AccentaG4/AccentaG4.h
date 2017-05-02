@@ -39,8 +39,12 @@
 class AccentaG4 {
 	private:
 		SoftwareSerial9 serial;
-		QueueArray <char> txQueue;
-		unsigned long txLast;
+		char setPin, abortPin, intPin, paPin;
+		void (*msgHandler)(char type, char* msg);
+		struct Tx {
+			QueueArray <char> queue;
+			unsigned long last;
+		} tx;
 		struct Rx {
 			unsigned int current;
 			char data[MSG_MAXLEN];
@@ -52,8 +56,6 @@ class AccentaG4 {
 			char lcd[50];
 		} status;
 		boolean validateChecksum(char expectedChecksum);
-		char setPin, abortPin, intPin, paPin;
-		void (*msgHandler)(char type, char* msg);
 		void readBusMessages();
 		void readPanelSignals();
 		void sendCommands();
@@ -65,7 +67,9 @@ class AccentaG4 {
 		void getLcdStatus();
 
 	public:
-		AccentaG4(uint8_t rxPin, uint8_t txPin, uint8_t setPin, uint8_t abortPin, uint8_t intPin, uint8_t paPin, void (*msgHandler)(char type, char* msg));
+		AccentaG4(uint8_t rxPin, uint8_t txPin, 
+			uint8_t setPin, uint8_t abortPin, uint8_t intPin, uint8_t paPin, 
+			void (*msgHandler)(char type, char* msg));
 		void begin();
 		void end();
 		void sendKey(char key);
