@@ -1,0 +1,163 @@
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+body {
+    margin: auto;
+    background: #303030;
+    user-select: none;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.wrapper * {
+    background-image: linear-gradient(top, #383838 0%, #1F1F1F 5%, #161616 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#1F1F1F), to(#161616));
+    display: inline-block;
+    box-shadow: 0 0 1px 1px rgb(10, 10, 10);
+    position: relative;
+    text-align: center;
+}
+
+.button {
+    height: 3rem;
+    width: 6rem;
+    border-radius: 3rem;
+    color: #a0a0a0;
+    font: normal 1.4rem arial;
+    padding-top: 0.75rem;
+    transition: color .3s ease;
+    order: 1;
+}
+
+.led {
+    height: 4rem;
+    width: 3.6rem;
+    border-radius: 1rem;
+    color: #818181;
+    font: normal 1.4rem arial;
+    padding-top: 2.1rem;
+}
+
+.led:before {
+    position: absolute;
+    content: '';
+    left: 1.2rem;
+    top: 0.4rem;
+    text-align: center;
+    width: 1.2rem;
+    height: 1.2rem;
+    background: #222222;
+    background-image: radial-gradient(top, #616161 0%, #616161 20%, #535353 60%);
+    border-radius: 50%;
+    box-shadow: 0 0 4px #1C1C17;
+    transition: all .1s ease;
+}
+
+@keyframes blinker {  
+  100% { opacity: 0; }
+}
+
+.led.blink.active:before {
+    animation: blinker .4s ease-in-out infinite;
+}
+
+.led.red.active:before {
+    background: #FF2F2F;
+    box-shadow: 0 0 4px #1C1C17, 0 0 5px #FF4242;
+}
+
+@keyframes alarm {
+    50% { background-color: #a00000; }
+}
+
+body.active {
+    animation: alarm 3s ease infinite;
+}    
+
+.led.yellow.active:before {
+    background: #FFFF2F;
+    box-shadow: 0 0 4px #1C1C17, 0 0 5px #FFFF42;
+}
+
+.led.green.active:before {
+    background: #4FFF4F;
+    box-shadow: 0 0 4px #1C1C17, 0 0 5px #42FF42;
+}
+
+.led.blue.active:before {
+    background: #4F8FFF;
+    box-shadow: 0 0 4px #1C1C17, 0 0 5px #4242FF;
+}
+
+[data-command] {
+    cursor: pointer;
+}
+
+[data-command]:active {
+    box-shadow: 0 0 1px 1px rgb(10, 10, 10), inset 0 2px 2px 0px black;
+}
+
+#keySet {
+    color: green;
+}
+
+#keyCancel {
+    color: darkred;
+}
+
+@media screen and (orientation:portrait) {
+    body {
+        width: 23rem;
+    }
+
+    .button {
+        margin: .5rem .8rem;
+    }
+
+    .led {
+        margin: .5rem 1rem;
+    }
+
+    .button[data-command="x"] {
+        order: 2;
+    }
+
+    .button[data-command="0"] {
+        order: 3;
+    }
+
+    .button[data-command="v"] {
+        order: 4;
+    }
+
+    .button[data-command="c"],
+    .button[data-command="o"],
+    .button[data-command="p"] {
+        order: 5;
+    }
+}
+
+@media screen and (orientation:landscape) {
+    body {
+        width: 40rem;
+    }
+
+    .button {
+        margin: .7rem 1rem;
+    }
+
+    .led {
+        margin: .7rem .6rem;
+    }
+}

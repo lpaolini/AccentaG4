@@ -1,0 +1,50 @@
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<link rel="manifest" href="manifest.json">
+	<link rel="stylesheet" href="alarm.css"/>
+</head>
+<body data-signal="IP">
+	<div class="wrapper">
+		<div id="zone1" data-led="1" data-command="1" data-trigger="click" class="led red">1</div>
+		<div id="zone2" data-led="2" data-command="2" data-trigger="click" class="led red">2</div>
+		<div id="zone3" data-led="3" data-command="3" data-trigger="click" class="led red">3</div>
+		<div id="zone4" data-led="4" data-command="4" data-trigger="click" class="led red">4</div>
+		<div id="zone5" data-led="5" data-command="5" data-trigger="click" class="led red">5</div>
+		<div id="zone6" data-led="6" data-command="6" data-trigger="click" class="led red">6</div>
+		<div id="zone7" data-led="7" data-command="7" data-trigger="click" class="led red">7</div>
+		<div id="zone8" data-led="8" data-command="8" data-trigger="click" class="led red">8</div>
+	</div>
+	<div class="wrapper">
+		<div id="key0" data-command="0" data-trigger="click" class="button">0</div>
+		<div id="key1" data-command="1" data-trigger="click" class="button">1</div>
+		<div id="key2" data-command="2" data-trigger="click" class="button">2</div>
+		<div id="key3" data-command="3" data-trigger="click" class="button">3</div>
+		<div id="key4" data-command="4" data-trigger="click" class="button">4</div>
+		<div id="key5" data-command="5" data-trigger="click" class="button">5</div>
+		<div id="key6" data-command="6" data-trigger="click" class="button">6</div>
+		<div id="key7" data-command="7" data-trigger="click" class="button">7</div>
+		<div id="key8" data-command="8" data-trigger="click" class="button">8</div>
+		<div id="key9" data-command="9" data-trigger="click" class="button">9</div>
+		<div id="keyChime" data-command="c" data-trigger="click" class="button">CHM</div>
+		<div id="keyOmit" data-command="o" data-trigger="click" class="button">OMT</div>
+		<div id="keyCancel" data-command="x" data-trigger="click" class="button">CAN</div>
+		<div id="keyProgram" data-command="p" data-trigger="click" class="button">PRG</div>
+		<div id="keySet" data-command="v" data-trigger="click" class="button">SET</div>
+	</div>
+	<div class="wrapper">
+		<div id="tamper" data-led="T" class="led red">tmp</div>
+		<div id="sos" data-led="H" class="led red">sos</div>
+		<div id="unset" data-led="U" class="led green">unst</div>
+ 		<div id="power" data-led="M" class="led red">pwr</div>
+		<div id="set" data-signal="S" class="led blue">set</div>
+		<div id="abort" data-signal="A" class="led yellow blink">abrt</div>
+		<div id="intruder" data-signal="I" class="led red blink">int</div>
+		<div id="panic" data-signal="P" data-command="s" data-trigger="dblclick" class="led red blink">pa</div>
+	</div>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="jquery-visibility.min.js"></script>
+	<script src="alarm.js"></script>
+</body>
+</html>
