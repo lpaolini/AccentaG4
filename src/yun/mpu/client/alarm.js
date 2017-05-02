@@ -46,10 +46,11 @@ $(() => {
           var data = evt.data.split(':');
           switch (data[0]) {
             case 'S':
+              $('body').toggleClass('active', data[1].indexOf('I') !== -1 || data[1].indexOf('P') !== -1);
               for (var i = 0; i < 4; i++) {
                 var signal = 'SAIP'.charAt(i);
-                $('[data-signal*="' + signal + '"]').toggleClass('active', data[1].indexOf(signal) !== -1);
-              } 
+                $('[data-signal~="' + signal + '"]').toggleClass('active', data[1].indexOf(signal) !== -1);
+              }
               break;
             case 'P':
               for (var i = 0; i < 12; i++) {
