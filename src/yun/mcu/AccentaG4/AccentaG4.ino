@@ -65,6 +65,7 @@ void setup() {
   Serial.begin(CONSOLE_SPEED);
   startBridge();
   panel.begin();
+  Serial.println("Ready");
 }
 
 void loop() {  
