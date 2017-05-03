@@ -41,7 +41,7 @@ var status = new Status({
 // initialize serial port
 const serial = new SerialPort.SerialPort('/dev/ttyATH0', {
   baudRate: 115200,
-  parser: SerialPort.parsers.readline('\r\n')
+  parser: SerialPort.parsers.readline('\r\n', 'binary')
 });
 
 // initialize websocket
