@@ -27,6 +27,8 @@ var lcd = (() => {
       if (cmd) {
         if (char >= 0x80) { // set position
           pos = char - 0x80;
+        } else {
+          console.log('unknown command: ', char.toString(16));
         }
         cmd = false;
       } else {
@@ -34,13 +36,21 @@ var lcd = (() => {
           case 0xa: // crlf
             pos = 64;
             break;
-          case 0x10: // left
+          case 0x5: // hide cursor?
+            console.log('hide cursor')
+            break;
+          case 0x6: // show cursor?
+            console.log('show cursor')
+            break;
+          case 0x10: // left?
+            console.log('0x10')
             pos--;
             break;
-          case 0x7: // right
+          case 0x16: // right?
+            console.log('0x7')
             pos++;
             break;
-          case 0xc: // clear?
+          case 0xc: // clear
             clear();
             break;
           case 0x4: // command
