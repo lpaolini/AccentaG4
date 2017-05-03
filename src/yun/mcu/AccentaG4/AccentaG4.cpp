@@ -108,13 +108,11 @@ void AccentaG4::setPanelSignals(int signals) {
 }
 
 void AccentaG4::getPanelSignals() {
-  	const char templ[4] = {'S', 'A', 'I', 'P'};
-	char value[5];
 	// SET, ABORT, INTRUDER, PANIC
+	char value[] = "SAIP";
 	for (int i = 0; i < 4; i++) {
-		value[i] = bitRead(status.signals, i) ? templ[i] : '.';
+		bitRead(status.signals, i) || (value[i] = '.');
 	}
-	value[4] = '\0';
 	msgHandler('S', value);
 }
 
@@ -124,13 +122,11 @@ void AccentaG4::setLedStatus(struct Rx rx) {
 }
 
 void AccentaG4::getLedStatus() {
-	const char templ[12] = {'1', '2', '3', '4', '5', '6', '7', '8', 'U', 'T', 'H', 'M'};
-	char value[13];
 	// ZONE 1-8, UNSET, TAMPER, SOS, POWER
+	char value[] = "12345678UTSP";
 	for (int i = 0; i < 12; i++) {
-		value[i] = bitRead(status.led, i) ? templ[i] : '.';
+		bitRead(status.led, i) || (value[i] = '.');
 	}
-	value[12] = '\0';
 	msgHandler('P', value);
 }
 

@@ -54,8 +54,8 @@ $(() => {
               break;
             case 'P':
               for (var i = 0; i < 12; i++) {
-                var signal = '12345678UTHM'.charAt(i);
-                $('[data-led*="' + signal + '"]').toggleClass('active', data[1].indexOf(signal) !== -1);
+                var led = '12345678UTSP'.charAt(i);
+                $('[data-led*="' + led + '"]').toggleClass('active', data[1].indexOf(led) !== -1);
               } 
               break;
             case 'L':
