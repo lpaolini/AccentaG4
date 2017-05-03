@@ -43,23 +43,28 @@ $(() => {
       ws.onmessage = (evt) => {
         monitor.ack();
         if (evt.data) {
-          var data = evt.data.split(':');
-          switch (data[0]) {
+          var type = evt.data.charAt(0);
+          var msg = evt.data.substring(2);
+          switch (type) {
             case 'S':
-              $('body').toggleClass('active', data[1].indexOf('I') !== -1 || data[1].indexOf('P') !== -1);
+              $('body').toggleClass('active', msg.indexOf('I') !== -1 || msg.indexOf('P') !== -1);
               for (var i = 0; i < 4; i++) {
                 var signal = 'SAIP'.charAt(i);
-                $('[data-signal~="' + signal + '"]').toggleClass('active', data[1].indexOf(signal) !== -1);
+                $('[data-signal~="' + signal + '"]').toggleClass('active', msg.indexOf(signal) !== -1);
               }
               break;
             case 'P':
               for (var i = 0; i < 12; i++) {
                 var led = '12345678UTSP'.charAt(i);
-                $('[data-led*="' + led + '"]').toggleClass('active', data[1].indexOf(led) !== -1);
+                $('[data-led*="' + led + '"]').toggleClass('active', msg.indexOf(led) !== -1);
               } 
               break;
             case 'L':
-              // ignore
+              var s = '[' + msg + '] ';
+              for (var i = 0; i < msg.length; i++) {
+                s += msg.charAt(i) + '['+ msg.charCodeAt(i).toString(16) + ']';
+              }
+              console.log(s);
               break;
             default:
               break;
