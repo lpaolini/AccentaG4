@@ -63,6 +63,9 @@ void AccentaG4::readBusMessages() {
 	// read keypad messages
 	while (serial.available()) {
 		rx.current = serial.read();
+		// Serial.write(rx.current);
+		// Serial.print(" : ");
+		// Serial.println(rx.current, HEX);
 		if (rx.current & 0x100) { // mark parity -> start of message
 			rx.data[0] = rx.current & 0xff; // drop parity bit
 			rx.ptr = 1;
@@ -132,7 +135,9 @@ void AccentaG4::getLedStatus() {
 }
 
 void AccentaG4::setLcdStatus(struct Rx rx) {
-	strcpy(status.lcd, rx.data + 2);
+	// strcpy(status.lcd, rx.data + 2);
+	strncpy(status.lcd, rx.data + 2, rx.ptr - 1);
+
 	getLcdStatus();
 }
 
