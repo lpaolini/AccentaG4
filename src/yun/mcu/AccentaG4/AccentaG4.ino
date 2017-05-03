@@ -15,9 +15,14 @@
 #define CONSOLE_SPEED   115200
 
 void handleMsg(char type, char* msg) {
+  // forward panel to Yun bridge
   Serial1.print(type);
   Serial1.print(":");
   Serial1.println(msg);
+  // forward panel to local serial
+  Serial.print(type);
+  Serial.print(":");
+  Serial.println(msg);
 }
 
 void startBridge() {
