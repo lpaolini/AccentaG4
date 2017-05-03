@@ -29,24 +29,37 @@ body {
     text-align: center;
 }
 
+.lcd {
+    height: 3.5rem;
+    width: 19rem;
+    border-radius: 1em;
+    color: cyan;
+}
+
+.lcd pre {
+    margin: 0;
+    font-size: 1.8rem;
+    opacity: 0.75;
+}
+
 .button {
-    height: 3rem;
+    height: 2.6rem;
     width: 6rem;
     border-radius: 3rem;
     color: #a0a0a0;
-    font: normal 1.4rem arial;
-    padding-top: 0.75rem;
+    font: normal 1.3rem arial;
+    padding-top: 0.6rem;
     transition: color .3s ease;
     order: 1;
 }
 
 .led {
-    height: 4rem;
+    height: 3.6rem;
     width: 3.6rem;
     border-radius: 1rem;
     color: #818181;
     font: normal 1.4rem arial;
-    padding-top: 2.1rem;
+    padding-top: 1.8rem;
 }
 
 .led:before {
@@ -126,7 +139,12 @@ body.active {
     }
 
     .led {
-        margin: .5rem 1rem;
+        margin: .4rem .8rem;
+    }
+
+    .lcd {
+        width: 100%;
+        margin: .4rem .8rem;
     }
 
     .button[data-command="x"] {
@@ -154,10 +172,14 @@ body.active {
     }
 
     .button {
-        margin: .7rem 1rem;
+        margin: .4rem .6rem;
     }
 
     .led {
-        margin: .7rem .6rem;
+        margin: .4rem .6rem;
+    }
+
+    .lcd {
+        margin: .4rem .6rem;
     }
 }

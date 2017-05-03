@@ -25,6 +25,70 @@ $(() => {
     };
   })(5000);
 
+  var lcd = (() => {
+    // https://dawes.wordpress.com/2010/01/05/hd44780-instruction-set/
+    var display;
+    var pos;
+    var cmd = false;
+    function clear () {
+      display = ['                ', '                '];
+      pos = 0;
+    }
+    function write(char) {
+      if (char >= ' ') {
+        var row, col;
+        if (pos < 16) {
+          row = 0;
+          col = pos;
+        } else {
+          row = 1;
+          col = pos - 64;
+        }
+        display[row] = display[row].substr(0, col) + char + display[row].substr(col + 1);
+        pos++;
+      }
+    }
+    function ingest (data) {
+      for (var i = 0; i < data.length; i++) {
+        var char = data.charCodeAt(i);
+        if (cmd) {
+          if (char >= 0x80) { // set position
+            pos = char - 0x80;
+          }
+          cmd = false;
+        } else {
+          switch (data.charCodeAt(i)) {
+            case 0xa: // crlf
+              pos = 64;
+              break;
+            case 0x10: // left
+              pos--;
+              break;
+            case 0x14: // right
+              pos++;
+              break;
+            case 0xc: // clear?
+              clear();
+              break;
+            case 0x4: // command
+              cmd = true;
+              break;
+            default:
+              write(data.charAt(i));
+          }
+        }
+      }
+    }
+    function get (row) {
+      return row !== undefined ? display[row] : display;
+    }
+    clear();
+    return {
+      ingest: ingest,
+      get: get
+    }
+  })();
+
   function isConnected() {
     return ws && ws.readyState === WebSocket.OPEN;
   }
@@ -60,11 +124,17 @@ $(() => {
               } 
               break;
             case 'L':
-              var s = '[' + msg + '] ';
+              var s = '"' + msg + '" ';
               for (var i = 0; i < msg.length; i++) {
                 s += msg.charAt(i) + '['+ msg.charCodeAt(i).toString(16) + ']';
               }
-              console.log(s);
+              console.log('LCD:', s);
+
+              lcd.ingest(msg);
+              console.log(lcd.get(0), lcd.get(1));
+              $('#lcd0').html(lcd.get(0));
+              $('#lcd1').html(lcd.get(1));
+
               break;
             default:
               break;

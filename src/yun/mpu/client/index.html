@@ -2,10 +2,17 @@
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
 	<link rel="manifest" href="manifest.json">
 	<link rel="stylesheet" href="alarm.css"/>
 </head>
 <body>
+	<div class="wrapper">
+		<div class="lcd">
+			<pre id="lcd0"></pre>
+			<pre id="lcd1"></pre>
+		</div>
+	</div>
 	<div class="wrapper">
 		<div id="zone1" data-led="1" data-command="1" data-trigger="click" class="led red">1</div>
 		<div id="zone2" data-led="2" data-command="2" data-trigger="click" class="led red">2</div>
@@ -29,9 +36,9 @@
 		<div id="key9" data-command="9" data-trigger="click" class="button">9</div>
 		<div id="keyChime" data-command="c" data-trigger="click" class="button">CHM</div>
 		<div id="keyOmit" data-command="o" data-trigger="click" class="button">OMT</div>
-		<div id="keyCancel" data-command="x" data-trigger="click" class="button">CAN</div>
+		<div id="keyCancel" data-command="x" data-trigger="click" class="button">X</div>
 		<div id="keyProgram" data-command="p" data-trigger="click" class="button">PRG</div>
-		<div id="keySet" data-command="v" data-trigger="click" class="button">SET</div>
+		<div id="keySet" data-command="v" data-trigger="click" class="button">&#10003;</div>
 	</div>
 	<div class="wrapper">
 		<div id="tamper" data-led="T" class="led red">tmp</div>
