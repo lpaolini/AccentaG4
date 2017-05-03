@@ -64,22 +64,22 @@ serial.on('error', function(err) {
 var broadcast = (function (heartbeatTimeout) {
   var timer;
   function send(message) {
-    reset();
+    stop();
     wss.clients.forEach(function (client) {
       if (client.readyState === WebSocket.OPEN) {
         client.send(message);
       }
     });
+    start();
+  }
+  function stop() {
+    clearTimeout(timer);
   }
   function start() {
     timer = setTimeout(function () {
       console.log('sending heartbeat');
       send();
     }, heartbeatTimeout);
-  }
-  function reset() {
-    clearTimeout(timer);
-    start();
   }
   start();
   return send;
