@@ -39,7 +39,7 @@
 class AccentaG4 {
 	private:
 		SoftwareSerial9 serial;
-		char setPin, abortPin, intPin, paPin;
+		uint8_t setPin, abortPin, intPin, paPin;
 		void (*msgHandler)(char type, char* msg);
 		struct Tx {
 			QueueArray <char> queue;

@@ -13,10 +13,10 @@ AccentaG4::AccentaG4(uint8_t rxPin, uint8_t txPin,
 	this->intPin = intPin;
 	this->paPin = paPin;
 	this->msgHandler = msgHandler;
-	if (setPin) pinMode(setPin, INPUT_PULLUP);
-	if (abortPin) pinMode(abortPin, INPUT_PULLUP);
-	if (intPin) pinMode(intPin, INPUT_PULLUP);
-	if (paPin) pinMode(paPin, INPUT_PULLUP);
+	pinMode(setPin, INPUT_PULLUP);
+	pinMode(abortPin, INPUT_PULLUP);
+	pinMode(intPin, INPUT_PULLUP);
+	pinMode(paPin, INPUT_PULLUP);
 }
 
 void AccentaG4::begin() {
@@ -108,7 +108,7 @@ void AccentaG4::setPanelSignals(int signals) {
 }
 
 void AccentaG4::getPanelSignals() {
-  const char templ[4] = {'S', 'A', 'I', 'P'};
+  	const char templ[4] = {'S', 'A', 'I', 'P'};
 	char value[5];
 	// SET, ABORT, INTRUDER, PANIC
 	for (int i = 0; i < 4; i++) {
