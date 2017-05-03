@@ -61,7 +61,7 @@ void AccentaG4::readPanelSignals() {
 
 void AccentaG4::readBusMessages() {
 	// read keypad messages
-	while (serial.available()) {sendCommands();
+	while (serial.available()) {
 		rx.current = serial.read();
 		if (rx.current & 0x100) { // mark parity -> start of message
 			rx.data[0] = rx.current & 0xff; // drop parity bit
@@ -72,12 +72,12 @@ void AccentaG4::readBusMessages() {
 					if (rx.ptr < 3) {
 						// bytes 1 and 2: data
 						rx.data[rx.ptr++] = rx.current;
-					} else {
+					} else if (rx.ptr == 3) {
 						// byte 3: checksum
 						if (validateChecksum(rx.current)) {
 							setLedStatus(rx);
 						}
-						rx.ptr = 0;
+						rx.ptr++;
 					}
 					break;
 				case L_COMMAND:
@@ -85,12 +85,13 @@ void AccentaG4::readBusMessages() {
 						// byte 1: length
 						// byte 2 to length + 1: data
 						rx.data[rx.ptr++] = rx.current;
-					} else {
+					} else if (rx.ptr == rx.data[1] + 2) {
 						// byte length + 2: checksum
 						if (validateChecksum(rx.current)) {
+							rx.data[rx.ptr] = '\0'; // terminate string
 							setLcdStatus(rx);
 						}
-						rx.ptr = 0;
+						rx.ptr++;
 					}
 					break;
 				default:
@@ -131,7 +132,6 @@ void AccentaG4::getLedStatus() {
 }
 
 void AccentaG4::setLcdStatus(struct Rx rx) {
-	rx.data[rx.ptr] = '\0'; // terminate string
 	strcpy(status.lcd, rx.data + 2);
 	getLcdStatus();
 }
