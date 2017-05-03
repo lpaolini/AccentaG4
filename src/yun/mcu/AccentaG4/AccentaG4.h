@@ -53,7 +53,7 @@ class AccentaG4 {
 		struct Status {
 			int signals;
 			int led;
-			char lcd[50];
+			char lcd[MSG_MAXLEN + 3];
 		} status;
 		boolean validateChecksum(char expectedChecksum);
 		void readBusMessages();
