@@ -12,7 +12,7 @@
 
 #define BUS_SPEED        1200
 
-#define MSG_MAXLEN		 32
+#define MSG_MAXLEN		 50
 
 #define K_DELAY_MS		 100
 #define K_COMMAND        75
@@ -53,7 +53,7 @@ class AccentaG4 {
 		struct Status {
 			int signals;
 			int led;
-			char lcd[MSG_MAXLEN + 3];
+			char lcd[MSG_MAXLEN];
 		} status;
 		boolean validateChecksum(char expectedChecksum);
 		void readBusMessages();
