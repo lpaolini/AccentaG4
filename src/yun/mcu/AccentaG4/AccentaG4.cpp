@@ -149,9 +149,11 @@ void AccentaG4::sendCommands() {
 	// send keypad commands
 	if (tx.queue.count() && millis() - tx.last > K_DELAY_MS) { // throttle tx
 		char key = tx.queue.pop();
+		serial.stopListening();
 		serial.write9(K_COMMAND | 0x100); // K cmd: emulate MARK parity
 		serial.write9(key & 0xff); // key: emulate SPACE parity
 		serial.write9((K_COMMAND + key) & 0xff); // checksum: emulate SPACE parity
+		serial.listen();
 		tx.last = millis();
 	}
 }
