@@ -24,53 +24,56 @@ body {
     background-image: linear-gradient(top, #383838 0%, #1F1F1F 5%, #161616 100%);
     background-image: -webkit-gradient(linear, left top, left bottom, from(#1F1F1F), to(#161616));
     display: inline-block;
-    box-shadow: 0 0 1px 1px rgb(10, 10, 10);
     position: relative;
     text-align: center;
 }
 
+.wrapper .lcd,
+.wrapper .button {
+    box-shadow: 0 0 1px 1px rgb(10, 10, 10);
+}
+
 .lcd {
-    height: 3.5rem;
+    height: 5rem;
     width: 19rem;
-    border-radius: 1em;
+    border-radius: 1rem;
+    padding: 0.5rem;
     color: cyan;
 }
 
 .lcd pre {
     margin: 0;
-    font-size: 1.8rem;
-    opacity: 0.75;
+    font-size: 2.0rem;
+    opacity: 0.6;
 }
 
 .button {
-    height: 2.6rem;
-    width: 6rem;
-    border-radius: 3rem;
+    height: 3rem;
+    border-radius: 1rem;
     color: #a0a0a0;
     font: normal 1.3rem arial;
-    padding-top: 0.6rem;
+    padding-top: 0.8rem;
     transition: color .3s ease;
-    order: 1;
 }
 
 .led {
-    height: 3.6rem;
-    width: 3.6rem;
+    height: 2.4rem;
     border-radius: 1rem;
     color: #818181;
     font: normal 1.4rem arial;
-    padding-top: 1.8rem;
+    padding-top: 0.4rem;
+    padding-left: 1.2rem;
 }
 
 .led:before {
     position: absolute;
     content: '';
-    left: 1.2rem;
-    top: 0.4rem;
+    left: 0.4rem;
+    top: 0.7rem;
     text-align: center;
-    width: 1.2rem;
-    height: 1.2rem;
-    background: #222222;
+    width: 1.0rem;
+    height: 1.0rem;
+    background: #282828;
     background-image: radial-gradient(top, #616161 0%, #616161 20%, #535353 60%);
     border-radius: 50%;
     box-shadow: 0 0 4px #1C1C17;
@@ -135,34 +138,18 @@ body.active {
     }
 
     .button {
-        margin: .5rem .8rem;
+        width: 5rem;
+        margin: .5rem .3rem;
     }
 
     .led {
-        margin: .4rem .8rem;
+        width: 5rem;
+        margin: .5rem .3rem;
     }
 
     .lcd {
         width: 100%;
-        margin: .4rem .8rem;
-    }
-
-    .button[data-command="x"] {
-        order: 2;
-    }
-
-    .button[data-command="0"] {
-        order: 3;
-    }
-
-    .button[data-command="v"] {
-        order: 4;
-    }
-
-    .button[data-command="c"],
-    .button[data-command="o"],
-    .button[data-command="p"] {
-        order: 5;
+        margin: .5rem .3rem;
     }
 }
 
@@ -172,14 +159,36 @@ body.active {
     }
 
     .button {
-        margin: .4rem .6rem;
+        width: 7rem;
+        margin: .4rem .3rem;
     }
 
     .led {
-        margin: .4rem .6rem;
+        width: 4.4rem;
+        margin: .4rem .3rem;
     }
 
     .lcd {
-        margin: .4rem .6rem;
+        margin: .4rem .3rem;
+    }
+
+    .button[data-command="s"] {
+        width: 5rem;
+        order: 2;
+    }
+
+    .button[data-command="c"] {
+        width: 5rem;
+        order: 3;
+    }
+
+    .button[data-command="o"] {
+        width: 5rem;
+        order: 3;
+    }
+
+    .button[data-command="p"] {
+        width: 5rem;
+        order: 3;
     }
 }
