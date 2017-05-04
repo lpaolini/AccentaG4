@@ -45,7 +45,8 @@ void AccentaG4::sendKey(char key) {
       case 'x': tx.queue.push(K_CANCEL); break;
       case 'p': tx.queue.push(K_PROGRAM); break;
       case 'v': tx.queue.push(K_CONFIRM); break;
-      case 's': tx.queue.push(K_SOS); break;
+      case 's': tx.queue.push(K_SELECT); break;
+      case '!': tx.queue.push(K_SOS); break;
       case '?': queryStatus(); break;    
     }
 }

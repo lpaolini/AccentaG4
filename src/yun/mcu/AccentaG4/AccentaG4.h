@@ -31,6 +31,7 @@
 #define K_CANCEL         60
 #define K_PROGRAM        61
 #define K_CONFIRM        62
+#define K_SELECT         63
 #define K_SOS            170
 
 #define L_COMMAND        76
