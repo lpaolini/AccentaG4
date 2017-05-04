@@ -1,72 +1,3 @@
-var lcd = (() => {
-  // https://dawes.wordpress.com/2010/01/05/hd44780-instruction-set/
-  var display;
-  var pos;
-  var cmd = false;
-  function clear () {
-    display = ['                ', '                '];
-    pos = 0;
-  }
-  function write(char) {
-    if (char >= ' ') {
-      var row, col;
-      if (pos < 16) {
-        row = 0;
-        col = pos;
-      } else {
-        row = 1;
-        col = pos - 64;
-      }
-      display[row] = display[row].substr(0, col) + char + display[row].substr(col + 1);
-      pos++;
-    }
-  }
-  function ingest (data) {
-    for (var i = 0; i < data.length; i++) {
-      var char = data.charCodeAt(i);
-      if (cmd) {
-        if (char >= 0x80) { // set position
-          pos = char - 0x80;
-        } else {
-          console.log('unknown command: ', char.toString(16));
-        }
-        cmd = false;
-      } else {
-        switch (data.charCodeAt(i)) {
-          case 0xa: // crlf
-            pos = 64;
-            break;
-          case 0x5: // hide cursor?
-            console.log('hide cursor')
-            break;
-          case 0x6: // show cursor?
-            console.log('show cursor')
-            break;
-          case 0x7: // cursor right
-            pos++;
-            break;
-          case 0xc: // clear
-            clear();
-            break;
-          case 0x4: // command
-            cmd = true;
-            break;
-          default:
-            write(data.charAt(i));
-        }
-      }
-    }
-  }
-  function get (row) {
-    return row !== undefined ? display[row] : display;
-  }
-  clear();
-  return {
-    ingest: ingest,
-    get: get
-  }
-})();
-
 $(() => {
   var ws;
 
@@ -74,7 +5,7 @@ $(() => {
     var timer;
     function start () {
       timer = setTimeout(() => {
-        console.log('connection lost...');
+        console.log('connection lost');
         offline();
       }, timeout);
     }
@@ -83,7 +14,6 @@ $(() => {
       timer = null;
     }
     function ack () {
-      console.log('connection acknowledged');
       stop();
       start();
     }
@@ -93,6 +23,78 @@ $(() => {
       ack: ack
     };
   })(5000);
+
+  var lcd = ((callback) => {
+    // https://dawes.wordpress.com/2010/01/05/hd44780-instruction-set/
+    var display;
+    var pos;
+    var cmd = false;
+    var cursor = false;
+    var cursorTimer;
+    function clear () {
+      display = ['                ', '                '];
+      pos = 0;
+    }
+    function write(char) {
+      if (char >= ' ') {
+        var row, col;
+        if (pos < 16) {
+          row = 0;
+          col = pos;
+        } else {
+          row = 1;
+          col = pos - 64;
+        }
+        display[row] = display[row].substr(0, col) + char + display[row].substr(col + 1);
+        pos++;
+      }
+    }
+    function ingest (data) {
+      for (var i = 0; i < data.length; i++) {
+        var char = data.charCodeAt(i);
+        if (cmd) {
+          if (char >= 0x80) { // set position
+            pos = char - 0x80;
+          } else {
+            console.log('unknown command: ', char.toString(16));
+          }
+          cmd = false;
+        } else {
+          switch (char) {
+            case 0x4: // command
+              cmd = true; break;
+            case 0x5: // hide cursor
+              cursor = false; break;
+            case 0x6: // show cursor
+              cursor = true; break;
+            case 0x7: // cursor right
+              pos++; break;
+            case 0xa: // newline
+              pos = 64; break;
+            case 0xc: // clear
+              clear(); break;
+            default:
+              if (char < 32) {
+                console.log('unknown control char: ', char.toString(16));
+              }
+              write(data.charAt(i));
+          }
+        }
+      }
+      callback(display);
+    }
+    function get (row) {
+      return row !== undefined ? display[row] : display;
+    }
+    clear();
+    return {
+      ingest: ingest,
+      get: get
+    }
+  })(function (display) {
+    $('#lcd0').html(display[0]);
+    $('#lcd1').html(display[1]);
+  });
 
   function isConnected() {
     return ws && ws.readyState === WebSocket.OPEN;
@@ -129,13 +131,13 @@ $(() => {
               } 
               break;
             case 'L':
-              for (var i = 0; i < msg.length; i++) {
-                console.log(msg.charCodeAt(i) >= 32 && msg.charCodeAt(i) <= 127 ? msg.charAt(i) : ' ', msg.charCodeAt(i).toString(16));
-              }
+              // for (var i = 0; i < msg.length; i++) {
+              //   console.log(msg.charCodeAt(i) >= 32 && msg.charCodeAt(i) <= 127 ? msg.charAt(i) : ' ', msg.charCodeAt(i).toString(16));
+              // }
 
               lcd.ingest(msg);
-              $('#lcd0').html(lcd.get(0));
-              $('#lcd1').html(lcd.get(1));
+              // $('#lcd0').html(lcd.get(0));
+              // $('#lcd1').html(lcd.get(1));
 
               break;
             default:
