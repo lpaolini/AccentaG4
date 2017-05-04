@@ -42,12 +42,7 @@ var lcd = (() => {
           case 0x6: // show cursor?
             console.log('show cursor')
             break;
-          case 0x10: // left?
-            console.log('0x10')
-            pos--;
-            break;
-          case 0x16: // right?
-            console.log('0x7')
+          case 0x7: // cursor right
             pos++;
             break;
           case 0xc: // clear
