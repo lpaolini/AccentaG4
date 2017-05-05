@@ -190,7 +190,7 @@ The MPU is responsible for the following tasks:
 - monitor the websockets clients for incoming messages and forward to serial interface
 - send email notifications for critical events
 
-Server-side code is written in Javascript and runs under NodeJS, with the help of the additional modules node-serialport and node-ws.
+Server-side code is written in Javascript and runs under NodeJS, with the help of the additional modules [node-serialport v.1.4.6](https://github.com/EmergingTechnologyAdvisors/node-serialport/tree/v1.4.6) and [node-ws v.0.4.32](https://github.com/websockets/ws/tree/0.4.32).
 Client-side code is a HTML5/CSS3/Javascript application running in the browser.
 
 ## Custom hardware
