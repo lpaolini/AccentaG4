@@ -6,7 +6,7 @@ Accenta G4 is a simple, reliable, affordable intruder alarm panel made by Honeyw
 
 It works very well for residential use but, clearly, it’s not designed for extension. You cannot expand zones, you can’t operate it remotely with your smartphone, it doesn’t expose a standard serial interface to play with.
 
-Recently, I started dreaming of a more sophisticated panel, and after thinking for a while of upgrading it, I decided it was time to hack mine.
+Recently, I started dreaming of a more sophisticated panel, and after thinking of a possible upgrade, I decided to hack mine.
 
 After a bit of googling, I found a blog with a couple of interesting posts ([this](https://inmachinablog.wordpress.com/2015/11/04/accenta-alarm-keypad-protocol/) and [this](https://inmachinablog.wordpress.com/2015/11/03/decoding-the-alarm-keypad-protocol/)) providing useful background on the protocol and signalling used on the keypad bus, along with a description of the messages exchanged between the keypad and the panel.
 
@@ -14,7 +14,7 @@ After a bit of googling, I found a blog with a couple of interesting posts ([thi
 
 The keypads (in [LED](https://www.security.honeywell.com/uk/products/intruder/control-panels/gen4/462382.html) and [LCD](https://www.security.honeywell.com/uk/products/intruder/control-panels/gen4/462383.html) variants) communicate with the panel over a single wire (half-duplex, shared bus) using TTL levels (+5v low, 0v high). A quick analysis with the logic analyzer revealed a slightly unusual protocol: RS-232 with 8 bit of data, *mark/space parity* and 1 stop bit or, if you prefer, *9 bit* of data and 1 stop bit, which is the same. In fact, considering bits are sent LSB first (little-endian), the parity bit is just the 9th bit of data.
 
-Any message sent over the bus has *mark* parity (1) on the first character (the command) and *space* parity (0) on the remaining characters of the message (data and checksum).
+Any message is sent over the bus with mark parity on the first byte and space parity on the remaining bytes.
 
 ## Messaging protocol
 
@@ -30,7 +30,7 @@ Apparently, the keypad sends just one type of command over the bus:
 ```
 K <keycode> <checksum>
 ```
-The “K” character has mark parity.
+The “K” character, being the first byte of the message, has mark parity.
 
 \<keycode\> is the code representing a physical or virtual (key combination) button on the keypad:
 
@@ -67,7 +67,7 @@ Each message is a *full* representation of all the LEDs on the keypad.
 ```
 P <zone info> <general info> <checksum>
 ```
-The “P” character has MARK parity.
+The “P” character, being the first byte of the message, has mark parity.
 
 \<zone info\> is a byte where each bit represents one zone LED:
 
@@ -95,15 +95,14 @@ The “P” character has MARK parity.
 | 6   | not used? |
 | 7   | not used? |
 
-I'm not sure whether the LCD keypad consumes this message or ignores it.
-
 #### Messages for the LCD keypad (L)
 
 Whenever the text displayed on the LCD needs to be updated a new message is sent:
 ```
 L <lenght> <LCD data> <checksum>
 ```
-The “L” character has MARK parity.
+The “L” character, being the first byte of the message, has mark parity.
+
 Lenght information is necessary, as messages are not terminated and the receiver needs to know the message size upfront.
 
 LCD data is a sequence of bytes, either printable (ASCII) or control codes, mostly for managing the cursor:
@@ -126,7 +125,7 @@ Cursor position is determined by the subsequent byte:
 | 0x80 to 0x8f | top row, column 1 to 16 |
 | 0xc0 to 0xcf | bottom row, column 1 to 16 |
 
-I think the LED keypad consumes "L" messages, to set *POWER* and *DAY* (system unset) LEDs .
+I think the LCD keypad consumes "P" messages as well, to set *power* and *day* (system unset) LEDs.
 
 ## To parity or not to parity…
 
@@ -142,7 +141,7 @@ So, it’s perfectly equivalent to forget about parity and simply think of alter
 | L       | 0x4c    | 0x14c      |
 | P       | 0x50    | 0x150      |
 
-No matter how you look at it, having the 9th bit set exclusively for the head of the message is quite convenient, as it makes the receiving routine simpler and more robust.
+No matter how you look at it, having the 9th bit set exclusively for the head of the message is quite convenient, as it makes the code at the receiving end simpler and more robust.
 
 ## Hardware signals
 
@@ -158,22 +157,21 @@ Signals are held at +13v and fall to 0v when active.
 
 ## The project
 
-The idea is to build a keypad emulator running in a standard browser.
+The objective is to build a keypad emulator running in a standard browser.
 
 ### Arduino Yún
 
-The circuit is based around [Arduino](https://www.arduino.cc/), a well-known opensource platform providing all the features needed for this project: it's powerful, it's easy to program, it can handle multiple serial ports (with some limitations), it’s very well documented and community support is great.
+The circuit is based on [Arduino](https://www.arduino.cc/), a well-known opensource platform providing all the features needed for this project: it's powerful, it's easy to program, it can handle multiple serial ports (with some limitations), it’s very well documented and community support is great.
 
-The variant of Arduino I have chosen is [Arduino Yún](https://www.arduino.cc/en/Main/ArduinoBoardYun), which combines an Arduino Leonardo (MCU) with a small linux box running [OpenWRT](https://openwrt.org/) (MPU), intercommunicating via a serial port (Serial1 on MCU, /dev/ttyATH0 on MPU).
+The variant of Arduino chosen for this project is [Arduino Yún](https://www.arduino.cc/en/Main/ArduinoBoardYun), which combines an ATmega32u4 MCU (same as Arduino Leonardo) with an Atheros AR9331 MPU running [OpenWRT](https://openwrt.org/) (MPU), communicating via a serial port (*Serial1* on MCU, */dev/ttyATH0* on MPU).
 
 ### MCU (Arduino)
 
 The MCU is responsible for the following tasks:
 
-- monitor panel hardware signals (PA, INT, SET, ABORT) and update the current status accordingly
+- monitor panel hardware signals (PA, INT, SET, ABORT) and transmit updates over the serial interface
+- monitor the keypad bus for incoming messages and transmit updates over the serial interface
 - monitor the serial interface for "virtual keypresses" and transmit emulated keypad messages over the keypad bus
-- monitor the keypad bus for incoming messages and update the current status accordingly
-- monitor status changes and transmit updates over the serial interface using a convenient internal protocol
 
 Arduino code is written in C/C++ and it's built around the [SoftwareSerial9](https://github.com/edreanernst/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library used for enqueuing outgoing commands.
 
