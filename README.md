@@ -177,7 +177,7 @@ The MCU is responsible for the following tasks:
 
 Arduino code is written in C/C++ and it's built around the [SoftwareSerial9](https://github.com/edreanernst/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library used for enqueuing outgoing commands.
 
-Warning: the [original version by addible](https://github.com/addibble/SoftwareSerial9) contains a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst) in the forked version I’m using.
+**WARNING**: the [original version by addible](https://github.com/addibble/SoftwareSerial9) contains a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst) in the forked version used in this project.
 
 ### MPU (OpenWRT)
 
