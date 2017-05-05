@@ -200,7 +200,7 @@ The circuit is designed to keep the opto-isolator LEDs off during standby, to ma
 - R5 sets the base saturation current for T2
 - R6 sets the base saturation current for T1
 
-## Serial interface
+## 9-bit serial communication
 
 Arduino code is built around the [SoftwareSerial9](https://github.com/edreanernst/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library.
 
@@ -208,5 +208,5 @@ The bundle also includes an example of Arduino sketch for interconnecting Arduin
 
 Warning: the [original version by addible](https://github.com/addibble/SoftwareSerial9) contains a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst) in the forked version I’m using.
 
-TBC
+TO BE CONTINUED
 
