@@ -158,20 +158,43 @@ Signals are held at +13v and fall to 0v when active.
 
 ## The project
 
-The idea is to build a keypad emulator exposing a standard serial interface to a linux machine.
+The idea is to build a keypad emulator running in a standard browser.
 
-In particular, it should accomplish the following tasks:
+### Arduino Yún
 
-- monitor panel hardware signals (FIRE, PA, INT, SET, ABORT) and update the current status accordingly
+The circuit is based around [Arduino](https://www.arduino.cc/), a well-known opensource platform providing all the features needed for this project: it's powerful, it's easy to program, it can handle multiple serial ports (with some limitations), it’s very well documented and community support is great.
+
+The variant of Arduino I have chosen is [Arduino Yún](https://www.arduino.cc/en/Main/ArduinoBoardYun), which combines an Arduino Leonardo (MCU) with a small linux box running [OpenWRT](https://openwrt.org/) (MPU), intercommunicating via a serial port (Serial1 on MCU, /dev/ttyATH0 on MPU).
+
+### MCU (Arduino)
+
+The MCU is responsible for the following tasks:
+
+- monitor panel hardware signals (PA, INT, SET, ABORT) and update the current status accordingly
 - monitor the serial interface for "virtual keypresses" and transmit emulated keypad messages over the keypad bus
 - monitor the keypad bus for incoming messages and update the current status accordingly
-- monitor status changes and transmit updates over the serial interface in a convenient format
+- monitor status changes and transmit updates over the serial interface using a convenient internal protocol
 
-The circuit I'm proposing is based around [Arduino](https://www.arduino.cc/), a well-known opensource platform providing all the features needed for this project: it's powerful, it's easy to program, it can handle multiple serial ports (with some limitations), it’s very well documented and community support is great.
+Arduino code is written in C/C++ and it's built around the [SoftwareSerial9](https://github.com/edreanernst/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library used for enqueuing outgoing commands.
 
-The variant of Arduino I have chosen is [Arduino Yún](https://www.arduino.cc/en/Main/ArduinoBoardYun), which combines an Arduino Leonardo with a small linux box running [OpenWRT](https://openwrt.org/).
+**WARNING**: the [original version by addible](https://github.com/addibble/SoftwareSerial9) contains a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst) in the forked version used in this project.
 
-## Wiring
+### MPU (OpenWRT)
+
+The MPU is responsible for the following tasks:
+
+- expose a HTTP server for serving the web application
+- expose a websockets server (used by the web application)
+- accept and keep track of websockets connections
+- monitor the serial interface for incoming messages from the panel and forward to connected websockets clients
+- monitor the websockets clients for incoming messages and forward to serial interface
+- send email notifications for critical events
+
+Server-side code is written in Javascript and runs under NodeJS (v.0.10.33), with the help of the additional modules [node-serialport (v.1.4.6)](https://github.com/EmergingTechnologyAdvisors/node-serialport/tree/v1.4.6) and [node-ws (v.0.4.32)](https://github.com/websockets/ws/tree/0.4.32).
+
+Client-side code is a HTML5/CSS3/Javascript application running in the browser.
+
+## Custom hardware
 
 Interfacing the panel with Arduino is pretty simple.
 
@@ -200,13 +223,5 @@ The circuit is designed to keep the opto-isolator LEDs off during standby, to ma
 - R5 sets the base saturation current for T2
 - R6 sets the base saturation current for T1
 
-## 9-bit serial communication
-
-Arduino code is built around the [SoftwareSerial9](https://github.com/edreanernst/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library.
-
-The bundle also includes an example of Arduino sketch for interconnecting Arduino's hardware serial interface to the keypad bus.
-
-Warning: the [original version by addible](https://github.com/addibble/SoftwareSerial9) contains a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst) in the forked version I’m using.
-
-TO BE CONTINUED
+TO BE CONTINUED...
 
