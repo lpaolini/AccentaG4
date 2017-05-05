@@ -35,7 +35,7 @@ $(() => {
       display = ['                ', '                '];
       pos = 0;
     }
-    function write (display, char) {
+    function write (char) {
       if (char >= ' ') {
         var row, col;
         if (pos < 16) {
@@ -57,7 +57,7 @@ $(() => {
       var cursorChar = '_';
       if (cursor) {
         timer = setInterval(function () {
-          cursorChar = write(display, cursorChar);
+          cursorChar = write(cursorChar);
           callback(display);
         }, 400);
       }
@@ -100,7 +100,7 @@ $(() => {
               if (char < 32) {
                 console.log('unknown control char: ', char.toString(16));
               }
-              write(display, data.charAt(i));
+              write(data.charAt(i));
               advance();
           }
         }
