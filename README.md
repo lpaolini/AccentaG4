@@ -153,7 +153,8 @@ Keypad bus aside, the panel board exposes also a few output signals representing
 - INT (intruder)
 - SET (alarm set)
 - ABORT (alarm aborted)
-- Signals are held at +13v and fall to 0v when active.
+
+Signals are held at +13v and fall to 0v when active.
 
 ## The project
 
