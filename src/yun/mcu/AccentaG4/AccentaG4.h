@@ -12,9 +12,9 @@
 
 #define BUS_SPEED        1200
 
-#define MSG_MAXLEN		 50
+#define MSG_MAXLEN       50
 
-#define K_DELAY_MS		 100
+#define K_DELAY_MS       100
 #define K_COMMAND        75
 #define K_0              48
 #define K_1              49
@@ -36,6 +36,9 @@
 
 #define L_COMMAND        76
 #define P_COMMAND        80
+
+#define PANEL_SIGNALS    "SAIP"
+#define LED_STATUS       "12345678UTSP"
 
 class AccentaG4 {
 	private:

@@ -64,9 +64,6 @@ void AccentaG4::readBusMessages() {
 	// read keypad messages
 	while (serial.available()) {
 		rx.current = serial.read();
-		// Serial.write(rx.current);
-		// Serial.print(" : ");
-		// Serial.println(rx.current, HEX);
 		if (rx.current & 0x100) { // mark parity -> start of message
 			rx.data[0] = rx.current & 0xff; // drop parity bit
 			rx.ptr = 1;
@@ -114,7 +111,7 @@ void AccentaG4::setPanelSignals(int signals) {
 
 void AccentaG4::getPanelSignals() {
 	// SET, ABORT, INTRUDER, PANIC
-	char value[] = "SAIP";
+	char value[] = PANEL_SIGNALS;
 	for (int i = 0; i < 4; i++) {
 		bitRead(status.signals, i) || (value[i] = '.');
 	}
@@ -128,7 +125,7 @@ void AccentaG4::setLedStatus(struct Rx rx) {
 
 void AccentaG4::getLedStatus() {
 	// ZONE 1-8, UNSET, TAMPER, SOS, POWER
-	char value[] = "12345678UTSP";
+	char value[] = LED_STATUS;
 	for (int i = 0; i < 12; i++) {
 		bitRead(status.led, i) || (value[i] = '.');
 	}
