@@ -34,6 +34,11 @@ $(() => {
     function reset () {
       display = ['                ', '                '];
       pos = 0;
+      stop();
+      show();
+    }
+    function show () {
+      callback(display);
     }
     function write (char) {
       if (char >= ' ') {
@@ -69,7 +74,7 @@ $(() => {
     }
     function refresh () {
       stop();
-      callback(display);
+      show();
       start();
     }
     function ingest (data) {
@@ -109,7 +114,8 @@ $(() => {
     }
     reset();
     return {
-      ingest: ingest
+      ingest: ingest,
+      reset: reset
     }
   })(function (display) {
     $('#lcd0').html(display[0]);
@@ -177,6 +183,7 @@ $(() => {
 
   function offline() {
     $('.led').removeClass('active');
+    lcd.reset();
   }
 
   // connect/disconnect based on page visibility
