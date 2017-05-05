@@ -30,12 +30,12 @@ $(() => {
     var pos;
     var cmd = false;
     var cursor = false;
-    var cursorTimer;
-    function clear () {
+    var timer;
+    function reset () {
       display = ['                ', '                '];
       pos = 0;
     }
-    function write(char) {
+    function write (display, char) {
       if (char >= ' ') {
         var row, col;
         if (pos < 16) {
@@ -45,9 +45,32 @@ $(() => {
           row = 1;
           col = pos - 64;
         }
+        var previousChar = display[row].substr(col, 1);
         display[row] = display[row].substr(0, col) + char + display[row].substr(col + 1);
-        pos++;
+        return previousChar;
       }
+    }
+    function advance () {
+      pos++;
+    }
+    function start () {
+      var cursorChar = '_';
+      if (cursor) {
+        timer = setInterval(function () {
+          cursorChar = write(display, cursorChar);
+          callback(display);
+        }, 400);
+      }
+    }
+    function stop () {
+      if (timer) {
+        clearInterval(timer);
+      }
+    }
+    function refresh () {
+      stop();
+      callback(display);
+      start();
     }
     function ingest (data) {
       for (var i = 0; i < data.length; i++) {
@@ -72,24 +95,21 @@ $(() => {
             case 0xa: // newline
               pos = 64; break;
             case 0xc: // clear
-              clear(); break;
+              reset(); break;
             default:
               if (char < 32) {
                 console.log('unknown control char: ', char.toString(16));
               }
-              write(data.charAt(i));
+              write(display, data.charAt(i));
+              advance();
           }
         }
       }
-      callback(display);
+      refresh();
     }
-    function get (row) {
-      return row !== undefined ? display[row] : display;
-    }
-    clear();
+    reset();
     return {
-      ingest: ingest,
-      get: get
+      ingest: ingest
     }
   })(function (display) {
     $('#lcd0').html(display[0]);
