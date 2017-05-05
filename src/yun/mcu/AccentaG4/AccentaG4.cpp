@@ -135,7 +135,6 @@ void AccentaG4::getLedStatus() {
 void AccentaG4::setLcdStatus(struct Rx rx) {
 	// strcpy(status.lcd, rx.data + 2);
 	strncpy(status.lcd, rx.data + 2, rx.ptr - 1);
-
 	getLcdStatus();
 }
 
