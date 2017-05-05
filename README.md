@@ -130,16 +130,18 @@ I think the LED keypad consumes "L" messages, to set *POWER* and *DAY* (system u
 
 ## To parity or not to parity…
 
-As said, 8-bit with mark/space parity and 9-bit without parity are exactly the same thing.
+As said, in little-endian, 8-bit with parity and 9-bit without parity are equivalent.
 
-In particular, 8-bit with mark parity is equivalent to 9-bit without parity when the 8-bit character is *OR*ed with 0x100 (256d, 100000000b).
+In particular, 8-bit with mark parity is equivalent to 9-bit without parity when the 8-bit character is *OR*ed with 0x100.
 
 So, it’s perfectly equivalent to forget about parity and simply think of alternate codes for the head of the message, with the 9th (or parity) bit set to 1:
-```
-"K" 0x4b --> 0x14b
-"L" 0x4c --> 0x14c
-"P" 0x50 --> 0x150
-```
+
+| command | keycode | 9-bit code |
+| :-----: | :-----: | :--------: |
+| K       | 0x4b    | 0x14b      |
+| L       | 0x4c    | 0x14c      |
+| P       | 0x50    | 0x150      |
+
 No matter how you look at it, having the 9th bit set exclusively for the head of the message is quite convenient, as it makes the receiving routine simpler and more robust.
 
 ## Hardware signals
