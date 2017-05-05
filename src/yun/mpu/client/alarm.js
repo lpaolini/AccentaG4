@@ -131,14 +131,7 @@ $(() => {
               } 
               break;
             case 'L':
-              // for (var i = 0; i < msg.length; i++) {
-              //   console.log(msg.charCodeAt(i) >= 32 && msg.charCodeAt(i) <= 127 ? msg.charAt(i) : ' ', msg.charCodeAt(i).toString(16));
-              // }
-
               lcd.ingest(msg);
-              // $('#lcd0').html(lcd.get(0));
-              // $('#lcd1').html(lcd.get(1));
-
               break;
             default:
               break;
