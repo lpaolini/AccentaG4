@@ -175,8 +175,9 @@ The MCU is responsible for the following tasks:
 - monitor panel hardware signals (PA, INT, SET, ABORT) and transmit updates over the serial interface
 - monitor the keypad bus for incoming messages and transmit updates over the serial interface
 - monitor the serial interface for "virtual keypresses" and transmit emulated keypad messages over the keypad bus
+- generate an heartbeat to be propagated to the clients to prove end-to-end connection is alive
 
-Arduino code is written in C/C++ and it's built around the [SoftwareSerial9](https://github.com/edreanernst/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library used for enqueuing outgoing commands.
+[Arduino code](src/yun/mcu/AccentaG4) is written in C/C++ and it's built around the [SoftwareSerial9](https://github.com/edreanernst/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library used for enqueuing outgoing commands.
 
 **WARNING**: the [original version by addible](https://github.com/addibble/SoftwareSerial9) contains a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst) in the forked version used in this project.
 
@@ -191,9 +192,9 @@ The MPU is responsible for the following tasks:
 - monitor the websockets clients for incoming messages and forward to serial interface
 - send email notifications for critical events
 
-Server-side code is written in Javascript and runs under NodeJS (v.0.10.33), with the help of the additional modules [node-serialport (v.1.4.6)](https://github.com/EmergingTechnologyAdvisors/node-serialport/tree/v1.4.6) and [node-ws (v.0.4.32)](https://github.com/websockets/ws/tree/0.4.32).
+[Server-side code](src/yun/mpu/server) is written in Javascript and runs under NodeJS (v.0.10.33), with the help of the additional modules [node-serialport (v.1.4.6)](https://github.com/EmergingTechnologyAdvisors/node-serialport/tree/v1.4.6) and [node-ws (v.0.4.32)](https://github.com/websockets/ws/tree/0.4.32).
 
-Client-side code is a HTML5/CSS3/Javascript application running in the browser.
+[Client-side code](src/yun/mpu/client) is a HTML5/CSS3/Javascript application running in the browser.
 
 ### Custom hardware
 
