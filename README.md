@@ -73,23 +73,23 @@ The “P” character, being the first byte of the message, has mark parity.
 
 | bit | LED |
 | :-: | --- |
-| 0   | Zone 1 |
-| 1   | Zone 2 |
-| 2   | Zone 3 |
-| 3   | Zone 4 |
-| 4   | Zone 5 |
-| 5   | Zone 6 |
-| 6   | Zone 7 |
-| 7   | Zone 8 |
+| 0   | zone 1 |
+| 1   | zone 2 |
+| 2   | zone 3 |
+| 3   | zone 4 |
+| 4   | zone 5 |
+| 5   | zone 6 |
+| 6   | zone 7 |
+| 7   | zone 8 |
 
 \<general info\> is a byte encoded like follows:
 
 | bit | LED |
 | :-: | --- |
-| 0   | Unset |
-| 1   | Tamper |
+| 0   | system unset |
+| 1   | tamper |
 | 2   | SOS |
-| 3   | Power |
+| 3   | power |
 | 4   | not used? |
 | 5   | not used? |
 | 6   | not used? |
@@ -103,7 +103,7 @@ L <lenght> <LCD data> <checksum>
 ```
 The “L” character, being the first byte of the message, has mark parity.
 
-Lenght information is necessary, as messages are not terminated and the receiver needs to know the message size upfront.
+Lenght information is necessary, as messages are not terminated and size is not fixed, thus the receiver needs to know the message size upfront.
 
 LCD data is a sequence of bytes, either printable (ASCII) or control codes, mostly for managing the cursor:
 
@@ -125,7 +125,7 @@ Cursor position is determined by the subsequent byte:
 | 0x80 to 0x8f | top row, column 1 to 16 |
 | 0xc0 to 0xcf | bottom row, column 1 to 16 |
 
-I think the LCD keypad consumes "P" messages as well, to set *power* and *day* (system unset) LEDs.
+I believe the LCD keypad consumes "P" messages as well, as information regarding the status of the *power* and *day* LEDs doesn't seem to be show up anywhere in "L" messages.
 
 ## To parity or not to parity…
 
@@ -141,7 +141,7 @@ So, it’s perfectly equivalent to forget about parity and simply think of alter
 | L       | 0x4c    | 0x14c      |
 | P       | 0x50    | 0x150      |
 
-No matter how you look at it, having the 9th bit set exclusively for the head of the message is quite convenient, as it makes the code at the receiving end simpler and more robust.
+No matter how you look at it, having the 9th bit set exclusively for the head of the message is quite convenient, as it makes the code at the receiving end simpler and more robust. In fact it's possible to detect the head of the message without any ambiguity.
 
 ## Hardware signals
 
@@ -154,10 +154,13 @@ Keypad bus aside, the panel board exposes also a few output signals representing
 - ABORT (alarm aborted)
 
 Signals are held at +13v and fall to 0v when active.
+They are absolutely crucial for this project as some critical alert conditions (like *intruder* or *PA*) are not reflected in LED or LCD status.
 
 ## The project
 
-The objective is to build a keypad emulator running in a standard browser.
+The objective of this project is to build a keypad emulator running in a standard browser.
+
+## Hardware
 
 ### Arduino Yún
 
@@ -165,7 +168,7 @@ The circuit is based on [Arduino](https://www.arduino.cc/), a well-known opensou
 
 The variant of Arduino chosen for this project is [Arduino Yún](https://www.arduino.cc/en/Main/ArduinoBoardYun), which combines an ATmega32u4 MCU (same as Arduino Leonardo) with an Atheros AR9331 MPU running [OpenWRT](https://openwrt.org/) (MPU), communicating via a serial port (*Serial1* on MCU, */dev/ttyATH0* on MPU).
 
-### MCU (Arduino)
+#### MCU (Arduino)
 
 The MCU is responsible for the following tasks:
 
@@ -177,7 +180,7 @@ Arduino code is written in C/C++ and it's built around the [SoftwareSerial9](htt
 
 **WARNING**: the [original version by addible](https://github.com/addibble/SoftwareSerial9) contains a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst) in the forked version used in this project.
 
-### MPU (OpenWRT)
+#### MPU (OpenWRT)
 
 The MPU is responsible for the following tasks:
 
@@ -192,7 +195,7 @@ Server-side code is written in Javascript and runs under NodeJS (v.0.10.33), wit
 
 Client-side code is a HTML5/CSS3/Javascript application running in the browser.
 
-## Custom hardware
+### Custom hardware
 
 Interfacing the panel with Arduino is pretty simple.
 
