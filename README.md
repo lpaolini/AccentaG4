@@ -200,9 +200,9 @@ The MCU is responsible for the following tasks:
 - listen to MPU for status queries and reply local status
 - generate heartbeat messages to be propagated to the clients, to prove end-to-end connection is alive
 
-[Arduino code](src/yun/mcu/AccentaG4) is written in C/C++ and it's built around the [SoftwareSerial9](https://github.com/edreanernst/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library used for enqueuing and throttling outgoing commands.
+[Arduino code](src/yun/mcu/AccentaG4) is written in C/C++ and it's built around the [SoftwareSerial9](https://github.com/lpaolini/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library used for enqueuing and throttling outgoing commands.
 
-**WARNING**: the [original version by addible](https://github.com/addibble/SoftwareSerial9) has a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst) in the forked version used in this project.
+**WARNING**: the original version of SoftwareSerial9 by [addible](https://github.com/addibble/SoftwareSerial9) has a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst/SoftwareSerial9). The version used in this project is a fork of the latter.
 
 ### MPU (OpenWRT)
 
