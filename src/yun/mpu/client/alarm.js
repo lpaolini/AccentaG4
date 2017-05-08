@@ -89,18 +89,26 @@ $(() => {
           cmd = false;
         } else {
           switch (char) {
-            case 0x4: // command
+            case 0x03: // unknown
+              break;
+            case 0x04: // command
               cmd = true; break;
-            case 0x5: // hide cursor
+            case 0x05: // hide cursor
               cursor = false; break;
-            case 0x6: // show cursor
+            case 0x06: // show cursor
               cursor = true; break;
-            case 0x7: // cursor right
+            case 0x07: // cursor right
               pos++; break;
-            case 0xa: // newline
+            case 0x0a: // newline
               pos = 64; break;
-            case 0xc: // clear
+            case 0x0c: // clear
               reset(); break;
+            case 0x0d: // unknown
+              break;
+            case 0x10: // unknown
+              break;
+            case 0x16: // unknown
+              break;
             default:
               if (char < 32) {
                 console.log('unknown control char: ', char.toString(16));
@@ -168,6 +176,7 @@ $(() => {
       };
       ws.onclose = () => {
         console.log('connection closed');
+        offline();
       }
     }
   }
