@@ -37,7 +37,7 @@
 #define L_COMMAND        76
 #define P_COMMAND        80
 
-#define HEARTBEAT_MS     3000
+#define HEARTBEAT_MS     2000
 
 #define PANEL_SIGNALS    "SAIP"
 #define LED_STATUS       "12345678UTSP"

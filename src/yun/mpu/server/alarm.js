@@ -83,7 +83,7 @@ var broadcast = (function (heartbeatTimeout) {
   }
   start();
   return send;
-})(5000);
+})(3000);
 
 serial.on('data', function (data) {
   console.log('panel: %s', data);

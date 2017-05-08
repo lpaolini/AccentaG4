@@ -169,6 +169,11 @@ $(() => {
               break;
             case 'H':
               console.log('heartbeat:', msg);
+              if (msg == 'S') {
+                // receiving sub heartbeat: connection is alive but is MCU not working
+                offline(); // handle properly
+              }
+              break;
             default:
               break;
           }
