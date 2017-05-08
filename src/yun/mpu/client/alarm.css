@@ -1,3 +1,11 @@
+@keyframes blinker {
+    100% { opacity: 0; }
+}
+
+@keyframes alarm {
+    50% { background-color: #a00000; }
+}
+
 *,
 *:before,
 *:after {
@@ -13,6 +21,10 @@ body {
     flex-direction: column;
     justify-content: center;
 }
+
+body.active {
+    animation: alarm 3s ease infinite;
+}    
 
 .wrapper {
     display: flex;
@@ -39,6 +51,26 @@ body {
     border-radius: 1rem;
     padding: 0.5rem;
     color: cyan;
+}
+
+.lcd:before {
+    position: absolute;
+    content: '';
+    left: 0.5rem;
+    top: 0.5rem;
+    text-align: center;
+    width: 0.8rem;
+    height: 0.8rem;
+    background: #282828;
+    background-image: radial-gradient(top, #616161 0%, #616161 20%, #535353 60%);
+    border-radius: 50%;
+    box-shadow: 0 0 4px #1C1C17;
+    transition: all .1s ease;
+}
+
+.lcd.heartbeat:before {
+    background: #FF2F2F;
+    box-shadow: 0 0 4px #1C1C17, 0 0 5px #FF4242;
 }
 
 .lcd pre {
@@ -80,10 +112,6 @@ body {
     transition: all .1s ease;
 }
 
-@keyframes blinker {  
-  100% { opacity: 0; }
-}
-
 .led.blink.active:before {
     animation: blinker .4s ease-in-out infinite;
 }
@@ -92,14 +120,6 @@ body {
     background: #FF2F2F;
     box-shadow: 0 0 4px #1C1C17, 0 0 5px #FF4242;
 }
-
-@keyframes alarm {
-    50% { background-color: #a00000; }
-}
-
-body.active {
-    animation: alarm 3s ease infinite;
-}    
 
 .led.yellow.active:before {
     background: #FFFF2F;

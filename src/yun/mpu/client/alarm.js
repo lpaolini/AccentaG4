@@ -143,11 +143,12 @@ $(() => {
       ws.onopen = () => {
         console.log('connection established');
         monitor.start();
-        ws.send('?');
+        ws.send('?'); // request current status
       };
       ws.onmessage = (evt) => {
         monitor.ack();
         if (evt.data) {
+          $('.lcd').removeClass('heartbeat');
           var type = evt.data.charAt(0);
           var msg = evt.data.substring(2);
           switch (type) {
@@ -167,16 +168,11 @@ $(() => {
             case 'L':
               lcd.ingest(msg);
               break;
-            case 'H':
-              console.log('heartbeat:', msg);
-              if (msg == 'S') {
-                // receiving sub heartbeat: connection is alive but is MCU not working
-                offline(); // handle properly
-              }
-              break;
             default:
               break;
           }
+        } else {
+          $('.lcd').addClass('heartbeat');
         }
       };
       ws.onclose = () => {
@@ -199,6 +195,7 @@ $(() => {
 
   function offline() {
     $('.led').removeClass('active');
+    $('.lcd').removeClass('heartbeat');
     lcd.reset();
   }
 

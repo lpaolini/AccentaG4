@@ -149,7 +149,7 @@ void AccentaG4::sendMessage(char type, char* msg) {
 
 void AccentaG4::sendHeartbeat() {
 	if (millis() - lastMessage > HEARTBEAT_MS) {
-		sendMessage('H', "M\0"); // heartbeat main
+		sendMessage('H', '\0');
 	}
 }
 

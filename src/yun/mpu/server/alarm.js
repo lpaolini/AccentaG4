@@ -78,7 +78,7 @@ var broadcast = (function (heartbeatTimeout) {
   function start() {
     timer = setTimeout(function () {
       console.log('sending heartbeat');
-      send('H:S'); // heartbeat:sub
+      send();
     }, heartbeatTimeout);
   }
   start();
