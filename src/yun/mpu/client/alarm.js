@@ -159,6 +159,8 @@ $(() => {
             case 'L':
               lcd.ingest(msg);
               break;
+            case 'H':
+              console.log('heartbeat');
             default:
               break;
           }

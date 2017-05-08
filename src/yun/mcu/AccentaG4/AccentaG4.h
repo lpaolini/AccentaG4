@@ -37,6 +37,8 @@
 #define L_COMMAND        76
 #define P_COMMAND        80
 
+#define HEARTBEAT_MS     3000
+
 #define PANEL_SIGNALS    "SAIP"
 #define LED_STATUS       "12345678UTSP"
 
@@ -59,9 +61,12 @@ class AccentaG4 {
 			int led;
 			char lcd[MSG_MAXLEN];
 		} status;
+		unsigned long lastMessage;
 		boolean validateChecksum(char expectedChecksum);
 		void readBusMessages();
 		void readPanelSignals();
+		void sendMessage(char type, char* msg);
+		void sendHeartbeat();
 		void sendCommands();
 		void setPanelSignals(int signals);
 		void getPanelSignals();

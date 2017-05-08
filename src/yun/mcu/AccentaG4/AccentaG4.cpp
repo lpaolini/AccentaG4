@@ -115,7 +115,7 @@ void AccentaG4::getPanelSignals() {
 	for (int i = 0; i < 4; i++) {
 		bitRead(status.signals, i) || (value[i] = '.');
 	}
-	msgHandler('S', value);
+	sendMessage('S', value);
 }
 
 void AccentaG4::setLedStatus(struct Rx rx) {
@@ -129,7 +129,7 @@ void AccentaG4::getLedStatus() {
 	for (int i = 0; i < 12; i++) {
 		bitRead(status.led, i) || (value[i] = '.');
 	}
-	msgHandler('P', value);
+	sendMessage('P', value);
 }
 
 void AccentaG4::setLcdStatus(struct Rx rx) {
@@ -139,8 +139,20 @@ void AccentaG4::setLcdStatus(struct Rx rx) {
 }
 
 void AccentaG4::getLcdStatus() {
-	msgHandler('L', status.lcd);
+	sendMessage('L', status.lcd);
 }
+
+void AccentaG4::sendMessage(char type, char* msg) {
+	msgHandler(type, msg);
+	lastMessage = millis();
+}
+
+void AccentaG4::sendHeartbeat() {
+	if (millis() - lastMessage > HEARTBEAT_MS) {
+		sendMessage('H', '\0');
+	}
+}
+
 
 void AccentaG4::sendCommands() {
 	// send keypad commands
@@ -173,4 +185,5 @@ void AccentaG4::loop() {
 	readPanelSignals();
 	readBusMessages();
 	sendCommands();
+	sendHeartbeat();
 }
