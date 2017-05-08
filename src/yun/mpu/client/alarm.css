@@ -172,22 +172,22 @@ body.active {
         margin: .4rem .3rem;
     }
 
-    .button[data-command="s"] {
+    #keySelect {
         width: 5rem;
         order: 2;
     }
 
-    .button[data-command="c"] {
+    #keyChime {
         width: 5rem;
         order: 3;
     }
 
-    .button[data-command="o"] {
+    #keyOmit {
         width: 5rem;
         order: 3;
     }
 
-    .button[data-command="p"] {
+    #keyProgram {
         width: 5rem;
         order: 3;
     }

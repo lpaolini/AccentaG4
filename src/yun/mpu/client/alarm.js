@@ -207,16 +207,16 @@ $(() => {
     show: connect,
     hide: disconnect
   });
-  
+
   // bind click commands
-  $('[data-command][data-trigger="click"]').click((e) => {
-    ws.send($(e.target).data('command'));
+  $('[data-click]').click((e) => {
+    ws.send($(e.target).data('click'));
   });
 
   // bind dbl-click commands
-  $('[data-command][data-trigger="dblclick"]').dblclick((e) => {
-    ws.send($(e.target).data('command'));
+  $('[data-dblclick]').dblclick((e) => {
+    ws.send($(e.target).data('dblclick'));
   });
-  
+
   connect();
 });
