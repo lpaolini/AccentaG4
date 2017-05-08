@@ -89,8 +89,8 @@ $(() => {
           cmd = false;
         } else {
           switch (char) {
-            case 0x03: // unknown
-              break;
+            // case 0x03: // unknown
+            //   break;
             case 0x04: // command
               cmd = true; break;
             case 0x05: // hide cursor
@@ -103,12 +103,12 @@ $(() => {
               pos = 64; break;
             case 0x0c: // clear
               reset(); break;
-            case 0x0d: // unknown
-              break;
-            case 0x10: // unknown
-              break;
-            case 0x16: // unknown
-              break;
+            // case 0x0d: // unknown
+            //   break;
+            // case 0x10: // unknown
+            //   break;
+            // case 0x16: // unknown
+            //   break;
             default:
               if (char < 32) {
                 console.log('unknown control char: ', char.toString(16));
