@@ -2,7 +2,7 @@
 Virtual keypad for Honeywell Security Accenta G4 panel.
 
 ## Introduction
-Accenta G4 is a simple, reliable, affordable intruder alarm panel made by Honeywell Security.
+[Accenta G4](https://www.security.honeywell.com/uk/products/intruder/control-panels/gen4/) is a simple, reliable, affordable intruder alarm panel made by *Honeywell Security*.
 
 It works very well for residential use but, clearly, it’s not designed for extension. You cannot expand zones, you can’t operate it remotely with your smartphone, it doesn’t expose a standard serial interface to play with.
 
