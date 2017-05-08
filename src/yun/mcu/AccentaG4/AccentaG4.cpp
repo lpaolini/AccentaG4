@@ -153,7 +153,6 @@ void AccentaG4::sendHeartbeat() {
 	}
 }
 
-
 void AccentaG4::sendCommands() {
 	// send keypad commands
 	if (tx.queue.count() && millis() - tx.last > K_DELAY_MS) { // throttle tx

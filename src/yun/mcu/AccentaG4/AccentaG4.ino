@@ -8,11 +8,11 @@
 #define SIG_INT_PIN      4
 #define SIG_PA_PIN       5
 
-#define READY_PIN 7
-#define STATUS_LED 13
+#define READY_PIN        7
+#define STATUS_LED       13
 
-#define LINK_SPEED      115200
-#define CONSOLE_SPEED   115200
+#define LINK_SPEED       115200
+#define CONSOLE_SPEED    115200
 
 void handleMsg(char type, char* msg) {
   // forward panel to Yun bridge
