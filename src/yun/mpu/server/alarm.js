@@ -78,12 +78,12 @@ var broadcast = (function (heartbeatTimeout) {
   function start() {
     timer = setTimeout(function () {
       console.log('sending heartbeat');
-      send();
+      send('H:S'); // heartbeat:sub
     }, heartbeatTimeout);
   }
   start();
   return send;
-})(2000);
+})(5000);
 
 serial.on('data', function (data) {
   console.log('panel: %s', data);
