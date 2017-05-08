@@ -159,44 +159,67 @@ They are absolutely crucial for this project as some critical alert conditions (
 ## The project
 
 The objective of this project is to build a keypad emulator running in a standard browser.
+For the hardware/software platform I've explored a few different options:
 
-## Hardware
+1. [GLI GL-AR150 PoE](https://www.gl-inet.com/ar150/)
+   - Pros:
+     - Runs OpenWRT
+     - Has GPIO ports
+     - PoE version availble
+   - Cons:
+     - PoE version has not enough GPIO ports for handling all signals
+     - Neither node-serialport or node-ws available as native packages in the OpenWRT repository
+     
+2. [Raspberry PI](https://www.raspberrypi.org/)
+   - Pros:
+     - Runs Debian
+   - Cons:
+     - node-serialport module not available as native package in the Debian repository
+     
+3. [Arduino Yún](https://www.arduino.cc/en/Main/ArduinoBoardYun)
+   - Pros:
+     - Runs OpenWRT
+     - Both node-serialport and node-ws available as native packages in the OpenWRT repository
+     - PoE version availble
+   - Cons:
+     - Expensive 
 
-### Arduino Yún
+After some thinking, I went for Arduino Yún.
 
-The circuit is based on [Arduino](https://www.arduino.cc/), a well-known opensource platform providing all the features needed for this project: it's powerful, it's easy to program, it can handle multiple serial ports (with some limitations), it’s very well documented and community support is great.
+## Arduino Yún
 
-The variant of Arduino chosen for this project is [Arduino Yún](https://www.arduino.cc/en/Main/ArduinoBoardYun), which combines an ATmega32u4 MCU (same as Arduino Leonardo) with an Atheros AR9331 MPU running [OpenWRT](https://openwrt.org/) (MPU), communicating via a serial port (*Serial1* on MCU, */dev/ttyATH0* on MPU).
+The variant of [Arduino](https://www.arduino.cc/) chosen for this project is [Arduino Yún](https://www.arduino.cc/en/Main/ArduinoBoardYun), combining an ATmega32u4 MCU (same as Arduino Leonardo) with an Atheros AR9331 MPU, internally connected via serial port (*Serial1* on MCU, */dev/ttyATH0* on MPU).
 
-#### MCU (Arduino)
+### MCU (Arduino)
 
 The MCU is responsible for the following tasks:
 
-- monitor panel hardware signals (PA, INT, SET, ABORT) and transmit updates over the serial interface
-- monitor the keypad bus for incoming messages and transmit updates over the serial interface
-- monitor the serial interface for "virtual keypresses" and transmit emulated keypad messages over the keypad bus
-- generate an heartbeat to be propagated to the clients to prove end-to-end connection is alive
+- monitor panel hardware signals (PA, INT, SET, ABORT), transmit updates to MPU and update local status
+- listen to the keypad bus for incoming messages, transmit updates to MPU and update local status
+- listen to MPU for virtual keystrokes, transmit emulated keypad messages over the keypad bus
+- listen to MPU for status queries and reply local status
+- generate heartbeat messages to be propagated to the clients, to prove end-to-end connection is alive
 
-[Arduino code](src/yun/mcu/AccentaG4) is written in C/C++ and it's built around the [SoftwareSerial9](https://github.com/edreanernst/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library used for enqueuing outgoing commands.
+[Arduino code](src/yun/mcu/AccentaG4) is written in C/C++ and it's built around the [SoftwareSerial9](https://github.com/edreanernst/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library used for enqueuing and throttling outgoing commands.
 
-**WARNING**: the [original version by addible](https://github.com/addibble/SoftwareSerial9) contains a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst) in the forked version used in this project.
+**WARNING**: the [original version by addible](https://github.com/addibble/SoftwareSerial9) has a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst) in the forked version used in this project.
 
-#### MPU (OpenWRT)
+### MPU (OpenWRT)
 
 The MPU is responsible for the following tasks:
 
 - expose a HTTP server for serving the web application
 - expose a websockets server (used by the web application)
-- accept and keep track of websockets connections
-- monitor the serial interface for incoming messages from the panel and forward to connected websockets clients
-- monitor the websockets clients for incoming messages and forward to serial interface
+- accept and manage websockets connections
+- listen to MCU for incoming messages and forward to websockets clients
+- listen to websockets clients for incoming messages and forward to MCU
 - send email notifications for critical events
 
 [Server-side code](src/yun/mpu/server) is written in Javascript and runs under NodeJS (v.0.10.33), with the help of the additional modules [node-serialport (v.1.4.6)](https://github.com/EmergingTechnologyAdvisors/node-serialport/tree/v1.4.6) and [node-ws (v.0.4.32)](https://github.com/websockets/ws/tree/0.4.32).
 
 [Client-side code](src/yun/mpu/client) is a HTML5/CSS3/Javascript application running in the browser.
 
-### Custom hardware
+## Custom hardware
 
 Interfacing the panel with Arduino is pretty simple.
 
@@ -208,22 +231,26 @@ An additional resistor and a zener diode can help limiting voltage and current a
 
 ![improved keypad bus interface](images/improved-keypad-bus-interface.png "Improved keypad bus interface")
 
-Panel signals (SET, ABORT, INT, PA, FIRE) can either source or sink current. If Arduino's input is configured as INPUT_PULLUP, a diode is enough to pull the input down to LOW logical level when the corresponding panel output is active (LOW).
+Panel signals (SET, ABORT, INT, PA) can either source or sink current. If Arduino's input is configured as INPUT_PULLUP, a diode is enough to pull the input down to LOW logical level when the corresponding panel output is active (LOW).
 
 ![minimal panel signals interface](images/minimal-panel-signals-interface.png "Minimal panel signals interface")
 
-However, the keypad bus is quite exposed and might be tampered with or be subject to interferences potentially harmful to Arduino. For this reasons, an opto-isolated design it's a much safer choice as it provides full electrical isolation between Arduino and the panel itself.
+However, the keypad bus might be tampered with or be subject to interferences potentially harmful to Arduino. For this reasons, an opto-isolated design it's a safer choice as it provides full electrical isolation between Arduino and the panel itself. Also it doesn't require to share Arduino's and panel's ground at the same potential, which is always a good thing.
 
 ![enhanced keypad bus interface](images/enhanced-interface.png "Enhanced (opto-isolated) keypad bus and panel signals interface")
 
-The circuit is designed to keep the opto-isolator LEDs off during standby, to maximize their life expectancy. Here is a short description of the resistors:
+The circuit is designed to keep the opto-isolator LEDs off during standby, to maximize their life expectancy. 
+Here is a short description of the resistors:
 
-- R1 sets the current for the transmitting opto-isolator LED
-- R2 limits the current into the opto-isolator transistor
-- R3 sets the stand-by value of the receiver to logical zero (pull-up)
-- R4 sets the current for the receiving opto-isolator LED
-- R5 sets the base saturation current for T2
-- R6 sets the base saturation current for T1
+|Resistor|Description|
+|:------:|-----------|
+|R1      |set the current for the transmitting opto-isolator LED|
+|R2      |limit the current into the opto-isolator transistor|
+|R3      |set the stand-by value of the receiver to logical zero (pull-up)|
+|R4      |set the current for the receiving opto-isolator LED|
+|R5      |set the saturation current for T2|
+|R6      |set the saturation current for T1|
+
 
 TO BE CONTINUED...
 
