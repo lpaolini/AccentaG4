@@ -14,7 +14,7 @@
 
 body {
     margin: auto;
-    background: #303030;
+    background: #404040;
     user-select: none;
     display: flex;
     flex-wrap: wrap;
@@ -41,8 +41,10 @@ body.active {
 }
 
 .wrapper .lcd,
+.wrapper .led,
 .wrapper .button {
-    box-shadow: 0 0 1px 1px rgb(10, 10, 10);
+    box-shadow: 0 0 1px 1px #606060;
+    /*box-shadow: 0 0 1px 1px rgb(10, 10, 10);*/
 }
 
 .lcd {
@@ -79,21 +81,22 @@ body.active {
     opacity: 0.6;
 }
 
-.button {
-    height: 3rem;
+.button,
+.led {
     border-radius: 1rem;
     color: #a0a0a0;
     font: normal 1.3rem arial;
+}
+
+.button {
+    height: 3rem;
     padding-top: 0.8rem;
     transition: color .3s ease;
 }
 
 .led {
     height: 2.4rem;
-    border-radius: 1rem;
-    color: #818181;
-    font: normal 1.4rem arial;
-    padding-top: 0.4rem;
+    padding-top: 0.45rem;
     padding-left: 1.2rem;
 }
 
