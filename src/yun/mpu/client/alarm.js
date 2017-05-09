@@ -1,13 +1,10 @@
 $(() => {
   var ws;
 
-  var monitor = ((timeout) => {
+  var monitor = ((timeout, callback) => {
     var timer;
     function start () {
-      timer = setTimeout(() => {
-        console.log('connection lost');
-        offline();
-      }, timeout);
+      timer = setTimeout(callback, timeout);
     }
     function stop () {
       clearTimeout(timer);
@@ -22,7 +19,11 @@ $(() => {
       stop: stop,
       ack: ack
     };
-  })(5000);
+  })(5000, () => {
+    console.log('connection lost');
+    offline();
+    connect();
+  });
 
   var lcd = ((callback) => {
     // https://dawes.wordpress.com/2010/01/05/hd44780-instruction-set/
@@ -140,45 +141,60 @@ $(() => {
     } else {
       ws = new WebSocket("ws://10.118.5.5:8080");
       console.log('establishing connection');
+      var timer = setTimeout(() => {
+        console.log('connection timeout, aborting');
+        ws.close();
+        connect();
+      }, 3000);
       ws.onopen = () => {
+        clearTimeout(timer);
         console.log('connection established');
         monitor.start();
         ws.send('?'); // request current status
       };
+      ws.onerror = (err) => {
+        clearTimeout(timer);
+        console.log('connection error', err);
+      };
       ws.onmessage = (evt) => {
         monitor.ack();
-        if (evt.data) {
-          $('.lcd').removeClass('heartbeat');
-          var type = evt.data.charAt(0);
-          var msg = evt.data.substring(2);
-          switch (type) {
-            case 'S':
-              $('body').toggleClass('active', msg.indexOf('I') !== -1 || msg.indexOf('P') !== -1);
-              for (var i = 0; i < 4; i++) {
-                var signal = 'SAIP'.charAt(i);
-                $('[data-signal~="' + signal + '"]').toggleClass('active', msg.indexOf(signal) !== -1);
-              }
-              break;
-            case 'P':
-              for (var i = 0; i < 12; i++) {
-                var led = '12345678UTSP'.charAt(i);
-                $('[data-led*="' + led + '"]').toggleClass('active', msg.indexOf(led) !== -1);
-              } 
-              break;
-            case 'L':
-              lcd.ingest(msg);
-              break;
-            default:
-              break;
-          }
-        } else {
-          $('.lcd').addClass('heartbeat');
-        }
+        handleMessage(evt.data);
       };
       ws.onclose = () => {
+        clearTimeout(timer);
         console.log('connection closed');
         offline();
       }
+    }
+  }
+
+  function handleMessage(msg) {
+    if (msg) {
+      $('.lcd').removeClass('heartbeat');
+      var type = msg.charAt(0);
+      var data = msg.substring(2);
+      switch (type) {
+        case 'S':
+          $('body').toggleClass('active', data.indexOf('I') !== -1 || data.indexOf('P') !== -1);
+          for (var i = 0; i < 4; i++) {
+            var signal = 'SAIP'.charAt(i);
+            $('[data-signal~="' + signal + '"]').toggleClass('active', data.indexOf(signal) !== -1);
+          }
+          break;
+        case 'P':
+          for (var i = 0; i < 12; i++) {
+            var led = '12345678UTSP'.charAt(i);
+            $('[data-led*="' + led + '"]').toggleClass('active', data.indexOf(led) !== -1);
+          } 
+          break;
+        case 'L':
+          lcd.ingest(data);
+          break;
+        default:
+          break;
+      }
+    } else {
+      $('.lcd').addClass('heartbeat');
     }
   }
 
