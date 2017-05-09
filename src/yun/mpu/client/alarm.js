@@ -121,7 +121,7 @@ var Lcd = (callback) => {
   }
 };
 
-var Connection = (handlers) => {
+var Connection = (url, handlers) => {
   var ws;
   var monitor = Monitor(5000, () => {
     console.log('connection lost');
@@ -135,7 +135,7 @@ var Connection = (handlers) => {
     if (isConnected()) {
       console.log('already connected');
     } else {
-      ws = new WebSocket("ws://10.118.5.5:8080");
+      ws = new WebSocket(url);
       console.log('establishing connection');
       var timer = setTimeout(() => {
         console.log('connection timeout, aborting');
@@ -189,7 +189,7 @@ $(() => {
     $('#lcd1').html(rows[1]);
   });
 
-  var connection = Connection({
+  var connection = Connection('ws://10.118.5.5:8080', {
     onMessage: (msg) => {
       if (msg) {
         $('.lcd').removeClass('heartbeat');
@@ -226,12 +226,6 @@ $(() => {
     }
   });
 
-  // connect/disconnect based on page visibility
-  $(document).on({
-    show: connection.start,
-    hide: connection.stop
-  });
-
   // bind click commands
   $('[data-click]').click((e) => {
     connection.send($(e.target).data('click'));
@@ -240,6 +234,12 @@ $(() => {
   // bind dbl-click commands
   $('[data-dblclick]').dblclick((e) => {
     connection.send($(e.target).data('dblclick'));
+  });
+
+  // connect/disconnect based on page visibility
+  $(document).on({
+    show: connection.start,
+    hide: connection.stop
   });
 
   connection.start();
