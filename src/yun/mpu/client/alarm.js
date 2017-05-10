@@ -125,11 +125,19 @@ var Connection = (url, handlers) => {
   var ws;
   var monitor = Monitor(5000, () => {
     console.log('connection lost');
-    handleOffline()
+    handlers.onOffline();
     start();
   });
+  var timer;
   function isConnected() {
     return ws && ws.readyState === WebSocket.OPEN;
+  }
+  function retry() {
+    timer = setTimeout(() => {
+      console.log('connection failed, retrying...');
+      ws.close();
+      start();
+    }, 3000);
   }
   function start() {
     if (isConnected()) {
@@ -137,11 +145,7 @@ var Connection = (url, handlers) => {
     } else {
       ws = new WebSocket(url);
       console.log('establishing connection');
-      var timer = setTimeout(() => {
-        console.log('connection timeout, aborting');
-        ws.close();
-        start();
-      }, 3000);
+      retry();
       ws.onopen = () => {
         clearTimeout(timer);
         console.log('connection established');
@@ -151,13 +155,14 @@ var Connection = (url, handlers) => {
       ws.onerror = (err) => {
         clearTimeout(timer);
         console.log('connection error', err);
+        retry();
       };
       ws.onmessage = (evt) => {
         monitor.ack();
         handlers.onMessage(evt.data);
       };
       ws.onclose = () => {
-        clearTimeout(timer);
+        // clearTimeout(timer);
         console.log('connection closed');
         handlers.onOffline();
       }
