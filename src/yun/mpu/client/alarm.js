@@ -1,20 +1,21 @@
 var Monitor = (timeout, callback) => {
   var timer;
   function start () {
+    stop();
     timer = setTimeout(callback, timeout);
   }
   function stop () {
     clearTimeout(timer);
     timer = null;
   }
-  function ack () {
+  function restart () {
     stop();
     start();
   }
   return {
     start: start,
     stop: stop,
-    ack: ack
+    restart: restart
   };
 };
 
@@ -123,55 +124,50 @@ var Lcd = (callback) => {
 
 var Connection = (url, handlers) => {
   var ws;
-  var monitor = Monitor(5000, () => {
+  var autoRetry = Monitor(3000, () => {
+    console.log('connection timeout');
+    ws.close();
+    start();
+  });
+  var keepAlive = Monitor(5000, () => {
     console.log('connection lost');
     handlers.onOffline();
     start();
   });
-  var timer;
   function isConnected() {
     return ws && ws.readyState === WebSocket.OPEN;
-  }
-  function retry() {
-    timer = setTimeout(() => {
-      console.log('connection failed, retrying...');
-      ws.close();
-      start();
-    }, 3000);
   }
   function start() {
     if (isConnected()) {
       console.log('already connected');
     } else {
-      ws = new WebSocket(url);
       console.log('establishing connection');
-      retry();
+      ws = new WebSocket(url);
+      autoRetry.start();
       ws.onopen = () => {
-        clearTimeout(timer);
         console.log('connection established');
-        monitor.start();
+        autoRetry.stop();
+        keepAlive.start();
         send('?'); // request current status
       };
       ws.onerror = (err) => {
-        clearTimeout(timer);
         console.log('connection error', err);
-        retry();
-      };
-      ws.onmessage = (evt) => {
-        monitor.ack();
-        handlers.onMessage(evt.data);
+        autoRetry.restart();
       };
       ws.onclose = () => {
-        // clearTimeout(timer);
         console.log('connection closed');
         handlers.onOffline();
       }
+      ws.onmessage = (evt) => {
+        keepAlive.restart();
+        handlers.onMessage(evt.data);
+      };
     }
   }
   function stop() {
     if (isConnected()) {
       console.log('closing connection');
-      monitor.stop();
+      keepAlive.stop();
       ws.close();
       handlers.onOffline();
     } else {
