@@ -4,12 +4,8 @@ const WebSocket = require('ws');
 const Status = require('./status');
 const Notify = require('./notify');
 
-var notify = new Notify();
-
-// var notify = new Notify({
-// 	from: 'from@email.provider.com',
-// 	to: 'to@email.provider.com'
-// });
+var config = require('./config');
+var notify = Notify(config.notify);
 
 notify('Alarm controller started');
 
@@ -24,16 +20,22 @@ var status = new Status({
   abort: function (on) {
     if (on) {
       notify('Alarm aborted');
+    } else {
+      notify('Alarm reset');
     }
   },
   intruder: function (on) {
     if (on) {
-      notify('Alarm activated: INTRUDER');
+      notify('Alarm activated: INTRUDER [!]');
+    } else {
+      notify('Alarm deactivated: INTRUDER');
     }
   },
   pa: function (on) {
     if (on) {
-      notify('Alarm activated: PANIC');
+      notify('Alarm activated: PANIC [!]');
+    } else {
+      notify('Alarm deactivated: PANIC');
     }
   }
 });
@@ -87,12 +89,12 @@ var broadcast = (function (heartbeatTimeout) {
 
 serial.on('data', function (data) {
   console.log('panel: %s', data);
-  if (/$S:/.test(data)) {
+  if (data.substr(0, 2) === 'S:') {
     var signals = data.substring(2);
-    status.update('set', data.charAt(0) === 'S');
-    status.update('abort', data.charAt(1) === 'A');
-    status.update('intruder', data.charAt(2) === 'I');
-    status.update('pa', data.charAt(3) === 'P');
+    status.update('set', signals.charAt(0) === 'S');
+    status.update('abort', signals.charAt(1) === 'A');
+    status.update('intruder', signals.charAt(2) === 'I');
+    status.update('pa', signals.charAt(3) === 'P');
   }
   broadcast(data);
 });
