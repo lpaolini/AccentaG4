@@ -14,7 +14,7 @@
 
 body {
     margin: auto;
-    background: #404040;
+    background: #383838;
     user-select: none;
     display: flex;
     flex-wrap: wrap;
@@ -43,8 +43,7 @@ body.active {
 .wrapper .lcd,
 .wrapper .led,
 .wrapper .button {
-    box-shadow: 0 0 1px 1px #606060;
-    /*box-shadow: 0 0 1px 1px rgb(10, 10, 10);*/
+    box-shadow: 0 0 1px 1px #505050;
 }
 
 .lcd {
