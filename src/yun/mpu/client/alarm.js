@@ -1,12 +1,15 @@
 var Monitor = (timeout, callback) => {
   var timer;
   function start () {
-    stop();
-    timer = setTimeout(callback, timeout);
+    if (!timer) {
+      timer = setTimeout(callback, timeout);
+    }
   }
   function stop () {
-    clearTimeout(timer);
-    timer = null;
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
   }
   function restart () {
     stop();
