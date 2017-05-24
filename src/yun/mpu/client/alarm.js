@@ -1,4 +1,4 @@
-var Monitor = (timeout, callback) => {
+var Timer = (callback, timeout) => {
   var timer;
   function start () {
     if (!timer) {
@@ -127,16 +127,16 @@ var Lcd = (callback) => {
 
 var Connection = (url, handlers) => {
   var ws;
-  var autoRetry = Monitor(3000, () => {
+  var autoRetry = Timer(() => {
     console.log('connection timeout');
     ws.close();
     start();
-  });
-  var keepAlive = Monitor(5000, () => {
+  }, 3000);
+  var keepAlive = Timer(() => {
     console.log('connection lost');
     handlers.onOffline();
     start();
-  });
+  }, 5000);
   function isConnected() {
     return ws && ws.readyState === WebSocket.OPEN;
   }
