@@ -1,3 +1,6 @@
+const fs = require('fs');
+const https = require('https');
+
 const SerialPort = require('serialport');
 const WebSocket = require('ws');
 
@@ -46,10 +49,23 @@ const serial = new SerialPort.SerialPort('/dev/ttyATH0', {
   parser: SerialPort.parsers.readline('\r\n', 'binary')
 });
 
+const server = https.createServer({
+  key: fs.readFileSync('./key.pem'),
+  cert: fs.readFileSync('./cert.pem')
+}, function (req, res) {
+  res.writeHead(200);
+  res.end('WebSocket');
+}).listen(8443);
+
 // initialize websocket
 const wss = new WebSocket.Server({
-  port: 8080
+  server: server
 });
+
+// initialize websocket
+// const wss = new WebSocket.Server({
+//   port: 8080
+// });
 
 serial.on('open', function(err) {
   if (err) {
