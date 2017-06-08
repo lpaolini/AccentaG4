@@ -58,9 +58,14 @@ const server = https.createServer({
   res.end('WebSocket');
 }).listen(8443);
 
-// initialize websocket
-const wss = new WebSocket.Server({
+// initialize SSL websocket
+const wssSSL = new WebSocket.Server({
   server: server
+});
+
+// initialize standard websocket
+const wss = new WebSocket.Server({
+  port: 8080
 });
 
 serial.on('open', function(err) {
@@ -79,6 +84,11 @@ var broadcast = (function (heartbeatTimeout) {
   var timer;
   function send(message) {
     stop();
+    wssSSL.clients.forEach(function (client) {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
+    });
     wss.clients.forEach(function (client) {
       if (client.readyState === WebSocket.OPEN) {
         client.send(message);
@@ -109,6 +119,14 @@ serial.on('data', function (data) {
     status.update('pa', signals.charAt(3) === 'P');
   }
   broadcast(data);
+});
+
+wssSSL.on('connection', function (ws) {
+  ws.on('message', function (message) {
+    serial.write(message, function () {
+      console.log('SSL client: %s', message);
+    });
+  });
 });
 
 wss.on('connection', function (ws) {

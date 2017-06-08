@@ -193,7 +193,11 @@ $(() => {
     $('#lcd1').html(rows[1]);
   });
 
-  var connection = Connection('wss://' + location.host + ':8443', {
+  var url = location.protocol === 'https:' ? 
+    'wss://' + location.host + ':8443' : 
+    'ws://' + location.host + ':8080'
+
+  var connection = Connection(url, {
     onMessage: (msg) => {
       if (msg) {
         $('.lcd').removeClass('heartbeat');
