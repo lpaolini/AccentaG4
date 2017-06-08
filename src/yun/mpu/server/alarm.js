@@ -49,6 +49,7 @@ const serial = new SerialPort.SerialPort('/dev/ttyATH0', {
   parser: SerialPort.parsers.readline('\r\n', 'binary')
 });
 
+// initialize SSL server
 const server = https.createServer({
   key: fs.readFileSync(__dirname + '/key.pem'),
   cert: fs.readFileSync(__dirname + '/cert.pem')
@@ -61,11 +62,6 @@ const server = https.createServer({
 const wss = new WebSocket.Server({
   server: server
 });
-
-// initialize websocket
-// const wss = new WebSocket.Server({
-//   port: 8080
-// });
 
 serial.on('open', function(err) {
   if (err) {
