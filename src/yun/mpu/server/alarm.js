@@ -44,41 +44,43 @@ var status = new Status({
 });
 
 // initialize serial port
-const serial = new SerialPort.SerialPort('/dev/ttyATH0', {
-  baudRate: 115200,
-  parser: SerialPort.parsers.readline('\r\n', 'binary')
-});
+const serial = (function () {
+  const serial = new SerialPort.SerialPort('/dev/ttyATH0', {
+    baudRate: 115200,
+    parser: SerialPort.parsers.readline('\r\n', 'binary')
+  });
+  // handle opening
+  serial.on('open', function(err) {
+    if (err) {
+      return console.log('Error opening port: ', err.message);
+    }
+    console.log('Serial port opened');
+  });
+  // handle errors
+  serial.on('error', function(err) {
+    console.log('Error: ', err.message);
+  });
+  return serial;
+})();
 
-// initialize SSL server
-const httpsServer = https.createServer({
-  key: fs.readFileSync(__dirname + '/key.pem'),
-  cert: fs.readFileSync(__dirname + '/cert.pem')
-}, function (req, res) {
-  res.writeHead(200);
-  res.end('WebSocket');
-}).listen(8443);
-
-// initialize websocket server
-const wss = {
-  secure: new WebSocket.Server({
-    server: httpsServer
-  }),
-  nonSecure: new WebSocket.Server({
-    port: 8080
-  })
-};
-
-serial.on('open', function(err) {
-  if (err) {
-    return console.log('Error opening port: ', err.message);
-  }
-  console.log('port opened');
-});
-
-// open errors will be emitted as an error event
-serial.on('error', function(err) {
-  console.log('Error: ', err.message);
-});
+// initialize dual (secure/non-secure) websocket servers
+const wss = (function () {
+  const httpsServer = https.createServer({
+    key: fs.readFileSync(__dirname + '/key.pem'),
+    cert: fs.readFileSync(__dirname + '/cert.pem')
+  }, function (req, res) {
+    res.writeHead(200);
+    res.end('WebSocket');
+  }).listen(8443);
+  return {
+    secure: new WebSocket.Server({
+      server: httpsServer
+    }),
+    nonSecure: new WebSocket.Server({
+      port: 8080
+    })
+  };
+})();
 
 var broadcast = (function (heartbeatTimeout) {
   var timer;
@@ -109,6 +111,7 @@ var broadcast = (function (heartbeatTimeout) {
   return send;
 })(3000);
 
+// react to serial messages
 serial.on('data', function (data) {
   console.log('panel: %s', data);
   if (data.substr(0, 2) === 'S:') {
@@ -121,18 +124,20 @@ serial.on('data', function (data) {
   broadcast(data);
 });
 
+// react to secure websockets messages
 wss.secure.on('connection', function (ws) {
   ws.on('message', function (message) {
     serial.write(message, function () {
-      console.log('secure client: %s', message);
+      console.log('secure websockets client: %s', message);
     });
   });
 });
 
+// react to non-secure websockets messages
 wss.nonSecure.on('connection', function (ws) {
   ws.on('message', function (message) {
     serial.write(message, function () {
-      console.log('non-secure client: %s', message);
+      console.log('non-secure websockets client: %s', message);
     });
   });
 });
