@@ -196,7 +196,7 @@ $(() => {
   var connection = Connection('ws://' + location.host + ':8080', {
     onMessage: (msg) => {
       if (msg) {
-        $('.lcd').removeClass('heartbeat');
+        $('.lcd').removeClass('lost');
         var type = msg.charAt(0);
         var data = msg.substring(2);
         switch (type) {
@@ -216,16 +216,22 @@ $(() => {
           case 'L':
             lcd.ingest(data);
             break;
+          case 'H':
+            if (parseInt(data, 10) > 120) {
+              $('.lcd').addClass('stale');
+            } else {
+              $('.lcd').removeClass('stale');
+            }
           default:
             break;
         }
       } else {
-        $('.lcd').addClass('heartbeat');
+        $('.lcd').addClass('lost');
       }
     },
     onOffline: () => {
       $('.led').removeClass('active');
-      $('.lcd').removeClass('heartbeat');
+      $('.lcd').removeClass('stale lost');
       lcd.reset();
     }
   });
