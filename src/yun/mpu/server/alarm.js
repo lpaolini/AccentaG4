@@ -66,8 +66,8 @@ const serial = (function () {
 // initialize dual (secure/non-secure) websocket servers
 const wss = (function () {
   const httpsServer = https.createServer({
-    key: fs.readFileSync(__dirname + '/key.pem'),
-    cert: fs.readFileSync(__dirname + '/cert.pem')
+    key: fs.readFileSync(config.ssl.key || __dirname + '/key.pem'),
+    cert: fs.readFileSync(config.ssl.cert || __dirname + '/cert.pem')
   }, function (req, res) {
     res.writeHead(200);
     res.end('WebSocket');
