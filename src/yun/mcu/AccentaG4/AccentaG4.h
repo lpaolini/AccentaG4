@@ -60,14 +60,18 @@ class AccentaG4 {
 			int signals;
 			int led;
 			char lcd[MSG_MAXLEN];
+			unsigned long timestamp;
 		} status;
 		unsigned long lastMessage;
+		char age[7];
+
 		boolean validateChecksum(char expectedChecksum);
 		void readBusMessages();
 		void readPanelSignals();
 		void sendMessage(char type, char* msg);
 		void sendHeartbeat();
 		void sendCommands();
+		void setTimestamp();
 		void setPanelSignals(int signals);
 		void getPanelSignals();
 		void setLedStatus(struct Rx rx);

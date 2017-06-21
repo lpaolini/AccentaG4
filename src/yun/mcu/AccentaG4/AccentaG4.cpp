@@ -102,9 +102,15 @@ void AccentaG4::readBusMessages() {
 	}
 }
 
+void AccentaG4::setTimestamp() {
+	status.timestamp = millis();
+	// sprintf(status.timestamp, "%lu\0", millis());
+}
+
 void AccentaG4::setPanelSignals(int signals) {
 	if (signals != status.signals) {
 		status.signals = signals;
+		setTimestamp();
 		getPanelSignals();
 	}
 }
@@ -120,6 +126,7 @@ void AccentaG4::getPanelSignals() {
 
 void AccentaG4::setLedStatus(struct Rx rx) {
 	status.led = rx.data[2] << 8 | rx.data[1];
+	setTimestamp();
 	getLedStatus();
 }
 
@@ -135,6 +142,7 @@ void AccentaG4::getLedStatus() {
 void AccentaG4::setLcdStatus(struct Rx rx) {
 	// strcpy(status.lcd, rx.data + 2);
 	strncpy(status.lcd, rx.data + 2, rx.ptr - 1);
+	setTimestamp();
 	getLcdStatus();
 }
 
@@ -149,7 +157,9 @@ void AccentaG4::sendMessage(char type, char* msg) {
 
 void AccentaG4::sendHeartbeat() {
 	if (millis() - lastMessage > HEARTBEAT_MS) {
-		sendMessage('H', '\0');
+		// sendMessage('H', '\0');
+		sprintf(age, "%lu\0", (millis() - status.timestamp) / 1000);
+		sendMessage('H', age);
 	}
 }
 
