@@ -7,7 +7,16 @@ const WebSocket = require('ws');
 const Status = require('./status');
 const Notify = require('./notify');
 
-var config = require('./config');
+// var config = require('./config');
+var config = {};
+
+if (process.argv.length > 2) {
+  config = require(process.argv[2]);
+} else {
+  console.log('Configuration file not provided');
+  process.exit(1);
+}
+
 var notify = Notify(config.notify);
 
 notify('Alarm controller started');
