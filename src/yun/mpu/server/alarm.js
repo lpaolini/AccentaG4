@@ -7,7 +7,6 @@ const WebSocket = require('ws');
 const Status = require('./status');
 const Notify = require('./notify');
 
-// var config = require('./config');
 var config = {};
 
 if (process.argv.length > 2) {
