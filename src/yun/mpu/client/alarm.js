@@ -194,8 +194,8 @@ $(() => {
   });
 
   var url = location.protocol === 'https:' ? 
-    'wss://' + location.host + ':8443' : 
-    'ws://' + location.host + ':8080'
+    'wss://' + location.hostname + ':8443' : 
+    'ws://' + location.hostname + ':8080'
 
   var connection = Connection(url, {
     onMessage: (msg) => {
