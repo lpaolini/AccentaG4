@@ -40,10 +40,15 @@ body.active {
     text-align: center;
 }
 
-.wrapper .lcd,
-.wrapper .led,
-.wrapper .button {
+.lcd,
+.led,
+.button {
     box-shadow: 0 0 1px 1px #505050;
+}
+
+[data-click],
+[data-dblclick] {
+    cursor: pointer;
 }
 
 .lcd {
