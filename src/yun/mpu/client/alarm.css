@@ -95,12 +95,12 @@ body.active {
     border-radius: 1rem;
     color: #a0a0a0;
     font: normal 1.3rem arial;
+    /*transition: color .1s ease;*/
 }
 
 .button {
     height: 3rem;
     padding-top: 0.8rem;
-    transition: color .3s ease;
 }
 
 .led {
@@ -148,12 +148,15 @@ body.active {
     box-shadow: 0 0 4px #1C1C17, 0 0 5px #4242FF;
 }
 
-[data-command] {
-    cursor: pointer;
+[data-click]:active,
+[data-dblclick]:active {
+    box-shadow:  0 0 1px 2px red;
+    color: red;
 }
 
-[data-command]:active {
-    box-shadow: 0 0 1px 1px rgb(10, 10, 10), inset 0 2px 2px 0px black;
+[data-click]:not(:active),
+[data-dblclick]:not(:active) {
+    transition: all 120ms step-end;
 }
 
 #keySet {
