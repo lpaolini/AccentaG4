@@ -49,6 +49,18 @@ body.active {
 [data-click],
 [data-dblclick] {
     cursor: pointer;
+    -webkit-tap-highlight-color:  rgba(255, 255, 255, 0);
+}
+
+[data-click]:active,
+[data-dblclick]:active {
+    box-shadow:  0 0 1px 2px red;
+    color: red;
+}
+
+[data-click]:not(:active),
+[data-dblclick]:not(:active) {
+    transition: all 120ms step-end;
 }
 
 .lcd {
@@ -146,17 +158,6 @@ body.active {
 .led.blue.active:before {
     background: #4F8FFF;
     box-shadow: 0 0 4px #1C1C17, 0 0 5px #4242FF;
-}
-
-[data-click]:active,
-[data-dblclick]:active {
-    box-shadow:  0 0 1px 2px red;
-    color: red;
-}
-
-[data-click]:not(:active),
-[data-dblclick]:not(:active) {
-    transition: all 120ms step-end;
 }
 
 #keySet {
