@@ -21,33 +21,20 @@ var notify = Notify(config.notify);
 notify('Alarm controller started');
 
 var status = new Status({
+  link: function (on) {
+    notify(on ? 'Link up' : 'Link down [!]');
+  },
   set: function (on) {
-    if (on) {
-      notify('Alarm set');
-    } else {
-      notify('Alarm unset');
-    }
+    notify(on ? 'Alarm set' : 'Alarm unset');
   },
   abort: function (on) {
-    if (on) {
-      notify('Alarm aborted');
-    } else {
-      notify('Alarm reset');
-    }
+    notify(on ? 'Alarm aborted' : 'Alarm reset')
   },
   intruder: function (on) {
-    if (on) {
-      notify('Alarm activated: INTRUDER [!]');
-    } else {
-      notify('Alarm deactivated: INTRUDER');
-    }
+    notify(on ? 'Alarm activated: INTRUDER [!]' : 'Alarm deactivated: INTRUDER');
   },
   pa: function (on) {
-    if (on) {
-      notify('Alarm activated: PANIC [!]');
-    } else {
-      notify('Alarm deactivated: PANIC');
-    }
+    notify(on ? 'Alarm activated: PANIC [!]' : 'Alarm deactivated: PANIC');
   }
 });
 
@@ -121,13 +108,19 @@ var broadcast = (function (heartbeatTimeout) {
 
 // react to serial messages
 serial.on('data', function (data) {
-  console.log('panel: %s', data);
-  if (data.substr(0, 2) === 'S:') {
-    var signals = data.substring(2);
-    status.update('set', signals.charAt(0) === 'S');
-    status.update('abort', signals.charAt(1) === 'A');
-    status.update('intruder', signals.charAt(2) === 'I');
-    status.update('pa', signals.charAt(3) === 'P');
+  switch (data.substr(0, 2)) {
+    case 'H:':
+      var staleness = parseInt(data.substring(2), 10);
+      status.update('link', staleness < 120);
+      break;
+    case 'S:':
+      var signals = data.substring(2);
+      status.update('set', signals.charAt(0) === 'S');
+      status.update('abort', signals.charAt(1) === 'A');
+      status.update('intruder', signals.charAt(2) === 'I');
+      status.update('pa', signals.charAt(3) === 'P');
+      break;
+    default:
   }
   broadcast(data);
 });
