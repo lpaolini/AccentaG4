@@ -16,11 +16,11 @@ if (process.argv.length > 2) {
   process.exit(1);
 }
 
-var notify = Notify(config.notify);
+const notify = Notify(config.notify);
 
 notify('Alarm controller started');
 
-var status = new Status({
+const status = new Status({
   link: function (on) {
     notify(on ? 'Link up' : 'Link down [!]');
   },
@@ -58,7 +58,7 @@ const serial = (function () {
   return serial;
 })();
 
-// initialize dual (secure/non-secure) websocket servers
+// initialize websocket servers
 const wss = (function () {
   const httpsServer = https.createServer({
     key: fs.readFileSync(config.ssl.key || __dirname + '/key.pem'),
@@ -67,26 +67,16 @@ const wss = (function () {
     res.writeHead(200);
     res.end('WebSocket');
   }).listen(8443);
-  return {
-    secure: new WebSocket.Server({
-      server: httpsServer
-    }),
-    nonSecure: new WebSocket.Server({
-      port: 8080
-    })
-  };
+  return new WebSocket.Server({
+    server: httpsServer
+  });
 })();
 
-var broadcast = (function (heartbeatTimeout) {
+const broadcast = (function (heartbeatTimeout) {
   var timer;
   function send(message) {
     stop();
-    wss.secure.clients.forEach(function (client) {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
-    wss.nonSecure.clients.forEach(function (client) {
+    wss.clients.forEach(function (client) {
       if (client.readyState === WebSocket.OPEN) {
         client.send(message);
       }
@@ -125,20 +115,11 @@ serial.on('data', function (data) {
   broadcast(data);
 });
 
-// react to secure websockets messages
-wss.secure.on('connection', function (ws) {
+// react to websockets messages
+wss.on('connection', function (ws) {
   ws.on('message', function (message) {
     serial.write(message, function () {
       console.log('secure websockets client: %s', message);
-    });
-  });
-});
-
-// react to non-secure websockets messages
-wss.nonSecure.on('connection', function (ws) {
-  ws.on('message', function (message) {
-    serial.write(message, function () {
-      console.log('non-secure websockets client: %s', message);
     });
   });
 });
