@@ -52,8 +52,8 @@ class AccentaG4 {
 			unsigned long last;
 		} tx;
 		struct Rx {
+			char data[MSG_MAXLEN];
 			unsigned int current;
-			unsigned char data[MSG_MAXLEN];
 			unsigned char ptr;
 		} rx;
 		struct Status {
@@ -73,11 +73,11 @@ class AccentaG4 {
 		void sendCommands();
 		void setTimestamp();
 		void setPanelSignals(int signals);
-		void getPanelSignals();
+		void sendPanelSignals();
 		void setLedStatus(struct Rx rx);
-		void getLedStatus();
+		void sendLedStatus();
 		void setLcdStatus(struct Rx rx);
-		void getLcdStatus();
+		void sendLcdStatus();
 
 	public:
 		AccentaG4(uint8_t rxPin, uint8_t txPin, 
