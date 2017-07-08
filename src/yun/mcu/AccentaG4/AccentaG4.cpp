@@ -155,20 +155,24 @@ void AccentaG4::sendMessage(char type, char* msg) {
 
 void AccentaG4::sendHeartbeat() {
 	if (millis() - lastMessage > HEARTBEAT_MS) {
+		char age[7];
 		sprintf(age, "%lu\0", (millis() - status.timestamp) / 1000);
 		sendMessage('H', age);
 	}
 }
 
+void AccentaG4::sendCommand(char key) {
+	serial.stopListening(); // half-duplex bus
+	serial.write9(K_COMMAND | 0x100); // K cmd: emulate MARK parity
+	serial.write9(key & 0xff); // key: emulate SPACE parity
+	serial.write9((K_COMMAND + key) & 0xff); // checksum: emulate SPACE parity
+	serial.listen();
+}
+
 void AccentaG4::sendCommands() {
 	// send keypad commands
 	if (tx.queue.count() && millis() - tx.last > K_DELAY_MS) { // throttle tx
-		char key = tx.queue.pop();
-		serial.stopListening();
-		serial.write9(K_COMMAND | 0x100); // K cmd: emulate MARK parity
-		serial.write9(key & 0xff); // key: emulate SPACE parity
-		serial.write9((K_COMMAND + key) & 0xff); // checksum: emulate SPACE parity
-		serial.listen();
+		sendCommand(tx.queue.pop());
 		tx.last = millis();
 	}
 }

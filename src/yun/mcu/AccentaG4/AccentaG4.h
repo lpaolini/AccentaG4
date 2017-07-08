@@ -63,13 +63,13 @@ class AccentaG4 {
 			unsigned long timestamp;
 		} status;
 		unsigned long lastMessage;
-		char age[7];
 
 		boolean validateChecksum(char expectedChecksum);
 		void readBusMessages();
 		void readPanelSignals();
 		void sendMessage(char type, char* msg);
 		void sendHeartbeat();
+		void sendCommand(char key);
 		void sendCommands();
 		void setTimestamp();
 		void setPanelSignals(int signals);
