@@ -53,7 +53,6 @@ class AccentaG4 {
 		} tx;
 		struct Rx {
 			char data[MSG_MAXLEN];
-			unsigned int current;
 			unsigned char ptr;
 		} rx;
 		struct Status {
