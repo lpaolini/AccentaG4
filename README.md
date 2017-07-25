@@ -244,10 +244,10 @@ Here is a short description of the resistors:
 
 |Resistor|Description|
 |:------:|-----------|
-|R1      |set the current for the transmitting opto-isolator LED|
-|R2      |limit the current into the opto-isolator transistor|
-|R3      |set the stand-by value of the receiver to logical zero (pull-up)|
-|R4      |set the current for the receiving opto-isolator LED|
+|R1      |limit the current into the transmitting opto-isolator LED|
+|R2      |limit the current into the transmitting opto-isolator transistor|
+|R3      |limit the current into the receiving opto-isolator transistor|
+|R4      |limit the current into the receiving opto-isolator LED|
 |R5      |set the saturation current for T2|
 |R6      |set the saturation current for T1|
 
