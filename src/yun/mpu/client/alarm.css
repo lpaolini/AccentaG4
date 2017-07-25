@@ -3,7 +3,7 @@
 }
 
 @keyframes alarm {
-    50% { background-color: #a00000; }
+    1% { background-color: #ff0000; }
 }
 
 *,
@@ -23,7 +23,7 @@ body {
 }
 
 body.active {
-    animation: alarm 3s ease infinite;
+    animation: alarm 1s ease infinite;
 }    
 
 .wrapper {
