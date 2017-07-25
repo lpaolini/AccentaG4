@@ -14,7 +14,7 @@
 
 #define MSG_MAXLEN       50
 
-#define K_DELAY_MS       200
+#define K_DELAY_MS       150
 #define K_COMMAND        75
 #define K_0              48
 #define K_1              49
