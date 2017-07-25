@@ -196,7 +196,7 @@ The MCU is responsible for the following tasks:
 
 - monitor panel hardware signals (PA, INT, SET, ABORT), transmit updates to MPU and update local status
 - listen to the keypad bus for incoming messages, transmit updates to MPU and update local status
-- listen to MPU for virtual keystrokes, transmit emulated keypad messages over the keypad bus
+- listen to MPU for virtual keystrokes and transmit emulated keypad messages over the keypad bus
 - listen to MPU for status queries and reply local status
 - generate heartbeat messages to be propagated to the clients, to prove end-to-end connection is alive
 
@@ -208,8 +208,8 @@ The MCU is responsible for the following tasks:
 
 The MPU is responsible for the following tasks:
 
-- expose a HTTP server for serving the web application
-- expose a websockets server (used by the web application)
+- expose a HTTPS server for serving the web application
+- expose a secure websockets server (used by the web application)
 - accept and manage websockets connections
 - listen to MCU for incoming messages and forward to websockets clients
 - listen to websockets clients for incoming messages and forward to MCU
@@ -235,7 +235,7 @@ Panel signals (SET, ABORT, INT, PA) can either source or sink current. If Arduin
 
 ![minimal panel signals interface](images/minimal-panel-signals-interface.png "Minimal panel signals interface")
 
-However, the keypad bus might be tampered with or be subject to interferences potentially harmful to Arduino. For this reasons, an opto-isolated design it's a safer choice as it provides full electrical isolation between Arduino and the panel itself. Also it doesn't require to share Arduino's and panel's ground at the same potential, which is always a good thing.
+However, the keypad bus might be tampered with or be subject to interferences potentially harmful to Arduino. For this reasons, an opto-isolated design it's a safer choice as it provides full electrical isolation between Arduino and the panel itself.
 
 ![enhanced keypad bus interface](images/enhanced-interface.png "Enhanced (opto-isolated) keypad bus and panel signals interface")
 
