@@ -210,8 +210,8 @@
       $('#row1', '.lcd').html(rows[1]);
     });
 
-    var leds = Led('data-led', '12345678UTSP');
-    var signals = Led('data-signal', 'SAIP');
+    var keypadLed = Led('data-keypad', '12345678UTSP');
+    var panelLed = Led('data-panel', 'SAIP');
 
     var url = location.protocol === 'https:' ? 
       'wss://' + location.hostname + ':8443' : 
@@ -224,17 +224,17 @@
           var type = msg.charAt(0);
           var data = msg.substring(2);
           switch (type) {
-            case 'S':
-              $('body').toggleClass('active', data.indexOf('I') !== -1 || data.indexOf('P') !== -1);
-              signals.ingest(data);
+            case 'S': // panel signals
+              $('body').toggleClass('active', /IP/.test(data));
+              panelLed.ingest(data);
               break;
-            case 'P':
-              leds.ingest(data);
+            case 'P': // keypad messages
+              keypadLed.ingest(data);
               break;
-            case 'L':
+            case 'L': // LCD messages
               lcd.ingest(data);
               break;
-            case 'H':
+            case 'H': // heartbeat
               if (parseInt(data, 10) > 120) {
                 $('.lcd').addClass('stale');
               } else {
@@ -248,8 +248,8 @@
         }
       },
       onOffline: () => {
-        signals.reset();
-        leds.reset();
+        panelLed.reset();
+        keypadLed.reset();
         lcd.reset();
       }
     });
