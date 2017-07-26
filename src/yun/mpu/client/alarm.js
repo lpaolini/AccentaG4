@@ -110,11 +110,12 @@
             // case 0x16: // unknown
             //   break;
             default:
-              if (char < 32) {
-                console.log('unknown control char: ', char.toString(16));
+              if (char >= 0x20 && char <= 0x7f) {
+                write(data.charAt(i));
+                advance();
+              } else {
+                console.log('unprintable character: ', char.toString(16));
               }
-              write(data.charAt(i));
-              advance();
           }
         }
       }
