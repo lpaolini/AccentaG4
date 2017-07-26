@@ -206,8 +206,8 @@
 
   $(() => {
     var lcd = Lcd((rows) => {
-      $('#lcd0').html(rows[0]);
-      $('#lcd1').html(rows[1]);
+      $('#row0', '.lcd').html(rows[0]);
+      $('#row1', '.lcd').html(rows[1]);
     });
 
     var leds = Led('data-led', '12345678UTSP');
