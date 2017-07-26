@@ -31,12 +31,6 @@
     var cmd = false;
     var cursor = false;
     var timer;
-    function reset () {
-      display = ['                ', '                '];
-      pos = 0;
-      stop();
-      show();
-    }
     function show () {
       callback(display);
     }
@@ -63,7 +57,7 @@
       if (cursor) {
         timer = setInterval(function () {
           cursorChar = write(cursorChar);
-          callback(display);
+          show();
         }, 400);
       }
     }
@@ -76,6 +70,11 @@
       stop();
       show();
       start();
+    }
+    function reset () {
+      display = ['                ', '                '];
+      pos = 0;
+      refresh();
     }
     function ingest (data) {
       for (var i = 0; i < data.length; i++) {
