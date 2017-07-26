@@ -225,7 +225,7 @@
           var data = msg.substring(2);
           switch (type) {
             case 'S': // panel signals
-              $('body').toggleClass('active', /IP/.test(data));
+              $('body').toggleClass('active', /[IP]/.test(data));
               panelLed.ingest(data);
               break;
             case 'P': // keypad messages
