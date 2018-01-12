@@ -202,7 +202,7 @@ The MCU is responsible for the following tasks:
 
 [Arduino code](src/yun/mcu/AccentaG4) is written in C/C++ and it's built around the [SoftwareSerial9](https://github.com/lpaolini/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library used for enqueuing and throttling outgoing commands.
 
-**WARNING**: the original version of SoftwareSerial9 by [addible](https://github.com/addibble/SoftwareSerial9) has a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst/SoftwareSerial9). The version used in this project is a fork of the latter.
+**WARNING**: the original version of SoftwareSerial9 by [addible](https://github.com/addibble/SoftwareSerial9) had a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst/SoftwareSerial9) in his fork and now fixed by addible too. Both work fine, just make sure to use the latest version.
 
 ### MPU (OpenWRT)
 
