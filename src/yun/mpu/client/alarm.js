@@ -264,7 +264,6 @@
         }
       },
       onOnline: () => {
-        console.log('ONLINE!')
         lcd.reset()
       },
       onOffline: () => {
