@@ -14,6 +14,7 @@
 
 body {
     margin: auto;
+    width: 23rem;
     background: #383838;
     user-select: none;
     display: flex;
@@ -40,12 +41,6 @@ body.active {
     text-align: center;
 }
 
-.lcd,
-.led,
-.button {
-    box-shadow: 0 0 1px 1px #505050;
-}
-
 [data-click],
 [data-dblclick] {
     cursor: pointer;
@@ -63,9 +58,16 @@ body.active {
     transition: all 120ms step-end;
 }
 
+.lcd,
+.led,
+.button {
+    box-shadow: 0 0 1px 1px #505050;
+}
+
 .lcd {
+    width: 100%;
     height: 5rem;
-    width: 19rem;
+    margin: .5rem .3rem;
     border-radius: 1rem;
     padding: 0.5rem;
     color: cyan;
@@ -111,12 +113,16 @@ body.active {
 }
 
 .button {
+    width: 5rem;
     height: 3rem;
+    margin: .5rem .3rem;
     padding-top: 0.8rem;
 }
 
 .led {
+    width: 5rem;
     height: 2.4rem;
+    margin: .5rem .3rem;
     padding-top: 0.45rem;
     padding-left: 1.2rem;
 }
@@ -166,65 +172,4 @@ body.active {
 
 #keyCancel {
     color: darkred;
-}
-
-@media screen and (orientation:portrait) {
-    body {
-        width: 23rem;
-    }
-
-    .button {
-        width: 5rem;
-        margin: .5rem .3rem;
-    }
-
-    .led {
-        width: 5rem;
-        margin: .5rem .3rem;
-    }
-
-    .lcd {
-        width: 100%;
-        margin: .5rem .3rem;
-    }
-}
-
-@media screen and (orientation:landscape) {
-    body {
-        width: 40rem;
-    }
-
-    .button {
-        width: 7rem;
-        margin: .4rem .3rem;
-    }
-
-    .led {
-        width: 4.4rem;
-        margin: .4rem .3rem;
-    }
-
-    .lcd {
-        margin: .4rem .3rem;
-    }
-
-    #keySelect {
-        width: 5rem;
-        order: 2;
-    }
-
-    #keyChime {
-        width: 5rem;
-        order: 3;
-    }
-
-    #keyOmit {
-        width: 5rem;
-        order: 3;
-    }
-
-    #keyProgram {
-        width: 5rem;
-        order: 3;
-    }
 }
