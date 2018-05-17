@@ -106,6 +106,7 @@ body.active {
 
 .button,
 .led {
+    margin: .5rem .3rem;
     border-radius: 1rem;
     color: #a0a0a0;
     font: normal 1.3rem arial;
@@ -115,14 +116,12 @@ body.active {
 .button {
     width: 5rem;
     height: 3rem;
-    margin: .5rem .3rem;
     padding-top: 0.8rem;
 }
 
 .led {
     width: 5rem;
     height: 2.4rem;
-    margin: .5rem .3rem;
     padding-top: 0.45rem;
     padding-left: 1.2rem;
 }
