@@ -71,6 +71,10 @@
       show();
       start();
     }
+    function offline () {
+      display = ['Connecting...   ', '                '];
+      show();
+    }
     function reset () {
       display = ['                ', '                '];
       pos = 0;
@@ -122,12 +126,14 @@
     }
     reset();
     return {
+      offline: offline,
       ingest: ingest,
       reset: reset
     }
   };
 
   var Connection = (url, handlers) => {
+    offline()
     var ws;
     var autoRetry = Timer(() => {
       console.log('connection timeout');
@@ -136,11 +142,20 @@
     }, 3000);
     var keepAlive = Timer(() => {
       console.log('connection lost');
-      handlers.onOffline();
+      offline()
       start();
     }, 5000);
     function isConnected() {
       return ws && ws.readyState === WebSocket.OPEN;
+    }
+    function online() {
+      handlers.onOnline && handlers.onOnline();
+    }
+    function offline() {
+      handlers.onOffline && handlers.onOffline();
+    }
+    function message(data) {
+      handlers.onMessage && handlers.onMessage(data);
     }
     function start() {
       if (isConnected()) {
@@ -153,6 +168,7 @@
           console.log('connection established');
           autoRetry.stop();
           keepAlive.start();
+          online();
           send('?'); // request current status
         };
         ws.onerror = (err) => {
@@ -161,11 +177,11 @@
         };
         ws.onclose = () => {
           console.log('connection closed');
-          handlers.onOffline();
+          offline()
         }
         ws.onmessage = (evt) => {
           keepAlive.restart();
-          handlers.onMessage(evt.data);
+          message(evt.data);
         };
       }
     }
@@ -174,7 +190,7 @@
         console.log('closing connection');
         keepAlive.stop();
         ws.close();
-        handlers.onOffline();
+        offline()
       } else {
         console.log('already disconnected');
       }
@@ -247,10 +263,14 @@
           $('.lcd').addClass('lost');
         }
       },
+      onOnline: () => {
+        console.log('ONLINE!')
+        lcd.reset()
+      },
       onOffline: () => {
         panelLed.reset();
         keypadLed.reset();
-        lcd.reset();
+        lcd.offline();
       }
     });
 
