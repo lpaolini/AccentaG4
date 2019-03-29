@@ -7,12 +7,12 @@
 
 AccentaG4::AccentaG4(uint8_t rxPin, uint8_t txPin, 
 	uint8_t setPin, uint8_t abortPin, uint8_t intPin, uint8_t paPin, 
-	void (*msgHandler)(char type, char* msg)) : serial(rxPin, txPin) {
+	void (*sendMsg)(char type, char* msg)) : serial(rxPin, txPin) {
 	this->setPin = setPin;
 	this->abortPin = abortPin;
 	this->intPin = intPin;
 	this->paPin = paPin;
-	this->msgHandler = msgHandler;
+	this->sendMessage = sendMessage;
 	pinMode(setPin, INPUT_PULLUP);
 	pinMode(abortPin, INPUT_PULLUP);
 	pinMode(intPin, INPUT_PULLUP);
@@ -103,14 +103,9 @@ void AccentaG4::readBusMessages() {
 	}
 }
 
-void AccentaG4::setTimestamp() {
-	status.timestamp = millis();
-}
-
 void AccentaG4::setPanelSignals(int signals) {
 	if (signals != status.signals) {
 		status.signals = signals;
-		setTimestamp();
 		sendPanelSignals();
 	}
 }
@@ -126,7 +121,6 @@ void AccentaG4::sendPanelSignals() {
 
 void AccentaG4::setLedStatus(struct Rx rx) {
 	status.led = rx.data[2] << 8 | rx.data[1];
-	setTimestamp();
 	sendLedStatus();
 }
 
@@ -141,25 +135,11 @@ void AccentaG4::sendLedStatus() {
 
 void AccentaG4::setLcdStatus(struct Rx rx) {
 	strncpy(status.lcd, rx.data + 2, rx.ptr - 1);
-	setTimestamp();
 	sendLcdStatus();
 }
 
 void AccentaG4::sendLcdStatus() {
 	sendMessage('L', status.lcd);
-}
-
-void AccentaG4::sendMessage(char type, char* msg) {
-	msgHandler(type, msg);
-	lastMessage = millis();
-}
-
-void AccentaG4::sendHeartbeat() {
-	if (millis() - lastMessage > HEARTBEAT_MS) {
-		char age[7];
-		sprintf(age, "%lu\0", (millis() - status.timestamp) / 1000);
-		sendMessage('H', age);
-	}
 }
 
 void AccentaG4::sendCommand(char key) {
@@ -196,5 +176,4 @@ void AccentaG4::loop() {
 	readPanelSignals();
 	readBusMessages();
 	sendCommands();
-	sendHeartbeat();
 }

@@ -46,7 +46,7 @@ class AccentaG4 {
 	private:
 		SoftwareSerial9 serial;
 		uint8_t setPin, abortPin, intPin, paPin;
-		void (*msgHandler)(char type, char* msg);
+		void (*sendMessage)(char type, char* msg);
 		struct Tx {
 			QueueArray <char> queue;
 			unsigned long last;
@@ -59,14 +59,12 @@ class AccentaG4 {
 			int signals;
 			int led;
 			char lcd[MSG_MAXLEN];
-			unsigned long timestamp;
 		} status;
 		unsigned long lastMessage;
 
 		boolean validateChecksum(char expectedChecksum);
 		void readBusMessages();
 		void readPanelSignals();
-		void sendMessage(char type, char* msg);
 		void sendHeartbeat();
 		void sendCommand(char key);
 		void sendCommands();

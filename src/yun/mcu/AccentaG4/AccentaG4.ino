@@ -14,7 +14,17 @@
 #define LINK_SPEED       115200
 #define CONSOLE_SPEED    115200
 
-void handleMsg(char type, char* msg) {
+#define HEARTBEAT_MS     2000
+
+unsigned long lastMessage;
+unsigned long timestamp;
+
+void sendMessage(char type, char* msg) {
+  handleMessage(type, msg);
+  timestamp = millis();
+}
+
+void handleMessage(char type, char* msg) {
   // forward panel to Yun bridge
   Serial1.print(type);
   Serial1.print(":");
@@ -23,6 +33,15 @@ void handleMsg(char type, char* msg) {
   Serial.print(type);
   Serial.print(":");
   Serial.println(msg);
+  lastMessage = millis();
+}
+
+void heartbeat() {
+	if (millis() - lastMessage > HEARTBEAT_MS) {
+		char age[7];
+		sprintf(age, "%lu\0", (millis() - timestamp) / 1000);
+		handleMessage('H', age);
+	}
 }
 
 void startBridge() {
@@ -52,7 +71,7 @@ void checkBridge() {
   }
 }
 
-AccentaG4 panel(COMMS_RX_PIN, COMMS_TX_PIN, SIG_SET_PIN, SIG_ABORT_PIN, SIG_INT_PIN, SIG_PA_PIN, handleMsg);
+AccentaG4 panel(COMMS_RX_PIN, COMMS_TX_PIN, SIG_SET_PIN, SIG_ABORT_PIN, SIG_INT_PIN, SIG_PA_PIN, sendMessage);
 
 void setup() {
   pinMode(READY_PIN, INPUT_PULLUP);
@@ -82,4 +101,5 @@ void loop() {
   }
     
   panel.loop();
+  heartbeat();
 }
