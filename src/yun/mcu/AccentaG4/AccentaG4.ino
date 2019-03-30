@@ -1,4 +1,5 @@
 #include "AccentaG4.h"
+#include "AirSensor.h"
 
 #define COMMS_RX_PIN     10
 #define COMMS_TX_PIN     11
@@ -15,6 +16,8 @@
 #define CONSOLE_SPEED    115200
 
 #define HEARTBEAT_MS     2000
+
+#define AIR_SENSOR_DELAY 10000
 
 unsigned long lastMessage;
 unsigned long timestamp;
@@ -68,6 +71,7 @@ void checkBridge() {
 }
 
 AccentaG4 panel(COMMS_RX_PIN, COMMS_TX_PIN, SIG_SET_PIN, SIG_ABORT_PIN, SIG_INT_PIN, SIG_PA_PIN, sendMessage);
+AirSensor airSensor(AIR_SENSOR_DELAY, sendMessage);
 
 void setupPanel() {
   pinMode(READY_PIN, INPUT_PULLUP);
@@ -83,8 +87,13 @@ void setupPanel() {
   Serial.println("Ready");
 }
 
+void setupAirSensor() {
+    airSensor.begin();
+}
+
 void setup() {
     setupPanel();
+    setupAirSensor();
 }
 
 void loop() {  
@@ -101,5 +110,6 @@ void loop() {
   }
     
   panel.loop();
+  airSensor.loop();
   heartbeat();
 }
