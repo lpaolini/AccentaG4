@@ -7,7 +7,7 @@
 
 AccentaG4::AccentaG4(uint8_t rxPin, uint8_t txPin, 
 	uint8_t setPin, uint8_t abortPin, uint8_t intPin, uint8_t paPin, 
-	void (*sendMsg)(char type, char* msg)) : serial(rxPin, txPin) {
+	void (*sendMessage)(String msg)) : serial(rxPin, txPin) {
 	this->setPin = setPin;
 	this->abortPin = abortPin;
 	this->intPin = intPin;
@@ -116,7 +116,7 @@ void AccentaG4::sendPanelSignals() {
 	for (int i = 0; i < 4; i++) {
 		bitRead(status.signals, i) || (value[i] = '.');
 	}
-	sendMessage('S', value);
+	sendMessage("S:" + String(value));
 }
 
 void AccentaG4::setLedStatus(struct Rx rx) {
@@ -130,7 +130,7 @@ void AccentaG4::sendLedStatus() {
 	for (int i = 0; i < 12; i++) {
 		bitRead(status.led, i) || (value[i] = '.');
 	}
-	sendMessage('P', value);
+	sendMessage("P:" + String(value));
 }
 
 void AccentaG4::setLcdStatus(struct Rx rx) {
@@ -139,7 +139,7 @@ void AccentaG4::setLcdStatus(struct Rx rx) {
 }
 
 void AccentaG4::sendLcdStatus() {
-	sendMessage('L', status.lcd);
+	sendMessage("L:" + String(status.lcd));
 }
 
 void AccentaG4::sendCommand(char key) {

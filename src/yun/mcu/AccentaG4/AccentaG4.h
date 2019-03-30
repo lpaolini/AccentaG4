@@ -44,7 +44,7 @@ class AccentaG4 {
 	private:
 		SoftwareSerial9 serial;
 		uint8_t setPin, abortPin, intPin, paPin;
-		void (*sendMessage)(char type, char* msg);
+		void (*sendMessage)(String msg);
 		struct Tx {
 			QueueArray <char> queue;
 			unsigned long last;
@@ -77,7 +77,7 @@ class AccentaG4 {
 	public:
 		AccentaG4(uint8_t rxPin, uint8_t txPin, 
 			uint8_t setPin, uint8_t abortPin, uint8_t intPin, uint8_t paPin, 
-			void (*msgHandler)(char type, char* msg));
+			void (*sendMessage)(String msg));
 		void begin();
 		void end();
 		void sendKey(char key);
