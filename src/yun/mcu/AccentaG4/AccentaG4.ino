@@ -1,5 +1,5 @@
 #include "AccentaG4.h"
-#include "AirSensor.h"
+#include "Sensors.h"
 
 #define COMMS_RX_PIN 10
 #define COMMS_TX_PIN 11
@@ -17,7 +17,7 @@
 
 #define HEARTBEAT_MS 2000
 
-#define AIR_SENSOR_DELAY 10000
+#define SENSORS_DELAY 5000
 
 unsigned long lastMessage;
 unsigned long timestamp;
@@ -70,7 +70,8 @@ void checkBridge() {
 
 AccentaG4 panel(COMMS_RX_PIN, COMMS_TX_PIN, SIG_SET_PIN, SIG_ABORT_PIN,
                 SIG_INT_PIN, SIG_PA_PIN, sendMessage);
-AirSensor airSensor(AIR_SENSOR_DELAY, sendMessage);
+
+Sensors sensors(SENSORS_DELAY, sendMessage);
 
 void setupPanel() {
     pinMode(READY_PIN, INPUT_PULLUP);
@@ -87,11 +88,13 @@ void setupPanel() {
     Serial.println("Ready");
 }
 
-void setupAirSensor() { airSensor.begin(); }
+void setupSensors() {
+    sensors.begin();
+}
 
 void setup() {
     setupPanel();
-    setupAirSensor();
+    setupSensors();
 }
 
 void loop() {
@@ -108,6 +111,6 @@ void loop() {
     }
 
     panel.loop();
-    airSensor.loop();
+    sensors.loop();
     heartbeat();
 }
