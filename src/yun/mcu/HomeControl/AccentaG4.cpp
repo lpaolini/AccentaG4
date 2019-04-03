@@ -23,6 +23,7 @@ AccentaG4::AccentaG4(uint8_t rxPin, uint8_t txPin, uint8_t setPin,
 void AccentaG4::begin() {
     serial.begin(BUS_SPEED);
     tx.last = millis();
+    queryStatus();
 }
 
 void AccentaG4::end() { serial.end(); }
@@ -173,7 +174,9 @@ void AccentaG4::setLcdStatus(struct Rx rx) {
     sendLcdStatus();
 }
 
-void AccentaG4::sendLcdStatus() { sendMessage("L:" + String(status.lcd)); }
+void AccentaG4::sendLcdStatus() {
+    sendMessage("L:" + String(status.lcd));
+}
 
 void AccentaG4::sendCommand(char key) {
     serial.stopListening();                   // half-duplex bus

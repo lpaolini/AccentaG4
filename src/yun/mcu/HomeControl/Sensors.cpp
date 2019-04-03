@@ -16,7 +16,7 @@ void Sensors::begin_sht31() {
     if (sht31.begin(0x44)) {
         sht31_enabled = true;
     } else {
-        sendMessage("SHT31:OFF");
+        // sendMessage("SHT31:OFF");
     }
 }
 
@@ -24,7 +24,7 @@ void Sensors::begin_sgp30() {
     if (sgp30.begin()) {
         sgp30_enabled = true;
     } else {
-        sendMessage("SGP30:OFF");
+        // sendMessage("SGP30:OFF");
     }
 }
 
@@ -32,12 +32,6 @@ void Sensors::begin() {
     begin_sht31();
     begin_sgp30();
 }
-
-// void Sensors::calibrate() {
-    // while (!ccs.available());
-    // float temp = ccs.calculateTemperature();
-    // ccs.setTempOffset(temp - 25.0);
-// }
 
 uint32_t Sensors::getAbsoluteHumidity(float temperature, float humidity) {
     // approximation formula from Sensirion SGP30 Driver Integration chapter 3.15
@@ -73,37 +67,55 @@ void Sensors::loop() {
 void Sensors::sample() {
     sample_sht31();
     sample_sgp30();
+    // sendMessage( 
+    //     "A:" + String(status.temperature) 
+    //     + ":" + String(status.relativeHumidity)
+    //     + ":" + String(status.absoluteHumidity)
+    //     + ":" + String(status.TVOC)
+    //     + ":" + String(status.eCO2)
+    // );
+    // sendMessage("T:" + String(status.temperature)); 
+    // sendMessage("H:" + String(status.relativeHumidity));
+    // sendMessage("V:" + String(status.TVOC));
+    // sendMessage("C:" + String(status.eCO2));
+//    );
 }
 
 void Sensors::sample_sht31() {
     if (sht31_enabled) {
         status.temperature = sht31.readTemperature();
         status.relativeHumidity = sht31.readHumidity();
-        
         if (!isnan(status.temperature) && !isnan(status.relativeHumidity)) {
-            sendMessage("SHT31:" 
-                + String(status.temperature) 
-                + ':' + String(status.relativeHumidity)
-            );
+            status.absoluteHumidity = getAbsoluteHumidity(status.temperature, status.relativeHumidity);
+            sendMessage("T:" + String(status.temperature)); 
+            sendMessage("H:" + String(status.relativeHumidity));
+            // sendMessage("SHT31:" 
+            //     + String(status.temperature) 
+            //     + ':' + String(status.relativeHumidity)
+            //     + ':' + String(status.absoluteHumidity)
+            // );
         } else {
-            sendMessage("SHT31:ERR");
+            // sendMessage("SHT31:ERR");
         }
     }
 }
 
 void Sensors::sample_sgp30() {
     if (sgp30_enabled) {
-        if (!isnan(status.temperature) && !isnan(status.relativeHumidity)) {
-            sgp30.setHumidity(getAbsoluteHumidity(status.temperature, status.relativeHumidity));
+        if (!isnan(status.absoluteHumidity)) {
+            sgp30.setHumidity(status.absoluteHumidity);
         }
         if (sgp30.IAQmeasure()) {
-            
-            sendMessage("SGP30:" 
-                + String(sgp30.TVOC) 
-                + ':' + String(sgp30.eCO2) 
-            );
+            status.TVOC = sgp30.TVOC;
+            status.eCO2 = sgp30.eCO2;
+            sendMessage("V:" + String(status.TVOC));
+            sendMessage("C:" + String(status.eCO2));
+            // sendMessage("SGP30:" 
+            //     + String(sgp30.TVOC) 
+            //     + ':' + String(sgp30.eCO2) 
+            // );
         } else {
-            sendMessage("SGP30:ERR");
+            // sendMessage("SGP30:ERR");
         }
     }
 }
