@@ -74,7 +74,7 @@ body.active {
 
 .lcd {
     width: 100%;
-    height: 5rem;
+    height: 6.5rem;
     border-radius: 1rem;
     padding: 0.5rem;
     color: cyan;
@@ -109,6 +109,13 @@ body.active {
     margin: 0;
     font-size: 2.0rem;
     opacity: 0.6;
+}
+
+.lcd pre.air {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.15rem;
+    margin: .5rem;
 }
 
 .button,
