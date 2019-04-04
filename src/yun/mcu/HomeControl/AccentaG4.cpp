@@ -152,7 +152,7 @@ void AccentaG4::sendPanelSignals() {
     for (int i = 0; i < 4; i++) {
         bitRead(status.signals, i) || (value[i] = '.');
     }
-    sendMessage("S:" + String(value));
+    sendMessage("SIG:" + String(value));
 }
 
 void AccentaG4::setLedStatus(struct Rx rx) {
@@ -166,7 +166,7 @@ void AccentaG4::sendLedStatus() {
     for (int i = 0; i < 12; i++) {
         bitRead(status.led, i) || (value[i] = '.');
     }
-    sendMessage("P:" + String(value));
+    sendMessage("LED:" + String(value));
 }
 
 void AccentaG4::setLcdStatus(struct Rx rx) {
@@ -175,7 +175,7 @@ void AccentaG4::setLcdStatus(struct Rx rx) {
 }
 
 void AccentaG4::sendLcdStatus() {
-    sendMessage("L:" + String(status.lcd));
+    sendMessage("LCD:" + String(status.lcd));
 }
 
 void AccentaG4::sendCommand(char key) {

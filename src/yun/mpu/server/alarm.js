@@ -98,13 +98,13 @@ const broadcast = (function (heartbeatTimeout) {
 
 // react to serial messages
 serial.on('data', function (data) {
-  switch (data.substr(0, 2)) {
-    case 'H:':
-      var staleness = parseInt(data.substring(2), 10);
+  switch (data.substr(0, 4)) {
+    case 'HBT:':
+      var staleness = parseInt(data.substring(4), 10);
       status.update('link', staleness < 120);
       break;
-    case 'S:':
-      var signals = data.substring(2);
+    case 'SIG:':
+      var signals = data.substring(4);
       status.update('set', signals.charAt(0) === 'S');
       status.update('abort', signals.charAt(1) === 'A');
       status.update('intruder', signals.charAt(2) === 'I');

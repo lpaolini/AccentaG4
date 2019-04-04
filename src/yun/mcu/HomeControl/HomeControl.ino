@@ -26,7 +26,7 @@ void heartbeat() {
     if (millis() - lastMessage > HEARTBEAT_MS) {
         char age[7];
         sprintf(age, "%lu\0", (millis() - timestamp) / 1000);
-        handleMessage("H:" + String(age));
+        handleMessage("HBT:" + String(age));
     }
 }
 

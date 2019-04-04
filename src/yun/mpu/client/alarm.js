@@ -237,25 +237,29 @@
       onMessage: (msg) => {
         if (msg) {
           $('.lcd').removeClass('lost');
-          var type = msg.charAt(0);
-          var data = msg.substring(2);
+          var type = msg.substring(0, 3);
+          var data = msg.substring(4);
           switch (type) {
-            case 'S': // panel signals
+            case 'SIG': // panel signals
               $('body').toggleClass('active', /[IP]/.test(data));
               panelLed.ingest(data);
               break;
-            case 'P': // keypad messages
+            case 'LED': // keypad messages
               keypadLed.ingest(data);
               break;
-            case 'L': // LCD messages
+            case 'LCD': // LCD messages
               lcd.ingest(data);
               break;
-            case 'H': // heartbeat
+            case 'HBT': // heartbeat
               if (parseInt(data, 10) > 120) {
                 $('.lcd').addClass('stale');
               } else {
                 $('.lcd').removeClass('stale');
               }
+              break;
+            case 'AIR': // air quality
+              console.log('Air quality', data)
+              break;
             default:
               break;
           }

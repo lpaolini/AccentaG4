@@ -67,13 +67,13 @@ void Sensors::loop() {
 void Sensors::sample() {
     sample_sht31();
     sample_sgp30();
-    // sendMessage( 
-    //     "A:" + String(status.temperature) 
-    //     + ":" + String(status.relativeHumidity)
-    //     + ":" + String(status.absoluteHumidity)
-    //     + ":" + String(status.TVOC)
-    //     + ":" + String(status.eCO2)
-    // );
+    sendMessage( 
+        "AIR:" + String(status.temperature) 
+        + ":" + String(status.relativeHumidity)
+        + ":" + String(status.absoluteHumidity)
+        + ":" + String(status.TVOC)
+        + ":" + String(status.eCO2)
+    );
     // sendMessage("T:" + String(status.temperature)); 
     // sendMessage("H:" + String(status.relativeHumidity));
     // sendMessage("V:" + String(status.TVOC));
@@ -87,8 +87,8 @@ void Sensors::sample_sht31() {
         status.relativeHumidity = sht31.readHumidity();
         if (!isnan(status.temperature) && !isnan(status.relativeHumidity)) {
             status.absoluteHumidity = getAbsoluteHumidity(status.temperature, status.relativeHumidity);
-            sendMessage("T:" + String(status.temperature)); 
-            sendMessage("H:" + String(status.relativeHumidity));
+            // sendMessage("T:" + String(status.temperature)); 
+            // sendMessage("H:" + String(status.relativeHumidity));
             // sendMessage("SHT31:" 
             //     + String(status.temperature) 
             //     + ':' + String(status.relativeHumidity)
@@ -108,8 +108,8 @@ void Sensors::sample_sgp30() {
         if (sgp30.IAQmeasure()) {
             status.TVOC = sgp30.TVOC;
             status.eCO2 = sgp30.eCO2;
-            sendMessage("V:" + String(status.TVOC));
-            sendMessage("C:" + String(status.eCO2));
+            // sendMessage("V:" + String(status.TVOC));
+            // sendMessage("C:" + String(status.eCO2));
             // sendMessage("SGP30:" 
             //     + String(sgp30.TVOC) 
             //     + ':' + String(sgp30.eCO2) 
