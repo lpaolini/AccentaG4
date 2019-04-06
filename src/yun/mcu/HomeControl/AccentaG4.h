@@ -47,7 +47,7 @@ class AccentaG4 {
 		void (*sendMessage)(String msg);
 		struct Tx {
 			QueueArray <char> queue;
-			unsigned long last;
+			unsigned long next;
 		} tx;
 		struct Rx {
 			char data[MSG_MAXLEN];
