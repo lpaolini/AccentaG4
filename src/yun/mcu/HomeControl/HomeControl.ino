@@ -16,6 +16,8 @@
 
 unsigned long nextHeartbeat = millis() + HEARTBEAT_MS;
 unsigned long lastMessage;
+unsigned long nextLoop = millis();
+bool ledOn = false;
 
 void sendMessage(String msg) {
     handleMessage(msg);
@@ -48,6 +50,16 @@ void setup() {
 }
 
 void loop() {
+    if (millis() > nextLoop) {
+        if (ledOn) {
+            digitalWrite(STATUS_LED, LOW);
+            nextLoop += 900;
+        } else {
+            digitalWrite(STATUS_LED, HIGH);
+            nextLoop += 100;
+        }
+        ledOn = !ledOn;
+    }
     bridge.loop();
     alarm.loop();
     sensors.loop();
