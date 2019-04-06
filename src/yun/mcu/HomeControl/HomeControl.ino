@@ -14,19 +14,17 @@
 #define HEARTBEAT_MS 2000
 #define SENSORS_DELAY 5000
 
+unsigned long nextHeartbeat = millis() + HEARTBEAT_MS;
 unsigned long lastMessage;
-unsigned long timestamp;
 
 void sendMessage(String msg) {
     handleMessage(msg);
-    timestamp = millis();
+    lastMessage = millis();
 }
 
 void heartbeat() {
-    if (millis() - lastMessage > HEARTBEAT_MS) {
-        char age[7];
-        sprintf(age, "%lu\0", (millis() - timestamp) / 1000);
-        handleMessage("HBT:" + String(age));
+    if (millis() > nextHeartbeat) {
+        handleMessage("HBT:" + String((millis() - lastMessage) / 1000));
     }
 }
 
@@ -39,7 +37,7 @@ Sensors sensors(SENSORS_DELAY, sendMessage);
 
 void handleMessage(String msg) {
     bridge.serial.println(msg);
-    lastMessage = millis();
+    nextHeartbeat = millis() + HEARTBEAT_MS;
 }
 
 void setup() {
