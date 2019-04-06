@@ -22,7 +22,7 @@ notify('Alarm controller started')
 
 const status = new Status({
     link: function (on) {
-        notify(on ? 'Link up' : 'Link down [!]')
+        notify(on ? 'Alarm panel link up' : 'Alarm panel link down [!]')
     },
     set: function (on) {
         notify(on ? 'Alarm set' : 'Alarm unset')
@@ -98,6 +98,7 @@ const broadcast = (function (heartbeatTimeout) {
 
 // react to serial messages
 serial.on('data', function (data) {
+    console.log('data: [' + data + ']')
     switch (data.substr(0, 4)) {
     case 'HBT:':
         var staleness = parseInt(data.substring(4), 10)
