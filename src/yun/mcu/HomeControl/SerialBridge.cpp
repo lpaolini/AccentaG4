@@ -5,22 +5,18 @@
 
 #include "SerialBridge.h"
 
-SerialBridge::SerialBridge(HardwareSerial &serial, long linkSpeed, int statusLed) : serial(serial) {
-     this->linkSpeed = linkSpeed;
-     this->statusLed = statusLed;
+SerialBridge::SerialBridge(HardwareSerial &serial, long linkSpeed,
+                           int statusLed)
+    : serial(serial) {
+    this->linkSpeed = linkSpeed;
+    this->statusLed = statusLed;
 }
 
-void SerialBridge::start() {
-    serial.begin(linkSpeed);
-}
+void SerialBridge::start() { serial.begin(linkSpeed); }
 
-void SerialBridge::stop() {
-    serial.end();
-}
+void SerialBridge::stop() { serial.end(); }
 
-bool SerialBridge::isDisabled() {
-    return digitalRead(READY_PIN);
-}
+bool SerialBridge::isDisabled() { return digitalRead(READY_PIN); }
 
 void SerialBridge::waitUntilReady() {
     while (digitalRead(READY_PIN)) {
@@ -42,12 +38,12 @@ void SerialBridge::check() {
 }
 
 void SerialBridge::blink() {
-     unsigned long currentMillis = millis();
-     if (currentMillis > nextBlink) {
+    unsigned long currentMillis = millis();
+    if (currentMillis > nextBlink) {
         nextBlink = currentMillis + BRIDGE_UP_BLINK_RATE_MS;
         ledState = !ledState;
         digitalWrite(statusLed, ledState);
-     }
+    }
 }
 
 void SerialBridge::begin() {
@@ -60,9 +56,7 @@ void SerialBridge::begin() {
     check();
 }
 
-void SerialBridge::end() {
-    stop();
-}
+void SerialBridge::end() { stop(); }
 
 void SerialBridge::loop() {
     check();

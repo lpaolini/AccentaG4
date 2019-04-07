@@ -1,6 +1,6 @@
-#include "SerialBridge.h"
 #include "AccentaG4.h"
 #include "Sensors.h"
+#include "SerialBridge.h"
 
 #define COMMS_RX_PIN 10
 #define COMMS_TX_PIN 11

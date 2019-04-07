@@ -30,60 +30,60 @@ void AccentaG4::end() { serial.end(); }
 
 void AccentaG4::sendKey(char key) {
     switch (key) {
-        case '0':
-            tx.queue.push(K_0);
-            break;
-        case '1':
-            tx.queue.push(K_1);
-            break;
-        case '2':
-            tx.queue.push(K_2);
-            break;
-        case '3':
-            tx.queue.push(K_3);
-            break;
-        case '4':
-            tx.queue.push(K_4);
-            break;
-        case '5':
-            tx.queue.push(K_5);
-            break;
-        case '6':
-            tx.queue.push(K_6);
-            break;
-        case '7':
-            tx.queue.push(K_7);
-            break;
-        case '8':
-            tx.queue.push(K_8);
-            break;
-        case '9':
-            tx.queue.push(K_9);
-            break;
-        case 'c':
-            tx.queue.push(K_CHIME);
-            break;
-        case 'o':
-            tx.queue.push(K_OMIT);
-            break;
-        case 'x':
-            tx.queue.push(K_CANCEL);
-            break;
-        case 'p':
-            tx.queue.push(K_PROGRAM);
-            break;
-        case 'v':
-            tx.queue.push(K_CONFIRM);
-            break;
-        case 's':
-            tx.queue.push(K_SELECT);
-            break;
-        case '!':
-            tx.queue.push(K_SOS);
-            break;
-        case '?':
-            queryStatus();
-            break;
+    case '0':
+        tx.queue.push(K_0);
+        break;
+    case '1':
+        tx.queue.push(K_1);
+        break;
+    case '2':
+        tx.queue.push(K_2);
+        break;
+    case '3':
+        tx.queue.push(K_3);
+        break;
+    case '4':
+        tx.queue.push(K_4);
+        break;
+    case '5':
+        tx.queue.push(K_5);
+        break;
+    case '6':
+        tx.queue.push(K_6);
+        break;
+    case '7':
+        tx.queue.push(K_7);
+        break;
+    case '8':
+        tx.queue.push(K_8);
+        break;
+    case '9':
+        tx.queue.push(K_9);
+        break;
+    case 'c':
+        tx.queue.push(K_CHIME);
+        break;
+    case 'o':
+        tx.queue.push(K_OMIT);
+        break;
+    case 'x':
+        tx.queue.push(K_CANCEL);
+        break;
+    case 'p':
+        tx.queue.push(K_PROGRAM);
+        break;
+    case 'v':
+        tx.queue.push(K_CONFIRM);
+        break;
+    case 's':
+        tx.queue.push(K_SELECT);
+        break;
+    case '!':
+        tx.queue.push(K_SOS);
+        break;
+    case '?':
+        queryStatus();
+        break;
     }
 }
 
@@ -101,39 +101,39 @@ void AccentaG4::readBusMessages() {
     int data;
     while (serial.available()) {
         data = serial.read();
-        if (data & 0x100) {            // mark parity -> start of message
-            rx.data[0] = data & 0xff;  // drop parity bit
+        if (data & 0x100) {           // mark parity -> start of message
+            rx.data[0] = data & 0xff; // drop parity bit
             rx.ptr = 1;
         } else if (rx.ptr < MSG_MAXLEN) {
             switch (rx.data[0]) {
-                case P_COMMAND:
-                    if (rx.ptr < 3) {
-                        // bytes 1 and 2: data
-                        rx.data[rx.ptr++] = data;
-                    } else if (rx.ptr == 3) {
-                        // byte 3: checksum
-                        if (validateChecksum(data)) {
-                            setLedStatus(rx);
-                        }
-                        rx.ptr++;
+            case P_COMMAND:
+                if (rx.ptr < 3) {
+                    // bytes 1 and 2: data
+                    rx.data[rx.ptr++] = data;
+                } else if (rx.ptr == 3) {
+                    // byte 3: checksum
+                    if (validateChecksum(data)) {
+                        setLedStatus(rx);
                     }
-                    break;
-                case L_COMMAND:
-                    if (rx.ptr == 1 || rx.ptr < rx.data[1] + 2) {
-                        // byte 1: length
-                        // byte 2 to length + 1: data
-                        rx.data[rx.ptr++] = data;
-                    } else if (rx.ptr == rx.data[1] + 2) {
-                        // byte length + 2: checksum
-                        if (validateChecksum(data)) {
-                            rx.data[rx.ptr] = '\0';  // terminate string
-                            setLcdStatus(rx);
-                        }
-                        rx.ptr++;
+                    rx.ptr++;
+                }
+                break;
+            case L_COMMAND:
+                if (rx.ptr == 1 || rx.ptr < rx.data[1] + 2) {
+                    // byte 1: length
+                    // byte 2 to length + 1: data
+                    rx.data[rx.ptr++] = data;
+                } else if (rx.ptr == rx.data[1] + 2) {
+                    // byte length + 2: checksum
+                    if (validateChecksum(data)) {
+                        rx.data[rx.ptr] = '\0'; // terminate string
+                        setLcdStatus(rx);
                     }
-                    break;
-                default:
-                    break;  // ignore other messages
+                    rx.ptr++;
+                }
+                break;
+            default:
+                break; // ignore other messages
             }
         }
     }
@@ -174,21 +174,19 @@ void AccentaG4::setLcdStatus(struct Rx rx) {
     sendLcdStatus();
 }
 
-void AccentaG4::sendLcdStatus() {
-    sendMessage("LCD:" + String(status.lcd));
-}
+void AccentaG4::sendLcdStatus() { sendMessage("LCD:" + String(status.lcd)); }
 
 void AccentaG4::sendCommand(char key) {
-    serial.stopListening();                   // half-duplex bus
-    serial.write9(K_COMMAND | 0x100);         // K cmd: emulate MARK parity
-    serial.write9(key & 0xff);                // key: emulate SPACE parity
-    serial.write9((K_COMMAND + key) & 0xff);  // checksum: emulate SPACE parity
+    serial.stopListening();                  // half-duplex bus
+    serial.write9(K_COMMAND | 0x100);        // K cmd: emulate MARK parity
+    serial.write9(key & 0xff);               // key: emulate SPACE parity
+    serial.write9((K_COMMAND + key) & 0xff); // checksum: emulate SPACE parity
     serial.listen();
 }
 
 void AccentaG4::sendCommands() {
     // send keypad commands
-    if (tx.queue.count() && millis() > tx.next) {  // throttle tx
+    if (tx.queue.count() && millis() > tx.next) { // throttle tx
         sendCommand(tx.queue.pop());
         tx.next = millis() + K_DELAY_MS;
     }

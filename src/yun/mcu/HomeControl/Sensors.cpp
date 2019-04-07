@@ -1,7 +1,7 @@
 /*
-  Sensors.cpp - Library for 
-	Adafruit SHT31 temperature/humidity sensor
-  	Adafruit SGP30 TVOC/CO2 sensor
+  Sensors.cpp - Library for
+        Adafruit SHT31 temperature/humidity sensor
+        Adafruit SGP30 TVOC/CO2 sensor
   Created by Luca Paolini, April 3, 2019.
 */
 
@@ -36,9 +36,14 @@ void Sensors::begin() {
 }
 
 uint32_t Sensors::getAbsoluteHumidity(float temperature, float humidity) {
-    // approximation formula from Sensirion SGP30 Driver Integration chapter 3.15
-    const float absoluteHumidity = 216.7f * ((humidity / 100.0f) * 6.112f * exp((17.62f * temperature) / (243.12f + temperature)) / (273.15f + temperature)); // [g/m^3]
-    const uint32_t absoluteHumidityScaled = static_cast<uint32_t>(1000.0f * absoluteHumidity); // [mg/m^3]
+    // approximation formula from Sensirion SGP30 Driver Integration
+    // chapter 3.15
+    const float absoluteHumidity =
+        216.7f * ((humidity / 100.0f) * 6.112f *
+                  exp((17.62f * temperature) / (243.12f + temperature)) /
+                  (273.15f + temperature)); // [g/m^3]
+    const uint32_t absoluteHumidityScaled =
+        static_cast<uint32_t>(1000.0f * absoluteHumidity); // [mg/m^3]
     return absoluteHumidityScaled;
 }
 
@@ -70,23 +75,22 @@ void Sensors::loop() {
 void Sensors::sample() {
     sample_sht31();
     sample_sgp30();
-    sendMessage( 
-        "AIR:" + String(status.temperature)
-        + ":" + String(status.relativeHumidity)
-        + ":" + String(status.absoluteHumidity)
-        + ":" + String(status.TVOC)
-        + ":" + String(status.eCO2)
-    );
+    sendMessage("AIR:" + String(status.temperature) + ":" +
+                String(status.relativeHumidity) + ":" +
+                String(status.absoluteHumidity) + ":" + String(status.TVOC) +
+                ":" + String(status.eCO2));
 }
 
 void Sensors::sample_sht31() {
     if (sht31_enabled) {
-        SHT31D result = sht31.readTempAndHumidity(SHT3XD_REPEATABILITY_LOW, SHT3XD_MODE_POLLING, 50);
+        SHT31D result = sht31.readTempAndHumidity(SHT3XD_REPEATABILITY_LOW,
+                                                  SHT3XD_MODE_POLLING, 50);
         if (result.error == SHT3XD_NO_ERROR) {
             status.temperature = result.t;
             status.relativeHumidity = result.rh;
             if (!isnan(status.temperature) && !isnan(status.relativeHumidity)) {
-                status.absoluteHumidity = getAbsoluteHumidity(status.temperature, status.relativeHumidity);
+                status.absoluteHumidity = getAbsoluteHumidity(
+                    status.temperature, status.relativeHumidity);
             } else {
                 status.absoluteHumidity = NAN;
             }

@@ -13,25 +13,26 @@
 #include <Arduino.h>
 
 class SerialBridge {
-	private:
+  private:
     long linkSpeed;
     int statusLed;
 
     int ledState = LOW;
     unsigned long nextBlink = 0;
-		void start();
-		void stop();
+    void start();
+    void stop();
     bool isDisabled();
-		void waitUntilReady();
+    void waitUntilReady();
     void check();
     void blink();
 
-	public:
-    SerialBridge::SerialBridge(HardwareSerial &serial, long linkSpeed, int statusLed);
+  public:
+    SerialBridge::SerialBridge(HardwareSerial &serial, long linkSpeed,
+                               int statusLed);
     HardwareSerial &serial;
     void begin();
-		void end();
-		void loop();
+    void end();
+    void loop();
 };
 
 #endif
