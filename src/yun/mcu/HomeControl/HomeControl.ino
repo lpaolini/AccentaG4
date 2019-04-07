@@ -8,38 +8,36 @@
 #define SIG_SET_PIN 3
 #define SIG_INT_PIN 4
 #define SIG_PA_PIN 5
-#define STATUS_LED 13
 #define LINK_SPEED 115200
 #define CONSOLE_SPEED 115200
 #define HEARTBEAT_MS 2000
-#define SENSORS_DELAY 5000
+#define SENSORS_INTERVAL_MS 5000
 
 unsigned long nextHeartbeat = millis() + HEARTBEAT_MS;
 unsigned long lastMessage;
-unsigned long nextLoop = millis();
-bool ledOn = false;
 
 void sendMessage(String msg) {
     handleMessage(msg);
     lastMessage = millis();
 }
 
-void heartbeat() {
-    if (millis() > nextHeartbeat) {
-        handleMessage("HBT:" + String((millis() - lastMessage) / 1000));
-    }
-}
-
-SerialBridge bridge(Serial1, LINK_SPEED, STATUS_LED);
+SerialBridge bridge(Serial1, LINK_SPEED, LED_BUILTIN);
 
 AccentaG4 alarm(COMMS_RX_PIN, COMMS_TX_PIN, SIG_SET_PIN, SIG_ABORT_PIN,
                 SIG_INT_PIN, SIG_PA_PIN, sendMessage);
 
-Sensors sensors(SENSORS_DELAY, sendMessage);
+Sensors sensors(SENSORS_INTERVAL_MS, sendMessage);
 
 void handleMessage(String msg) {
     bridge.serial.println(msg);
     nextHeartbeat = millis() + HEARTBEAT_MS;
+}
+
+void heartbeat() {
+    unsigned long currentMillis = millis();
+    if (currentMillis > nextHeartbeat) {
+        handleMessage("HBT:" + String((currentMillis - lastMessage) / 1000));
+    }
 }
 
 void setup() {
@@ -50,16 +48,6 @@ void setup() {
 }
 
 void loop() {
-    if (millis() > nextLoop) {
-        if (ledOn) {
-            digitalWrite(STATUS_LED, LOW);
-            nextLoop += 900;
-        } else {
-            digitalWrite(STATUS_LED, HIGH);
-            nextLoop += 100;
-        }
-        ledOn = !ledOn;
-    }
     bridge.loop();
     alarm.loop();
     sensors.loop();

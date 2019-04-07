@@ -7,6 +7,8 @@
 #define SerialBridge_h
 
 #define READY_PIN 7
+#define BRIDGE_UP_BLINK_RATE_MS 500
+#define BRIDGE_DOWN_BLINK_RATE_MS 100
 
 #include <Arduino.h>
 
@@ -14,9 +16,15 @@ class SerialBridge {
 	private:
     long linkSpeed;
     int statusLed;
+
+    int ledState = LOW;
+    unsigned long nextBlink = 0;
 		void start();
 		void stop();
-		void check();
+    bool isDisabled();
+		void waitUntilReady();
+    void check();
+    void blink();
 
 	public:
     SerialBridge::SerialBridge(HardwareSerial &serial, long linkSpeed, int statusLed);

@@ -257,8 +257,8 @@
                             $('.lcd').removeClass('stale')
                         }
                         break
-                    case 'AIR': // air quality
-                        console.log('Air quality', data)
+                    case 'SEN': // sensors
+                        console.log('Air sensors', data)
                         break
                     default:
                         break

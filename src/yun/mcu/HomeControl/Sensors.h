@@ -9,7 +9,7 @@
 #define Sensors_h
 
 #include <Arduino.h>
-#include <Adafruit_SHT31.h>
+#include <ClosedCube_SHT31D.h>
 #include <Adafruit_SGP30.h>
 
 struct Status {
@@ -22,10 +22,10 @@ struct Status {
 
 class Sensors {
 	private:
-		unsigned long delay;
+		unsigned long interval;
 		void (*sendMessage)(String msg);
 
-		Adafruit_SHT31 sht31 = Adafruit_SHT31();
+		ClosedCube_SHT31D sht31;
     bool sht31_enabled;
 		void begin_sht31();
     void sample_sht31();
@@ -37,14 +37,13 @@ class Sensors {
     void sample_sgp30();
 		void end_sgp30();
 
-		// void calibrate();
     uint32_t getAbsoluteHumidity(float temperature, float humidity);
 		void sample();
-		unsigned long nextSample;
+		unsigned long nextSample = 0;
 		Status status;
 
 	public:
-		Sensors(unsigned long delay, void (*sendMessage)(String msg));
+		Sensors(unsigned long interval, void (*sendMessage)(String msg));
 		void begin();
 		void end();
 		void loop();

@@ -7,24 +7,26 @@
 
 #include "Sensors.h"
 
-Sensors::Sensors(unsigned long delay, void (*sendMessage)(String msg)) {
-    this->delay = delay;
+Sensors::Sensors(unsigned long interval, void (*sendMessage)(String msg)) {
+    this->interval = interval;
     this->sendMessage = sendMessage;
 }
 
 void Sensors::begin_sht31() {
     if (sht31.begin(0x44)) {
         sht31_enabled = true;
+        sendMessage("SEN:SHT31 detected " + String(sht31.readSerialNumber()));
     } else {
-        // sendMessage("SHT31:OFF");
+        sendMessage("SEN:SHT31 not detected");
     }
 }
 
 void Sensors::begin_sgp30() {
     if (sgp30.begin()) {
         sgp30_enabled = true;
+        sendMessage("SEN:SGP30 detected");
     } else {
-        // sendMessage("SGP30:OFF");
+        sendMessage("SEN:SGP30 not detected");
     }
 }
 
@@ -58,9 +60,10 @@ void Sensors::end() {
 }
 
 void Sensors::loop() {
-    if ((sht31_enabled || sgp30_enabled) && millis() > nextSample) {
+    unsigned long currentMillis = millis();
+    if ((sht31_enabled || sgp30_enabled) && currentMillis > nextSample) {
         sample();
-        nextSample = millis() + delay;
+        nextSample = currentMillis + interval;
     }
 }
 
@@ -68,34 +71,29 @@ void Sensors::sample() {
     sample_sht31();
     sample_sgp30();
     sendMessage( 
-        "AIR:" + String(status.temperature) 
+        "AIR:" + String(status.temperature)
         + ":" + String(status.relativeHumidity)
         + ":" + String(status.absoluteHumidity)
         + ":" + String(status.TVOC)
         + ":" + String(status.eCO2)
     );
-    // sendMessage("T:" + String(status.temperature)); 
-    // sendMessage("H:" + String(status.relativeHumidity));
-    // sendMessage("V:" + String(status.TVOC));
-    // sendMessage("C:" + String(status.eCO2));
-//    );
 }
 
 void Sensors::sample_sht31() {
     if (sht31_enabled) {
-        status.temperature = sht31.readTemperature();
-        status.relativeHumidity = sht31.readHumidity();
-        if (!isnan(status.temperature) && !isnan(status.relativeHumidity)) {
-            status.absoluteHumidity = getAbsoluteHumidity(status.temperature, status.relativeHumidity);
-            // sendMessage("T:" + String(status.temperature)); 
-            // sendMessage("H:" + String(status.relativeHumidity));
-            // sendMessage("SHT31:" 
-            //     + String(status.temperature) 
-            //     + ':' + String(status.relativeHumidity)
-            //     + ':' + String(status.absoluteHumidity)
-            // );
+        SHT31D result = sht31.readTempAndHumidity(SHT3XD_REPEATABILITY_LOW, SHT3XD_MODE_POLLING, 50);
+        if (result.error == SHT3XD_NO_ERROR) {
+            status.temperature = result.t;
+            status.relativeHumidity = result.rh;
+            if (!isnan(status.temperature) && !isnan(status.relativeHumidity)) {
+                status.absoluteHumidity = getAbsoluteHumidity(status.temperature, status.relativeHumidity);
+            } else {
+                status.absoluteHumidity = NAN;
+            }
         } else {
-            // sendMessage("SHT31:ERR");
+            sendMessage("SEN: SHT31 " + String(result.error));
+            status.temperature = NAN;
+            status.relativeHumidity = NAN;
         }
     }
 }
@@ -108,14 +106,10 @@ void Sensors::sample_sgp30() {
         if (sgp30.IAQmeasure()) {
             status.TVOC = sgp30.TVOC;
             status.eCO2 = sgp30.eCO2;
-            // sendMessage("V:" + String(status.TVOC));
-            // sendMessage("C:" + String(status.eCO2));
-            // sendMessage("SGP30:" 
-            //     + String(sgp30.TVOC) 
-            //     + ':' + String(sgp30.eCO2) 
-            // );
         } else {
-            // sendMessage("SGP30:ERR");
+            sendMessage("SEN: SGP30 error");
+            status.TVOC = NAN;
+            status.eCO2 = NAN;
         }
     }
 }

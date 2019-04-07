@@ -18,23 +18,36 @@ void SerialBridge::stop() {
     serial.end();
 }
 
+bool SerialBridge::isDisabled() {
+    return digitalRead(READY_PIN);
+}
+
+void SerialBridge::waitUntilReady() {
+    while (digitalRead(READY_PIN)) {
+        digitalWrite(statusLed, HIGH);
+        delay(BRIDGE_DOWN_BLINK_RATE_MS);
+        digitalWrite(statusLed, LOW);
+        delay(BRIDGE_DOWN_BLINK_RATE_MS);
+    }
+}
+
 void SerialBridge::check() {
-    // Wait for mpu boot complete
-    if (digitalRead(READY_PIN)) {
+    if (isDisabled()) {
         Serial.println("Bridge disabled");
         stop();
-        while (digitalRead(READY_PIN)) {
-            // Flash led while waiting
-            digitalWrite(statusLed, HIGH);
-            delay(100);
-            digitalWrite(statusLed, LOW);
-            delay(100);
-        }
+        waitUntilReady();
         start();
         Serial.println("Bridge enabled");
-    } else {
-        digitalWrite(statusLed, LOW);
     }
+}
+
+void SerialBridge::blink() {
+     unsigned long currentMillis = millis();
+     if (currentMillis > nextBlink) {
+        nextBlink = currentMillis + BRIDGE_UP_BLINK_RATE_MS;
+        ledState = !ledState;
+        digitalWrite(statusLed, ledState);
+     }
 }
 
 void SerialBridge::begin() {
@@ -43,6 +56,7 @@ void SerialBridge::begin() {
     digitalWrite(statusLed, HIGH);
     delay(2500);
     start();
+    digitalWrite(statusLed, LOW);
     check();
 }
 
@@ -52,4 +66,5 @@ void SerialBridge::end() {
 
 void SerialBridge::loop() {
     check();
+    blink();
 }
