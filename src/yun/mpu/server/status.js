@@ -6,9 +6,10 @@ function Status(handlers) {
 }
 
 Status.prototype.update = function (property, status) {
-    if ((!this.status[property]) == status) {
+    if ((this.status[property]) !== status) {
+        this.status[property] = status
         var handler = this.handlers[property]
-        handler && handler(this.status[property] = status)
+        handler && handler(status)
     }
 }
 

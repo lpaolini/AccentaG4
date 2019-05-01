@@ -7,76 +7,103 @@
 	<link rel="stylesheet" href="alarm.css"/>
 </head>
 <body>
-	<div class="wrapper">
-		<div>
-			<div id="autoArm" data-click="#ARM=1" class="led red">arm</div>
-			<div id="autoDisarm" data-click="#DIS=1" class="led red">disarm</div>
+	<div class="main">
+		<div class="lcd">
+			<pre id="row0"></pre>
+			<pre id="row1"></pre>
+			<pre class="air">
+				<div id="auto-arm" data-autoarm></div>
+				<div>Auto arm/disarm</div>
+				<div id="auto-disarm" data-autodisarm></div>
+			</pre>
+			<pre class="air">
+				<div>n/a&deg;C</div>
+				<div>n/a%RH</div>
+				<div>n/appbTVOC</div>
+				<div>n/appmCO<sub>2</sub></div>
+			</pre>
 		</div>
-		<div>
-			<div class="lcd">
-				<pre id="row0"></pre>
-				<pre id="row1"></pre>
-				<pre class="air">
-					<div>25&deg;C</div>
-					<div>55%RH</div>
-					<div>1234ppbTVOC</div>
-					<div>5678ppmCO<sub>2</sub></div>
-				</pre>
+		<div class="keyboard">
+			<div>
+				<div id="zone1" data-keypad="1" data-click="1" class="led red">1</div>
+				<div id="zone2" data-keypad="2" data-click="2" class="led red">2</div>
+				<div id="zone3" data-keypad="3" data-click="3" class="led red">3</div>
+				<div id="zone4" data-keypad="4" data-click="4" class="led red">4</div>
+			</div>
+			<div>
+				<div id="zone5" data-keypad="5" data-click="5" class="led red">5</div>
+				<div id="zone6" data-keypad="6" data-click="6" class="led red">6</div>
+				<div id="zone7" data-keypad="7" data-click="7" class="led red">7</div>
+				<div id="zone8" data-keypad="8" data-click="8" class="led red">8</div>
+			</div>
+			<div>
+				<div id="key1" data-click="1" class="button">1</div>
+				<div id="key2" data-click="2" class="button">2</div>
+				<div id="key3" data-click="3" class="button">3</div>
+				<div id="keyChime" data-click="c" class="button">CHM</div>
+			</div>
+			<div>
+				<div id="key4" data-click="4" class="button">4</div>
+				<div id="key5" data-click="5" class="button">5</div>
+				<div id="key6" data-click="6" class="button">6</div>
+				<div id="keyOmit" data-click="o" class="button">OMT</div>
+			</div>
+			<div>
+				<div id="key7" data-click="7" class="button">7</div>
+				<div id="key8" data-click="8" class="button">8</div>
+				<div id="key9" data-click="9" class="button">9</div>
+				<div id="keyProgram" data-click="p" class="button">PRG</div>
+			</div>
+			<div>
+				<div id="keySelect" data-click="s" class="button">SEL</div>
+				<div id="key0" data-click="0" class="button">0</div>
+				<div id="keyCancel" data-click="x" class="button">X</div>
+				<div id="keySet" data-click="v" class="button">&#10003;</div>
+			</div>
+			<div>
+				<div id="tamper" data-keypad="T" class="led red">tmp</div>
+				<div id="sos" data-keypad="S" class="led red">sos</div>
+				<div id="unset" data-keypad="U" class="led green">unst</div>
+				<div id="power" data-keypad="P" class="led red">pwr</div>
+			</div>
+			<div>
+				<div id="set" data-panel="S" class="led blue">set</div>
+				<div id="abort" data-panel="A" class="led yellow blink">abrt</div>
+				<div id="intruder" data-panel="I" class="led red blink">intr</div>
+				<div id="panic" data-panel="P" class="led red blink">pa</div>
+			</div>
+			<div>
+				<div id="set1" data-click="vp1" class="button">P1</div>
+				<div id="set2" data-click="vp2" class="button">P2</div>
+				<div id="set3" data-click="vp3" class="button">P3</div>
+				<div id="pa" data-click="!" class="button">PANIC</div>
 			</div>
 		</div>
-		<div>
-			<div id="zone1" data-keypad="1" data-click="1" class="led red">1</div>
-			<div id="zone2" data-keypad="2" data-click="2" class="led red">2</div>
-			<div id="zone3" data-keypad="3" data-click="3" class="led red">3</div>
-			<div id="zone4" data-keypad="4" data-click="4" class="led red">4</div>
-		</div>
-		<div>
-			<div id="zone5" data-keypad="5" data-click="5" class="led red">5</div>
-			<div id="zone6" data-keypad="6" data-click="6" class="led red">6</div>
-			<div id="zone7" data-keypad="7" data-click="7" class="led red">7</div>
-			<div id="zone8" data-keypad="8" data-click="8" class="led red">8</div>
-		</div>
-		<div>
-			<div id="key1" data-click="1" class="button">1</div>
-			<div id="key2" data-click="2" class="button">2</div>
-			<div id="key3" data-click="3" class="button">3</div>
-			<div id="keyChime" data-click="c" class="button">CHM</div>
-		</div>
-		<div>
-			<div id="key4" data-click="4" class="button">4</div>
-			<div id="key5" data-click="5" class="button">5</div>
-			<div id="key6" data-click="6" class="button">6</div>
-			<div id="keyOmit" data-click="o" class="button">OMT</div>
-		</div>
-		<div>
-			<div id="key7" data-click="7" class="button">7</div>
-			<div id="key8" data-click="8" class="button">8</div>
-			<div id="key9" data-click="9" class="button">9</div>
-			<div id="keyProgram" data-click="p" class="button">PRG</div>
-		</div>
-		<div>
-			<div id="keySelect" data-click="s" class="button">SEL</div>
-			<div id="key0" data-click="0" class="button">0</div>
-			<div id="keyCancel" data-click="x" class="button">X</div>
-			<div id="keySet" data-click="v" class="button">&#10003;</div>
-		</div>
-		<div>
-			<div id="tamper" data-keypad="T" class="led red">tmp</div>
-			<div id="sos" data-keypad="S" class="led red">sos</div>
-			<div id="unset" data-keypad="U" class="led green">unst</div>
-			<div id="power" data-keypad="P" class="led red">pwr</div>
-		</div>
-		<div>
-			<div id="set" data-panel="S" class="led blue">set</div>
-			<div id="abort" data-panel="A" class="led yellow blink">abrt</div>
-			<div id="intruder" data-panel="I" class="led red blink">intr</div>
-			<div id="panic" data-panel="P" class="led red blink">pa</div>
-		</div>
-		<div>
-			<div id="set1" data-click="vp1" class="button">P1</div>
-			<div id="set2" data-click="vp2" class="button">P2</div>
-			<div id="set3" data-click="vp3" class="button">P3</div>
-			<div id="pa" data-click="!" class="button">PANIC</div>
+		<div class="auto">
+			<div class="auto-container">
+				<div>
+					<h4>Arm</h4>
+					<ul class="arm">
+						<li class="button" data-click="#ARM=-1">OFF</li>
+						<li class="button" data-click="#ARM=18">18:00</li>
+						<li class="button" data-click="#ARM=21">21:00</li>
+						<li class="button" data-click="#ARM=0">00:00</li>
+						<li class="button" data-click="#ARM=1">01:00</li>
+						<li class="button" data-click="#ARM=2">02:00</li>
+					</ul>
+				</div>
+				<div>
+					<h4>Disarm</h4>
+					<ul class="disarm">
+						<li class="button" data-click="#DIS=-1">OFF</li>
+						<li class="button" data-click="#DIS=6">06:00</li>
+						<li class="button" data-click="#DIS=7">07:00</li>
+						<li class="button" data-click="#DIS=8">08:00</li>
+						<li class="button" data-click="#DIS=10">10:00</li>
+						<li class="button" data-click="#DIS=12">12:00</li>
+					</ul>
+				</div>
+			</div>
 		</div>
 	</div>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>

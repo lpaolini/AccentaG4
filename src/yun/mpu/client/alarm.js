@@ -220,6 +220,18 @@
         }
     }
 
+    var Auto = (attr) => {
+        return {
+            ingest: data => {
+                const hour = parseInt(data)
+                const time = hour === -1
+                    ? 'OFF'
+                    : `${hour < 10 ? '0' : ''}${hour}:00`
+                $('[' + attr + ']').html(time)
+            }
+        }
+    }
+
     $(() => {
         var lcd = Lcd(rows => {
             $('#row0', '.lcd').html(rows[0])
@@ -228,6 +240,8 @@
 
         var keypadLed = Led('data-keypad', '12345678UTSP')
         var panelLed = Led('data-panel', 'SAIP')
+        var autoArm = Auto('data-autoarm')
+        var autoDisarm = Auto('data-autodisarm')
 
         var url = location.protocol === 'https:' ?
             'wss://' + location.hostname + ':8443' :
@@ -261,10 +275,10 @@
                         console.log('Air sensors', data)
                         break
                     case 'ARM': // auto arm
-                        console.log('auto arm', data)
+                        autoArm.ingest(data)
                         break
                     case 'DIS': // auto disarm
-                        console.log('auto disarm', data)
+                        autoDisarm.ingest(data)
                         break
                     default:
                         break
@@ -298,6 +312,12 @@
             show: connection.start,
             hide: connection.stop
         })
+
+        $('.lcd').on('click', () => {
+            $('.keyboard').toggle()
+            $('.auto').toggle()
+        })
+        // $('.auto').on('click', () => $('.auto').hide())
 
         connection.start()
     })

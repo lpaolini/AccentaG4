@@ -37,12 +37,15 @@ const status = new Status({
         notify(on ? 'Alarm activated: PANIC [!]' : 'Alarm deactivated: PANIC')
     },
     autoArm: function (hour) {
-        console.log(hour ? 'Auto-arm enabled at ' + hour + ':00' : 'Auto-arm disabled')
+        console.log(hour === -1 ? 'Auto-arm disabled' : 'Auto-arm enabled at ' + hour + ':00')
     },
     autoDisarm: function (hour) {
-        console.log(hour ? 'Auto-disarm enabled at ' + hour + ':00' : 'Auto-disarm disabled')
+        console.log(hour === -1 ? 'Auto-disarm disabled' : 'Auto-disarm enabled at ' + hour + ':00')
     }
 })
+
+status.update('autoArm', config.autoArmHour)
+status.update('autoDisarm', config.autoDisarmHour)
 
 // initialize serial port
 const serial = (function () {
@@ -102,16 +105,6 @@ const broadcast = (function (heartbeatTimeout) {
     return send
 })(3000)
 
-const processCommand = function (command) {
-    if (command.substring(0, 4) === 'ARM=') {
-        status.update('autoArm', parseInt(command.split('=')[1]))
-        broadcast('ARM:' + status.read('autoArm'))
-    } else if (command.substring(0, 4) === 'DIS=') {
-        status.update('autoDisarm', parseInt(command.split('=')[1]))
-        broadcast('DIS:' + status.read('autoDisarm'))
-    }
-}
-
 // react to serial messages
 serial.on('data', function (data) {
     console.log('data: [' + data + ']')
@@ -135,9 +128,17 @@ serial.on('data', function (data) {
 // react to websockets messages
 wss.on('connection', function (ws) {
     ws.on('message', function (message) {
-        if (message.substring(0, 1) === '#') {
-            processCommand(message.substring(1))
+        if (message.substring(0, 5) === '#ARM=') {
+            status.update('autoArm', parseInt(message.split('=')[1]))
+            broadcast('ARM:' + status.read('autoArm'))
+        } else if (message.substring(0, 5) === '#DIS=') {
+            status.update('autoDisarm', parseInt(message.split('=')[1]))
+            broadcast('DIS:' + status.read('autoDisarm'))
         } else {
+            if (message === '?') {
+                broadcast('ARM:' + status.read('autoArm'))
+                broadcast('DIS:' + status.read('autoDisarm'))
+            }
             serial.write(message, function () {
                 console.log('secure websockets client: %s', message)
             })

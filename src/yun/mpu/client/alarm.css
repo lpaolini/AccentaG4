@@ -14,8 +14,8 @@
 
 body {
     --width: 22rem;
-    --height: 36rem;
-    width: var(--width);
+    --height: 38rem;
+    position: relative;
     margin: auto;
     background: #383838;
     user-select: none;
@@ -23,30 +23,70 @@ body {
     flex-wrap: wrap;
     flex-direction: column;
     justify-content: center;
+    color: white;
+    font-family: arial, sans-serif;
 }
 
 body.active {
     animation: alarm 1s ease infinite;
 }    
 
-.wrapper {
+.main {
+    width: var(--width);
     height: var(--height);
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.keyboard {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    flex-grow: 1;
 }
 
-.wrapper > * {
+.keyboard > * {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
 }
 
-.wrapper > * > * {
-    background-image: linear-gradient(top, #383838 0%, #1F1F1F 5%, #161616 100%);
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#1F1F1F), to(#161616));
-    position: relative;
-    text-align: center;
+.auto {
+    display: none;
+}
+
+.auto-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.auto-container > * {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.auto ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.auto li:not(:first-child) {
+    margin-top: 1rem;
+}
+
+.auto .arm {
+    display: flex;
+    flex-direction: column;
+}
+
+.auto .disarm {
+    display: flex;
+    flex-direction: column;
 }
 
 [data-click],
@@ -69,14 +109,19 @@ body.active {
 .lcd,
 .led,
 .button {
+    position: relative;
+    background-image: linear-gradient(top, #383838 0%, #1F1F1F 5%, #161616 100%);
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#1F1F1F), to(#161616));
+    text-align: center;
     box-shadow: 0 0 1px 1px #505050;
 }
 
 .lcd {
     width: 100%;
-    height: 6.5rem;
+    height: 8.5rem;
     border-radius: 1rem;
     padding: 0.5rem;
+    margin-bottom: .5rem;
     color: cyan;
 }
 
@@ -122,8 +167,8 @@ body.active {
 .led {
     border-radius: 1rem;
     color: #a0a0a0;
-    font: normal 1.3rem arial;
-    /*transition: color .1s ease;*/
+    font-size: 1.3rem;
+    /* text-align: center; */
 }
 
 .button {
