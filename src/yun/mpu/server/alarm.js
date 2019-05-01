@@ -103,7 +103,7 @@ const broadcast = (function (heartbeatTimeout) {
 })(3000)
 
 const processCommand = function (command) {
-    if (command.substring(0, 4) === 'ARM=')) {
+    if (command.substring(0, 4) === 'ARM=') {
         status.update('autoArm', parseInt(command.split('=')[1]))
         broadcast('ARM:' + status.read('autoArm'))
     } else if (command.substring(0, 4) === 'DIS=') {
