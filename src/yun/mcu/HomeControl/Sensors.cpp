@@ -23,8 +23,11 @@ void Sensors::begin_sht31() {
 
 void Sensors::begin_sgp30() {
     if (sgp30.begin()) {
-        sgp30_enabled = true;
         sendMessage("SEN:SGP30 detected");
+        if (sgp30.IAQinit()) {
+            sgp30_enabled = true;
+            sendMessage("SEN:SGP30 initialized");
+        }
     } else {
         sendMessage("SEN:SGP30 not detected");
     }
