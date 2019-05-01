@@ -35,6 +35,12 @@ const status = new Status({
     },
     pa: function (on) {
         notify(on ? 'Alarm activated: PANIC [!]' : 'Alarm deactivated: PANIC')
+    },
+    autoArm: function (hour) {
+        console.log(hour ? 'Auto-arm enabled at ' + hour + ':00' : 'Auto-arm disabled')
+    },
+    autoDisarm: function (hour) {
+        console.log(hour ? 'Auto-disarm enabled at ' + hour + ':00' : 'Auto-disarm disabled')
     }
 })
 
@@ -96,6 +102,14 @@ const broadcast = (function (heartbeatTimeout) {
     return send
 })(3000)
 
+const processCommand = function (command) {
+    if (command.startsWith('autoArm=')) {
+        status.update('autoArm', parseInt(command.split('=')[1]))
+    } else if (command.startsWith('autoDisarm=')) {
+        status.update('autoDisarm', parseInt(command.split('=')[1]))
+    }
+}
+
 // react to serial messages
 serial.on('data', function (data) {
     console.log('data: [' + data + ']')
@@ -119,8 +133,31 @@ serial.on('data', function (data) {
 // react to websockets messages
 wss.on('connection', function (ws) {
     ws.on('message', function (message) {
-        serial.write(message, function () {
-            console.log('secure websockets client: %s', message)
-        })
+        if (message.startsWith('#')) {
+            processCommand(message.substring(1))
+        } else {
+            serial.write(message, function () {
+                console.log('secure websockets client: %s', message)
+            })
+        }
     })
 })
+
+setInterval(function() {
+    var date = new Date()
+    if (status.read('set')) {
+        if (config.autoDisarmCode
+            && date.getHours() === status.read('autoDisarm')
+            && date.getMinutes() === 0) {
+            console.log('alarm auto-disarmed')
+            serial.write(config.autoDisarmCode)
+        }
+    } else {
+        if (config.autoArmCode
+            && date.getHours() === status.read('autoArm')
+            && date.getMinutes() === 0) {
+            console.log('alarm auto-armed')
+            serial.write(config.autoArmCode)
+        }
+    }
+}, 60000)
