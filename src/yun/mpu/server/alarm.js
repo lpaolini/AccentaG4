@@ -133,7 +133,7 @@ serial.on('data', function (data) {
 // react to websockets messages
 wss.on('connection', function (ws) {
     ws.on('message', function (message) {
-        if (message.startsWith('#')) {
+        if (message.substring(0) === '#') {
             processCommand(message.substring(1))
         } else {
             serial.write(message, function () {
