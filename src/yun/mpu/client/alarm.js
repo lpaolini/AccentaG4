@@ -260,6 +260,12 @@
                     case 'SEN': // sensors
                         console.log('Air sensors', data)
                         break
+                    case 'ARM': // auto arm
+                        console.log('auto arm', data)
+                        break
+                    case 'DIS': // auto disarm
+                        console.log('auto disarm', data)
+                        break
                     default:
                         break
                     }

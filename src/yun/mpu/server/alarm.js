@@ -103,10 +103,12 @@ const broadcast = (function (heartbeatTimeout) {
 })(3000)
 
 const processCommand = function (command) {
-    if (command.startsWith('autoArm=')) {
+    if (command.substring(0, 4) === 'ARM=')) {
         status.update('autoArm', parseInt(command.split('=')[1]))
-    } else if (command.startsWith('autoDisarm=')) {
+        broadcast('ARM:' + status.read('autoArm'))
+    } else if (command.substring(0, 4) === 'DIS=') {
         status.update('autoDisarm', parseInt(command.split('=')[1]))
+        broadcast('DIS:' + status.read('autoDisarm'))
     }
 }
 
@@ -133,7 +135,7 @@ serial.on('data', function (data) {
 // react to websockets messages
 wss.on('connection', function (ws) {
     ws.on('message', function (message) {
-        if (message.substring(0) === '#') {
+        if (message.substring(0, 1) === '#') {
             processCommand(message.substring(1))
         } else {
             serial.write(message, function () {
