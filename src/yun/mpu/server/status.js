@@ -7,6 +7,11 @@ function Status(handlers) {
 
 Status.prototype.update = function (property, status) {
     if ((!this.status[property]) == status) {
-        this.handlers[property](this.status[property] = status)
+        var handler = this.handlers[property]
+        handler && handler(this.status[property] = status)
     }
+}
+
+Status.prototype.read = function (property) {
+    return this.status[property]
 }
