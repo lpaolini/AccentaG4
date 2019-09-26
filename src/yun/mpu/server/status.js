@@ -6,7 +6,8 @@ function Status(handlers) {
 }
 
 Status.prototype.update = function (property, status) {
-    if ((this.status[property]) !== status) {
+    const prevStatus = this.status[property] || false
+    if (status !== prevStatus) {
         this.status[property] = status
         var handler = this.handlers[property]
         handler && handler(status)

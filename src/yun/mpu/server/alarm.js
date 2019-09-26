@@ -2,6 +2,8 @@ const fs = require('fs')
 const https = require('https')
 
 const SerialPort = require('serialport')
+const Delimiter = require('@serialport/parser-delimiter')
+
 const WebSocket = require('ws')
 
 const Status = require('./status')
@@ -12,7 +14,7 @@ var config = {}
 if (process.argv.length > 2) {
     config = require(process.argv[2])
 } else {
-    console.log('Configuration file not provided')
+    console.log('Configuration file not provided, exiting.')
     process.exit(1)
 }
 
@@ -48,23 +50,29 @@ status.update('autoArm', config.autoArmHour)
 status.update('autoDisarm', config.autoDisarmHour)
 
 // initialize serial port
-const serial = (function () {
-    const serial = new SerialPort.SerialPort('/dev/ttyATH0', {
-        baudRate: 115200,
-        parser: SerialPort.parsers.readline('\r\n', 'binary')
+const {port, parser} = (function () {
+    const port = new SerialPort(config.serial, {
+        baudRate: 115200
     })
+    
+    const parser = new Delimiter({
+        delimiter: '\r\n'
+    })
+    
+    port.pipe(parser)
+            
     // handle opening
-    serial.on('open', function(err) {
+    port.on('open', function(err) {
         if (err) {
             return console.log('Error opening port: ', err.message)
         }
         console.log('Serial port opened')
     })
     // handle errors
-    serial.on('error', function(err) {
+    port.on('error', function(err) {
         console.log('Error: ', err.message)
     })
-    return serial
+    return {port, parser}
 })()
 
 // initialize websocket servers
@@ -75,7 +83,7 @@ const wss = (function () {
     }, function (req, res) {
         res.writeHead(200)
         res.end('WebSocket')
-    }).listen(8443)
+    }).listen(config.port)
     return new WebSocket.Server({
         server: httpsServer
     })
@@ -106,8 +114,9 @@ const broadcast = (function (heartbeatTimeout) {
 })(3000)
 
 // react to serial messages
-serial.on('data', function (data) {
-    console.log('data: [' + data + ']')
+parser.on('data', function (buffer) {
+    const data = buffer.toString('binary')
+    console.log('incoming serial data:', {data})
     switch (data.substr(0, 4)) {
     case 'HBT:':
         var staleness = parseInt(data.substring(4), 10)
@@ -139,8 +148,8 @@ wss.on('connection', function (ws) {
                 broadcast('ARM:' + status.read('autoArm'))
                 broadcast('DIS:' + status.read('autoDisarm'))
             }
-            serial.write(message, function () {
-                console.log('secure websockets client: %s', message)
+            port.write(message, function () {
+                console.log('incoming websocket message:', {message})
             })
         }
     })
@@ -153,14 +162,14 @@ setInterval(function() {
             && date.getHours() === status.read('autoDisarm')
             && date.getMinutes() === 0) {
             console.log('alarm auto-disarmed')
-            serial.write(config.autoDisarmCode)
+            port.write(config.autoDisarmCode)
         }
     } else {
         if (config.autoArmCode
             && date.getHours() === status.read('autoArm')
             && date.getMinutes() === 0) {
             console.log('alarm auto-armed')
-            serial.write(config.autoArmCode)
+            port.write(config.autoArmCode)
         }
     }
 }, 60000)

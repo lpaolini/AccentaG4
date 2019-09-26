@@ -1,5 +1,5 @@
 #include "AccentaG4.h"
-#include "Sensors.h"
+// #include "Sensors.h"
 #include "SerialBridge.h"
 
 #define COMMS_RX_PIN 10
@@ -21,12 +21,12 @@ void sendMessage(String msg) {
     lastMessage = millis();
 }
 
-SerialBridge bridge(Serial1, LINK_SPEED, LED_BUILTIN);
+SerialBridge bridge(Serial, LINK_SPEED, LED_BUILTIN);
 
 AccentaG4 alarm(COMMS_RX_PIN, COMMS_TX_PIN, SIG_SET_PIN, SIG_ABORT_PIN,
                 SIG_INT_PIN, SIG_PA_PIN, sendMessage);
 
-Sensors sensors(SENSORS_INTERVAL_MS, sendMessage);
+// Sensors sensors(SENSORS_INTERVAL_MS, sendMessage);
 
 void handleMessage(String msg) {
     bridge.serial.println(msg);
@@ -43,14 +43,13 @@ void heartbeat() {
 void setup() {
     bridge.begin();
     alarm.begin();
-    sensors.begin();
-    Serial.println("Ready");
+    // sensors.begin();
 }
 
 void loop() {
     bridge.loop();
     alarm.loop();
-    sensors.loop();
+    // sensors.loop();
     if (bridge.serial.available()) {
         alarm.sendKey(bridge.serial.read());
     }

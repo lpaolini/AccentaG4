@@ -16,10 +16,11 @@ void SerialBridge::start() { serial.begin(linkSpeed); }
 
 void SerialBridge::stop() { serial.end(); }
 
-bool SerialBridge::isDisabled() { return digitalRead(READY_PIN); }
+//bool SerialBridge::isDisabled() { return digitalRead(READY_PIN); }
+bool SerialBridge::isDisabled() { return false; }
 
 void SerialBridge::waitUntilReady() {
-    while (digitalRead(READY_PIN)) {
+    while (isDisabled()) {
         digitalWrite(statusLed, HIGH);
         delay(BRIDGE_DOWN_BLINK_RATE_MS);
         digitalWrite(statusLed, LOW);
@@ -29,11 +30,11 @@ void SerialBridge::waitUntilReady() {
 
 void SerialBridge::check() {
     if (isDisabled()) {
-        Serial.println("Bridge disabled");
+        // Serial.println("Bridge disabled");
         stop();
         waitUntilReady();
         start();
-        Serial.println("Bridge enabled");
+        // Serial.println("Bridge enabled");
     }
 }
 
