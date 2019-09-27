@@ -14,11 +14,12 @@
 #define SENSORS_INTERVAL_MS 5000
 
 unsigned long nextHeartbeat = millis() + HEARTBEAT_MS;
-unsigned long lastMessage;
+unsigned long lastMessageReceived;
+unsigned long lastMessageSent;
 
 void sendMessage(String msg) {
     handleMessage(msg);
-    lastMessage = millis();
+    lastMessageSent = millis();
 }
 
 SerialBridge bridge(Serial, LINK_SPEED, LED_BUILTIN);
@@ -36,7 +37,7 @@ void handleMessage(String msg) {
 void heartbeat() {
     unsigned long currentMillis = millis();
     if (currentMillis > nextHeartbeat) {
-        handleMessage("HBT:" + String((currentMillis - lastMessage) / 1000));
+        handleMessage("HBT:" + String((currentMillis - lastMessageSent) / 1000));
     }
 }
 
@@ -51,6 +52,7 @@ void loop() {
     alarm.loop();
     // sensors.loop();
     if (bridge.serial.available()) {
+        lastMessageReceived = millis();
         alarm.sendKey(bridge.serial.read());
     }
     heartbeat();

@@ -1,6 +1,9 @@
 const fs = require('fs')
 const https = require('https')
 
+const {Subject, timer, merge} = require('rxjs')
+const {switchMap, mapTo} = require('rxjs/operators')
+
 const SerialPort = require('serialport')
 const Delimiter = require('@serialport/parser-delimiter')
 
@@ -8,6 +11,8 @@ const WebSocket = require('ws')
 
 const Status = require('./status')
 const Notify = require('./notify')
+
+const HEARTBEAT_TIMEOUT = 3000
 
 var config = {}
 
@@ -89,29 +94,8 @@ const wss = (function () {
     })
 })()
 
-const broadcast = (function (heartbeatTimeout) {
-    var timer
-    function send(message) {
-        stop()
-        wss.clients.forEach(function (client) {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(message)
-            }
-        })
-        start()
-    }
-    function stop() {
-        clearTimeout(timer)
-    }
-    function start() {
-        timer = setTimeout(function () {
-            console.log('sending heartbeat')
-            send()
-        }, heartbeatTimeout)
-    }
-    start()
-    return send
-})(3000)
+const upstream$ = new Subject()
+const downstream$ = new Subject()
 
 // react to serial messages
 parser.on('data', function (buffer) {
@@ -131,7 +115,7 @@ parser.on('data', function (buffer) {
         break
     default:
     }
-    broadcast(data)
+    downstream$.next(data)
 })
 
 // react to websockets messages
@@ -139,16 +123,16 @@ wss.on('connection', function (ws) {
     ws.on('message', function (message) {
         if (message.substring(0, 5) === '#ARM=') {
             status.update('autoArm', parseInt(message.split('=')[1]))
-            broadcast('ARM:' + status.read('autoArm'))
+            downstream$.next('ARM:' + status.read('autoArm'))
         } else if (message.substring(0, 5) === '#DIS=') {
             status.update('autoDisarm', parseInt(message.split('=')[1]))
-            broadcast('DIS:' + status.read('autoDisarm'))
+            downstream$.next('DIS:' + status.read('autoDisarm'))
         } else {
             if (message === '?') {
-                broadcast('ARM:' + status.read('autoArm'))
-                broadcast('DIS:' + status.read('autoDisarm'))
+                downstream$.next('ARM:' + status.read('autoArm'))
+                downstream$.next('DIS:' + status.read('autoDisarm'))
             }
-            port.write(message, function () {
+            upstream$.next(message, function () {
                 console.log('incoming websocket message:', {message})
             })
         }
@@ -162,14 +146,40 @@ setInterval(function() {
             && date.getHours() === status.read('autoDisarm')
             && date.getMinutes() === 0) {
             console.log('alarm auto-disarmed')
-            port.write(config.autoDisarmCode)
+            upstream$.next(config.autoDisarmCode)
         }
     } else {
         if (config.autoArmCode
             && date.getHours() === status.read('autoArm')
             && date.getMinutes() === 0) {
             console.log('alarm auto-armed')
-            port.write(config.autoArmCode)
+            upstream$.next(config.autoArmCode)
         }
     }
 }, 60000)
+
+const broadcast = data =>
+    wss.clients.forEach(function (client) {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(data)
+        }
+    })
+
+const withHeartbeat = (stream$, heartbeatDelay, heartbeatValue = '') =>
+    merge(
+        stream$,
+        stream$.pipe(
+            switchMap(
+                () => timer(heartbeatDelay, heartbeatDelay)
+            ),
+            mapTo(heartbeatValue)
+        )
+    )
+
+withHeartbeat(upstream$, 1000).subscribe(
+    data => port.write(data)
+)
+
+withHeartbeat(downstream$, HEARTBEAT_TIMEOUT).subscribe(
+    data => broadcast(data)
+)

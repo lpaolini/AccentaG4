@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "rxjs": "^6.5.3",
     "serialport": "^7.1.5",
     "ws": "^7.1.2"
   }
