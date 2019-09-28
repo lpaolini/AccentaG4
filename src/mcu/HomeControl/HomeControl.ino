@@ -11,13 +11,14 @@
 #define LINK_SPEED 115200
 #define CONSOLE_SPEED 115200
 #define SENSORS_INTERVAL_MS 5000
+#define HEARTBEAT_CHAR '*'
 #define HEARTBEAT_WINDOW_MS 1500
 
-void handleHeartbeat(HardwareSerial serial) {
-    serial.println("*");
+void heartbeatHandler(HardwareSerial serial) {
+    serial.println(HEARTBEAT_CHAR);
 }
 
-SerialBridge bridge(Serial, LINK_SPEED, LED_BUILTIN, HEARTBEAT_WINDOW_MS, handleHeartbeat);
+SerialBridge bridge(Serial, LINK_SPEED, LED_BUILTIN, HEARTBEAT_CHAR, HEARTBEAT_WINDOW_MS, heartbeatHandler);
 
 void sendMessage(String msg) {
     if (bridge.isActive()) {
