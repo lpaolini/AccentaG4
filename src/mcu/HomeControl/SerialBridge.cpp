@@ -5,11 +5,13 @@
 
 #include "SerialBridge.h"
 
-SerialBridge::SerialBridge(HardwareSerial &serial, long linkSpeed, int statusLed, unsigned long heartbeatWindow)
+SerialBridge::SerialBridge(HardwareSerial &serial, long linkSpeed, int statusLed, 
+    unsigned long heartbeatWindow, void (*handleHeartbeat)(HardwareSerial &serial))
     : serial(serial) {
     this->linkSpeed = linkSpeed;
     this->statusLed = statusLed;
     this->heartbeatWindow = heartbeatWindow;
+    this->handleHeartbeat = handleHeartbeat;
 }
 
 void SerialBridge::start() { serial.begin(linkSpeed); }
@@ -26,7 +28,8 @@ int SerialBridge::heartbeatAwareRead() {
     if (c == '*') {
         heartbeatEnabled = true;
         lastHeartbeat = millis();
-        serial.println("*");
+        // serial.println("*");
+        handleHeartbeat(serial);
         return -1;
     } else {
         return c;
