@@ -35,7 +35,7 @@ bool SerialBridge::isEnabled() {
     return enabled && withinGracePeriod;
 }
 
-int SerialBridge::enabledAwareRead() {
+void SerialBridge::read() {
     int c = serial.read();
     if (c == enableChar) {
         enabled = true;
@@ -44,16 +44,20 @@ int SerialBridge::enabledAwareRead() {
         if (enableHandler) {
             enableHandler(serial, enableChar);
         }
-        return -1;
+        return;
     }
     if (c == disableChar) {
         enabled = false;
         if (disableHandler) {
             disableHandler(serial, disableChar);
         }
-        return -1;
+        return;
     }
-    return isEnabled() ? c : -1;
+    if (isEnabled()) {
+        if (readHandler) {
+            readHandler(serial, c);
+        }
+    };
 }
 
 void SerialBridge::resetBlink() {
@@ -84,10 +88,6 @@ void SerialBridge::end() {
 }
 
 void SerialBridge::loop() {
+    read();
     blink();
-
-    int c = enabledAwareRead();
-    if (c != -1) {
-        readHandler(serial, c);
-    }
 }

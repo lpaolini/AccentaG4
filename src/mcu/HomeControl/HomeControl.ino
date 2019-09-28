@@ -53,9 +53,4 @@ void loop() {
     bridge.loop();
     alarm.loop();
     // sensors.loop();
-
-    // int c = bridge.enabledAwareRead();
-    // if (c != -1) {
-    //     alarm.sendKey(c);
-    // }
 }

@@ -30,7 +30,7 @@ class SerialBridge {
     void stop();
     void resetBlink();
     void blink();
-    int enabledAwareRead();
+    void read();
 
   public:
     SerialBridge::SerialBridge(
@@ -42,7 +42,6 @@ class SerialBridge {
     );
     HardwareSerial &serial;
     bool isEnabled();
-    // int enabledAwareRead();
     void begin();
     void end();
     void loop();
