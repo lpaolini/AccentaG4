@@ -49,7 +49,7 @@ void loop() {
     // sensors.loop();
 
     int c = bridge.enabledAwareRead();
-    if (bridge.isEnabled() && c != -1) {
+    if (c != -1) {
         alarm.sendKey(c);
     }
 }

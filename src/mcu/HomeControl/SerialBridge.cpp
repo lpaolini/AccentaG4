@@ -20,9 +20,13 @@ SerialBridge::SerialBridge(
     this->disableHandler = disableHandler;
 }
 
-void SerialBridge::start() { serial.begin(linkSpeed); }
+void SerialBridge::start() {
+    serial.begin(linkSpeed);
+}
 
-void SerialBridge::stop() { serial.end(); }
+void SerialBridge::stop() {
+    serial.end();
+}
 
 bool SerialBridge::isEnabled() {
     boolean withinGracePeriod = (enableGraceMillis == 0) || (millis() - lastEnabled < enableGraceMillis);
@@ -46,7 +50,7 @@ int SerialBridge::enabledAwareRead() {
         }
         return -1;
     }
-    return c;
+    return isEnabled() ? c : -1;
 }
 
 void SerialBridge::blink() {
