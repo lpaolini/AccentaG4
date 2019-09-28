@@ -16,7 +16,7 @@ class SerialBridge {
     int statusLed;
     char heartbeatChar;
     unsigned long heartbeatWindow;
-    void (*heartbeatHandler)(HardwareSerial &serial);
+    void (*heartbeatHandler)(HardwareSerial &serial, char heartbeatChar);
     
     boolean heartbeatEnabled = false;
     unsigned long heartbeatLastMillis;
@@ -31,7 +31,7 @@ class SerialBridge {
     SerialBridge::SerialBridge(
         HardwareSerial &serial, long linkSpeed, int statusLed, 
         char heartbeatChar, unsigned long heartbeatWindow, 
-        void (*heartbeatHandler)(HardwareSerial &serial)
+        void (*heartbeatHandler)(HardwareSerial &serial, char heartbeatChar)
     );
     HardwareSerial &serial;
     bool isActive();

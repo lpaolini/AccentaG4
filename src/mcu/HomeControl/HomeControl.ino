@@ -14,8 +14,8 @@
 #define HEARTBEAT_CHAR '*'
 #define HEARTBEAT_WINDOW_MS 1500
 
-void heartbeatHandler(HardwareSerial serial) {
-    serial.println(HEARTBEAT_CHAR);
+void heartbeatHandler(HardwareSerial serial, char heartbeatChar) {
+    serial.println(heartbeatChar);
 }
 
 SerialBridge bridge(Serial, LINK_SPEED, LED_BUILTIN, HEARTBEAT_CHAR, HEARTBEAT_WINDOW_MS, heartbeatHandler);

@@ -8,7 +8,7 @@
 SerialBridge::SerialBridge(
     HardwareSerial &serial, long linkSpeed, int statusLed, 
     char heartbeatChar, unsigned long heartbeatWindow, 
-    void (*heartbeatHandler)(HardwareSerial &serial)
+    void (*heartbeatHandler)(HardwareSerial &serial, char heartbeatChar)
 ) : serial(serial) {
     this->linkSpeed = linkSpeed;
     this->statusLed = statusLed;
@@ -32,7 +32,7 @@ int SerialBridge::heartbeatAwareRead() {
         heartbeatEnabled = true;
         heartbeatLastMillis = millis();
         if (heartbeatHandler) {
-            heartbeatHandler(serial);
+            heartbeatHandler(serial, heartbeatChar);
         }
         return -1;
     } else {
