@@ -11,17 +11,23 @@
 #define LINK_SPEED 115200
 #define CONSOLE_SPEED 115200
 #define SENSORS_INTERVAL_MS 5000
-#define HEARTBEAT_CHAR '*'
-#define HEARTBEAT_WINDOW_MS 1500
+#define ENABLE_CHAR '*'
+#define DISABLE_CHAR '-'
+#define ENABLE_GRACE_MS 1500
 
-void heartbeatHandler(HardwareSerial serial, char heartbeatChar) {
-    serial.println(heartbeatChar);
+void enableHandler(HardwareSerial serial, char enableChar) {
+    serial.println(enableChar);
 }
 
-SerialBridge bridge(Serial, LINK_SPEED, LED_BUILTIN, HEARTBEAT_CHAR, HEARTBEAT_WINDOW_MS, heartbeatHandler);
+void disableHandler(HardwareSerial serial, char disableChar) {
+    serial.println(disableChar);
+}
+
+SerialBridge bridge(Serial, LINK_SPEED, LED_BUILTIN, ENABLE_CHAR, DISABLE_CHAR,
+                    ENABLE_GRACE_MS, enableHandler, disableHandler);
 
 void sendMessage(String msg) {
-    if (bridge.isActive()) {
+    if (bridge.isEnabled()) {
         bridge.serial.println(msg);
     }
 }
@@ -42,8 +48,8 @@ void loop() {
     alarm.loop();
     // sensors.loop();
 
-    int c = bridge.heartbeatAwareRead();
-    if (bridge.isActive() && c != -1) {
+    int c = bridge.enabledAwareRead();
+    if (bridge.isEnabled() && c != -1) {
         alarm.sendKey(c);
     }
 }

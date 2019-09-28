@@ -7,44 +7,53 @@
 
 SerialBridge::SerialBridge(
     HardwareSerial &serial, long linkSpeed, int statusLed, 
-    char heartbeatChar, unsigned long heartbeatWindow, 
-    void (*heartbeatHandler)(HardwareSerial &serial, char heartbeatChar)
+    char enableChar, char disableChar, unsigned long enableGraceMillis, 
+    void (*enableHandler)(HardwareSerial &serial, char enableChar),
+    void (*disableHandler)(HardwareSerial &serial, char disableChar)
 ) : serial(serial) {
     this->linkSpeed = linkSpeed;
     this->statusLed = statusLed;
-    this->heartbeatChar = heartbeatChar;
-    this->heartbeatWindow = heartbeatWindow;
-    this->heartbeatHandler = heartbeatHandler;
+    this->enableChar = enableChar;
+    this->disableChar = disableChar;
+    this->enableGraceMillis = enableGraceMillis;
+    this->enableHandler = enableHandler;
+    this->disableHandler = disableHandler;
 }
 
 void SerialBridge::start() { serial.begin(linkSpeed); }
 
 void SerialBridge::stop() { serial.end(); }
 
-bool SerialBridge::isActive() {
-    boolean withinHeartbeatWindow = millis() - heartbeatLastMillis < heartbeatWindow;
-    return heartbeatEnabled && withinHeartbeatWindow;
+bool SerialBridge::isEnabled() {
+    boolean withinGracePeriod = (enableGraceMillis == 0) || (millis() - lastEnabled < enableGraceMillis);
+    return enabled && withinGracePeriod;
 }
 
-int SerialBridge::heartbeatAwareRead() {
+int SerialBridge::enabledAwareRead() {
     int c = serial.read();
-    if (c == heartbeatChar) {
-        heartbeatEnabled = true;
-        heartbeatLastMillis = millis();
-        if (heartbeatHandler) {
-            heartbeatHandler(serial, heartbeatChar);
+    if (c == enableChar) {
+        enabled = true;
+        lastEnabled = millis();
+        if (enableHandler) {
+            enableHandler(serial, enableChar);
         }
         return -1;
-    } else {
-        return c;
     }
+    if (c == disableChar) {
+        enabled = false;
+        if (disableHandler) {
+            disableHandler(serial, disableChar);
+        }
+        return -1;
+    }
+    return c;
 }
 
 void SerialBridge::blink() {
     unsigned long currentMillis = millis();
     if (currentMillis > nextBlink) {
         nextBlink = currentMillis + BRIDGE_UP_BLINK_RATE_MS;
-        ledState = isActive() && !ledState;
+        ledState = isEnabled() && !ledState;
         digitalWrite(statusLed, ledState);
     }
 }

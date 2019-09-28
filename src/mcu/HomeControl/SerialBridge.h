@@ -14,12 +14,14 @@ class SerialBridge {
   private:
     long linkSpeed;
     int statusLed;
-    char heartbeatChar;
-    unsigned long heartbeatWindow;
-    void (*heartbeatHandler)(HardwareSerial &serial, char heartbeatChar);
+    char enableChar;
+    char disableChar;
+    unsigned long enableGraceMillis;
+    void (*enableHandler)(HardwareSerial &serial, char enableChar);
+    void (*disableHandler)(HardwareSerial &serial, char disableChar);
     
-    boolean heartbeatEnabled = false;
-    unsigned long heartbeatLastMillis;
+    boolean enabled = false;
+    unsigned long lastEnabled;
     int ledState = LOW;
     unsigned long nextBlink = 0;
     
@@ -30,12 +32,13 @@ class SerialBridge {
   public:
     SerialBridge::SerialBridge(
         HardwareSerial &serial, long linkSpeed, int statusLed, 
-        char heartbeatChar, unsigned long heartbeatWindow, 
-        void (*heartbeatHandler)(HardwareSerial &serial, char heartbeatChar)
+        char enableChar, char disableChar, unsigned long enableGraceMillis, 
+        void (*enableHandler)(HardwareSerial &serial, char enableChar),
+        void (*disableHandler)(HardwareSerial &serial, char disableChar)
     );
     HardwareSerial &serial;
-    bool isActive();
-    int heartbeatAwareRead();
+    bool isEnabled();
+    int enabledAwareRead();
     void begin();
     void end();
     void loop();
