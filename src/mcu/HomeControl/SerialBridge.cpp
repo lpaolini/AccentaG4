@@ -9,7 +9,8 @@ SerialBridge::SerialBridge(
     HardwareSerial &serial, long linkSpeed, int statusLed, 
     char enableChar, char disableChar, unsigned long enableGraceMillis, 
     void (*enableHandler)(HardwareSerial &serial, char enableChar),
-    void (*disableHandler)(HardwareSerial &serial, char disableChar)
+    void (*disableHandler)(HardwareSerial &serial, char disableChar),
+    void (*readHandler)(HardwareSerial &serial, char readChar)
 ) : serial(serial) {
     this->linkSpeed = linkSpeed;
     this->statusLed = statusLed;
@@ -18,6 +19,7 @@ SerialBridge::SerialBridge(
     this->enableGraceMillis = enableGraceMillis;
     this->enableHandler = enableHandler;
     this->disableHandler = disableHandler;
+    this->readHandler = readHandler;
 }
 
 void SerialBridge::start() {
@@ -83,4 +85,9 @@ void SerialBridge::end() {
 
 void SerialBridge::loop() {
     blink();
+
+    int c = enabledAwareRead();
+    if (c != -1) {
+        readHandler(serial, c);
+    }
 }

@@ -19,6 +19,7 @@ class SerialBridge {
     unsigned long enableGraceMillis;
     void (*enableHandler)(HardwareSerial &serial, char enableChar);
     void (*disableHandler)(HardwareSerial &serial, char disableChar);
+    void (*readHandler)(HardwareSerial &serial, char c);
     
     boolean enabled = false;
     unsigned long lastEnabled;
@@ -29,17 +30,19 @@ class SerialBridge {
     void stop();
     void resetBlink();
     void blink();
+    int enabledAwareRead();
 
   public:
     SerialBridge::SerialBridge(
         HardwareSerial &serial, long linkSpeed, int statusLed, 
         char enableChar, char disableChar, unsigned long enableGraceMillis, 
         void (*enableHandler)(HardwareSerial &serial, char enableChar),
-        void (*disableHandler)(HardwareSerial &serial, char disableChar)
+        void (*disableHandler)(HardwareSerial &serial, char disableChar),
+        void (*readHandler)(HardwareSerial &serial, char c)
     );
     HardwareSerial &serial;
     bool isEnabled();
-    int enabledAwareRead();
+    // int enabledAwareRead();
     void begin();
     void end();
     void loop();

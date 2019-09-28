@@ -23,8 +23,10 @@ void disableHandler(HardwareSerial serial, char disableChar) {
     serial.println(disableChar);
 }
 
+void readHandler(HardwareSerial serial, char c);
+
 SerialBridge bridge(Serial, LINK_SPEED, LED_BUILTIN, ENABLE_CHAR, DISABLE_CHAR,
-                    ENABLE_GRACE_MS, enableHandler, disableHandler);
+                    ENABLE_GRACE_MS, enableHandler, disableHandler, readHandler);
 
 void sendMessage(String msg) {
     if (bridge.isEnabled()) {
@@ -34,6 +36,10 @@ void sendMessage(String msg) {
 
 AccentaG4 alarm(COMMS_RX_PIN, COMMS_TX_PIN, SIG_SET_PIN, SIG_ABORT_PIN,
                 SIG_INT_PIN, SIG_PA_PIN, sendMessage);
+
+void readHandler(HardwareSerial serial, char c) {
+    alarm.sendKey(c);
+}
 
 // Sensors sensors(SENSORS_INTERVAL_MS, sendMessage);
 
@@ -48,8 +54,8 @@ void loop() {
     alarm.loop();
     // sensors.loop();
 
-    int c = bridge.enabledAwareRead();
-    if (c != -1) {
-        alarm.sendKey(c);
-    }
+    // int c = bridge.enabledAwareRead();
+    // if (c != -1) {
+    //     alarm.sendKey(c);
+    // }
 }
