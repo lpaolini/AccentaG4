@@ -220,7 +220,7 @@
         }
     }
 
-    var Auto = (attr) => {
+    var Auto = attr => {
         return {
             ingest: data => {
                 const hour = parseInt(data)
@@ -254,6 +254,10 @@
                     var type = msg.substring(0, 3)
                     var data = msg.substring(4)
                     switch (type) {
+                    case '*': // heartbeat
+                        $('.lcd').addClass('heartbeat')
+                        setTimeout(() => $('.lcd').removeClass('heartbeat'), 100)
+                        break
                     case 'SIG': // panel signals
                         $('body').toggleClass('active', /[IP]/.test(data))
                         panelLed.ingest(data)
@@ -263,13 +267,6 @@
                         break
                     case 'LCD': // LCD messages
                         lcd.ingest(data)
-                        break
-                    case 'HBT': // heartbeat
-                        if (parseInt(data, 10) > 120) {
-                            $('.lcd').addClass('stale')
-                        } else {
-                            $('.lcd').removeClass('stale')
-                        }
                         break
                     case 'SEN': // sensors
                         console.log('Air sensors', data)
@@ -283,8 +280,6 @@
                     default:
                         break
                     }
-                } else {
-                    $('.lcd').addClass('lost')
                 }
             },
             onOnline: () => {

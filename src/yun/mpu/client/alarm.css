@@ -140,15 +140,15 @@ body.active {
     transition: all .1s ease;
 }
 
-.lcd.stale:before {
-    background: #FFBB2F;
+.lcd.heartbeat:before {
+    background: rgb(32, 164, 182);
     box-shadow: 0 0 4px #1C1C17, 0 0 5px #FFBB42;
 }
 
-.lcd.lost:before {
+/* .lcd.lost:before {
     background: #FF2F2F;
     box-shadow: 0 0 4px #1C1C17, 0 0 5px #FF4242;
-}
+} */
 
 .lcd pre {
     margin: 0;

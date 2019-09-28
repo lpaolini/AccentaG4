@@ -2,7 +2,7 @@ const fs = require('fs')
 const https = require('https')
 
 const {Subject, timer, merge} = require('rxjs')
-const {switchMap, mapTo} = require('rxjs/operators')
+const {mapTo} = require('rxjs/operators')
 
 const SerialPort = require('serialport')
 const Delimiter = require('@serialport/parser-delimiter')
@@ -12,14 +12,12 @@ const WebSocket = require('ws')
 const Status = require('./status')
 const Notify = require('./notify')
 
-const HEARTBEAT_TIMEOUT = 3000
-
 var config = {}
 
 if (process.argv.length > 2) {
     config = require(process.argv[2])
 } else {
-    console.log('Configuration file not provided, exiting.')
+    console.error('Configuration file not provided, exiting.')
     process.exit(1)
 }
 
@@ -28,34 +26,20 @@ const notify = Notify(config.notify)
 notify('Alarm controller started')
 
 const status = new Status({
-    link: function (on) {
-        notify(on ? 'Alarm panel link up' : 'Alarm panel link down [!]')
-    },
-    set: function (on) {
-        notify(on ? 'Alarm set' : 'Alarm unset')
-    },
-    abort: function (on) {
-        notify(on ? 'Alarm aborted' : 'Alarm reset')
-    },
-    intruder: function (on) {
-        notify(on ? 'Alarm activated: INTRUDER [!]' : 'Alarm deactivated: INTRUDER')
-    },
-    pa: function (on) {
-        notify(on ? 'Alarm activated: PANIC [!]' : 'Alarm deactivated: PANIC')
-    },
-    autoArm: function (hour) {
-        console.log(hour === -1 ? 'Auto-arm disabled' : 'Auto-arm enabled at ' + hour + ':00')
-    },
-    autoDisarm: function (hour) {
-        console.log(hour === -1 ? 'Auto-disarm disabled' : 'Auto-disarm enabled at ' + hour + ':00')
-    }
+    link: on => notify(on ? 'Alarm panel link up' : 'Alarm panel link down [!]'),
+    set: on => notify(on ? 'Alarm set' : 'Alarm unset'),
+    abort: on => notify(on ? 'Alarm aborted' : 'Alarm reset'),
+    intruder: on => notify(on ? 'Alarm activated: INTRUDER [!]' : 'Alarm deactivated: INTRUDER'),
+    pa: on => notify(on ? 'Alarm activated: PANIC [!]' : 'Alarm deactivated: PANIC'),
+    autoArm: hour => console.info(hour === -1 ? 'Auto-arm disabled' : 'Auto-arm enabled at ' + hour + ':00'),
+    autoDisarm: hour => console.info(hour === -1 ? 'Auto-disarm disabled' : 'Auto-disarm enabled at ' + hour + ':00')
 })
 
 status.update('autoArm', config.autoArmHour)
 status.update('autoDisarm', config.autoDisarmHour)
 
 // initialize serial port
-const {port, parser} = (function () {
+const {port, parser} = (() => {
     const port = new SerialPort(config.serial, {
         baudRate: 115200
     })
@@ -67,25 +51,25 @@ const {port, parser} = (function () {
     port.pipe(parser)
             
     // handle opening
-    port.on('open', function(err) {
+    port.on('open', err => {
         if (err) {
-            return console.log('Error opening port: ', err.message)
+            return console.error('Error opening port: ', err.message)
         }
-        console.log('Serial port opened')
+        console.info('Serial port opened')
     })
     // handle errors
-    port.on('error', function(err) {
-        console.log('Error: ', err.message)
-    })
+    port.on('error', err =>
+        console.error('Error: ', err.message)
+    )
     return {port, parser}
 })()
 
 // initialize websocket servers
-const wss = (function () {
+const wss = (() => {
     const httpsServer = https.createServer({
         key: fs.readFileSync(config.ssl.key || __dirname + '/key.pem'),
         cert: fs.readFileSync(config.ssl.cert || __dirname + '/cert.pem')
-    }, function (req, res) {
+    }, (req, res) => {
         res.writeHead(200)
         res.end('WebSocket')
     }).listen(config.port)
@@ -98,9 +82,8 @@ const upstream$ = new Subject()
 const downstream$ = new Subject()
 
 // react to serial messages
-parser.on('data', function (buffer) {
+parser.on('data', buffer => {
     const data = buffer.toString('binary')
-    console.log('incoming serial data:', {data})
     switch (data.substr(0, 4)) {
     case 'HBT:':
         var staleness = parseInt(data.substring(4), 10)
@@ -119,25 +102,30 @@ parser.on('data', function (buffer) {
 })
 
 // react to websockets messages
-wss.on('connection', function (ws) {
-    ws.on('message', function (message) {
-        if (message.substring(0, 5) === '#ARM=') {
-            status.update('autoArm', parseInt(message.split('=')[1]))
+wss.on('connection', ws =>
+    handleWebsocketConnection(ws)
+)
+
+const handleWebsocketConnection = ws =>
+    ws.on('message', message =>
+        handleWebsocketMessage(message)
+    )
+
+const handleWebsocketMessage = message => {
+    if (message.substring(0, 5) === '#ARM=') {
+        status.update('autoArm', parseInt(message.split('=')[1]))
+        downstream$.next('ARM:' + status.read('autoArm'))
+    } else if (message.substring(0, 5) === '#DIS=') {
+        status.update('autoDisarm', parseInt(message.split('=')[1]))
+        downstream$.next('DIS:' + status.read('autoDisarm'))
+    } else {
+        if (message === '?') {
             downstream$.next('ARM:' + status.read('autoArm'))
-        } else if (message.substring(0, 5) === '#DIS=') {
-            status.update('autoDisarm', parseInt(message.split('=')[1]))
             downstream$.next('DIS:' + status.read('autoDisarm'))
-        } else {
-            if (message === '?') {
-                downstream$.next('ARM:' + status.read('autoArm'))
-                downstream$.next('DIS:' + status.read('autoDisarm'))
-            }
-            upstream$.next(message, function () {
-                console.log('incoming websocket message:', {message})
-            })
         }
-    })
-})
+        upstream$.next(message)
+    }
+}
 
 setInterval(function() {
     var date = new Date()
@@ -145,41 +133,52 @@ setInterval(function() {
         if (config.autoDisarmCode
             && date.getHours() === status.read('autoDisarm')
             && date.getMinutes() === 0) {
-            console.log('alarm auto-disarmed')
+            console.info('alarm auto-disarmed')
             upstream$.next(config.autoDisarmCode)
         }
     } else {
         if (config.autoArmCode
             && date.getHours() === status.read('autoArm')
             && date.getMinutes() === 0) {
-            console.log('alarm auto-armed')
+            console.info('alarm auto-armed')
             upstream$.next(config.autoArmCode)
         }
     }
 }, 60000)
 
-const broadcast = data =>
+const broadcastToWebsocket = data =>
     wss.clients.forEach(function (client) {
         if (client.readyState === WebSocket.OPEN) {
             client.send(data)
         }
     })
 
-const withHeartbeat = (stream$, heartbeatDelay, heartbeatValue = '') =>
-    merge(
-        stream$,
-        stream$.pipe(
-            switchMap(
-                () => timer(heartbeatDelay, heartbeatDelay)
-            ),
-            mapTo(heartbeatValue)
-        )
-    )
+const sendToSerial = data =>
+    port.write(data)
 
-withHeartbeat(upstream$, 1000).subscribe(
-    data => port.write(data)
+const mergeHeartbeat = (heartbeatDelay, heartbeatValue) =>
+    observable$ =>
+        merge(
+            observable$,
+            timer(heartbeatDelay, heartbeatDelay).pipe(
+                mapTo(heartbeatValue)
+            )
+        )
+
+const upstreamWithHeartbeat$ = upstream$.pipe(
+    mergeHeartbeat(1000, '*')
 )
 
-withHeartbeat(downstream$, HEARTBEAT_TIMEOUT).subscribe(
-    data => broadcast(data)
+upstreamWithHeartbeat$.subscribe(
+    data => {
+        data !== '*' && console.log('Upstream message:', {data})
+        sendToSerial(data)
+    }
+)
+
+downstream$.subscribe(
+    data => {
+        data !== '*' && console.log('Downstream message:', {data})
+        broadcastToWebsocket(data)
+    }
 )
