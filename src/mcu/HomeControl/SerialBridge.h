@@ -6,7 +6,7 @@
 #ifndef SerialBridge_h
 #define SerialBridge_h
 
-#define BRIDGE_UP_BLINK_RATE_MS 500
+#define BLINK_RATE_MS 500
 
 #include <Arduino.h>
 
@@ -27,6 +27,7 @@ class SerialBridge {
     
     void start();
     void stop();
+    void resetBlink();
     void blink();
 
   public:

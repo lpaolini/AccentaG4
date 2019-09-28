@@ -38,6 +38,7 @@ int SerialBridge::enabledAwareRead() {
     if (c == enableChar) {
         enabled = true;
         lastEnabled = millis();
+        resetBlink();
         if (enableHandler) {
             enableHandler(serial, enableChar);
         }
@@ -53,10 +54,15 @@ int SerialBridge::enabledAwareRead() {
     return isEnabled() ? c : -1;
 }
 
+void SerialBridge::resetBlink() {
+    nextBlink = millis();
+    ledState = LOW;
+}
+
 void SerialBridge::blink() {
     unsigned long currentMillis = millis();
-    if (currentMillis > nextBlink) {
-        nextBlink = currentMillis + BRIDGE_UP_BLINK_RATE_MS;
+    if (currentMillis >= nextBlink) {
+        nextBlink = currentMillis + BLINK_RATE_MS;
         ledState = isEnabled() && !ledState;
         digitalWrite(statusLed, ledState);
     }
