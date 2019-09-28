@@ -1,5 +1,5 @@
 #include "AccentaG4.h"
-// #include "Sensors.h"
+#include "Sensors.h"
 #include "SerialBridge.h"
 
 #define COMMS_RX_PIN 10
@@ -41,16 +41,16 @@ void readHandler(HardwareSerial serial, char c) {
     alarm.sendKey(c);
 }
 
-// Sensors sensors(SENSORS_INTERVAL_MS, sendMessage);
+Sensors sensors(SENSORS_INTERVAL_MS, sendMessage);
 
 void setup() {
     bridge.begin();
     alarm.begin();
-    // sensors.begin();
+    sensors.begin();
 }
 
 void loop() {
     bridge.loop();
     alarm.loop();
-    // sensors.loop();
+    sensors.loop();
 }
