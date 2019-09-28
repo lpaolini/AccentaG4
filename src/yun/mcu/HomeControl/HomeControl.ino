@@ -26,11 +26,6 @@ AccentaG4 alarm(COMMS_RX_PIN, COMMS_TX_PIN, SIG_SET_PIN, SIG_ABORT_PIN,
 
 // Sensors sensors(SENSORS_INTERVAL_MS, sendMessage);
 
-void heartbeat() {
-    bridge.heartbeat();
-    bridge.serial.println("*");
-}
-
 void setup() {
     bridge.begin();
     alarm.begin();
@@ -41,12 +36,9 @@ void loop() {
     bridge.loop();
     alarm.loop();
     // sensors.loop();
-    if (bridge.serial.available()) {
-        char c = bridge.serial.read();
-        if (c == '*') {
-            heartbeat();
-        } else {
-            alarm.sendKey(c);
-        }
+
+    int c = bridge.heartbeatAwareRead();
+    if (bridge.isActive() && c != -1) {
+        alarm.sendKey(c);
     }
 }

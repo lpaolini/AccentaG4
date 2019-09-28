@@ -28,8 +28,8 @@ class SerialBridge {
   public:
     SerialBridge::SerialBridge(HardwareSerial &serial, long linkSpeed, int statusLed, unsigned long heartbeatWindow);
     HardwareSerial &serial;
-    void heartbeat();
     bool isActive();
+    int heartbeatAwareRead();
     void begin();
     void end();
     void loop();

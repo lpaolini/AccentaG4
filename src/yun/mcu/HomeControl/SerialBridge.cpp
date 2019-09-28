@@ -16,14 +16,21 @@ void SerialBridge::start() { serial.begin(linkSpeed); }
 
 void SerialBridge::stop() { serial.end(); }
 
-void SerialBridge::heartbeat() {
-    heartbeatEnabled = true;
-    lastHeartbeat = millis();
-}
-
 bool SerialBridge::isActive() {
     boolean withinHeartbeatWindow = millis() - lastHeartbeat < heartbeatWindow;
     return heartbeatEnabled && withinHeartbeatWindow;
+}
+
+int SerialBridge::heartbeatAwareRead() {
+    int c = serial.read();
+    if (c == '*') {
+        heartbeatEnabled = true;
+        lastHeartbeat = millis();
+        serial.println("*");
+        return -1;
+    } else {
+        return c;
+    }
 }
 
 void SerialBridge::blink() {
@@ -43,7 +50,10 @@ void SerialBridge::begin() {
     digitalWrite(statusLed, LOW);
 }
 
-void SerialBridge::end() { stop(); }
+void SerialBridge::end() {
+    stop();
+    digitalWrite(statusLed, LOW);
+}
 
 void SerialBridge::loop() {
     blink();
