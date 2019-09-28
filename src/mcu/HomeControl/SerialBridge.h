@@ -7,7 +7,6 @@
 #define SerialBridge_h
 
 #define BRIDGE_UP_BLINK_RATE_MS 500
-#define BRIDGE_DOWN_BLINK_RATE_MS 100
 
 #include <Arduino.h>
 
