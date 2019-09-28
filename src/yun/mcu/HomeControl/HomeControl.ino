@@ -13,14 +13,10 @@
 #define SENSORS_INTERVAL_MS 5000
 #define HEARTBEAT_WINDOW_MS 1500
 
-boolean heartbeatEnabled = false;
-unsigned long lastHeartbeat;
-
-SerialBridge bridge(Serial, LINK_SPEED, LED_BUILTIN);
+SerialBridge bridge(Serial, LINK_SPEED, LED_BUILTIN, HEARTBEAT_WINDOW_MS);
 
 void sendMessage(String msg) {
-    boolean withinHeartbeatWindow = millis() - lastHeartbeat < HEARTBEAT_WINDOW_MS;
-    if (heartbeatEnabled && withinHeartbeatWindow) {
+    if (bridge.isActive()) {
         bridge.serial.println(msg);
     }
 }
@@ -31,9 +27,8 @@ AccentaG4 alarm(COMMS_RX_PIN, COMMS_TX_PIN, SIG_SET_PIN, SIG_ABORT_PIN,
 // Sensors sensors(SENSORS_INTERVAL_MS, sendMessage);
 
 void heartbeat() {
+    bridge.heartbeat();
     bridge.serial.println("*");
-    heartbeatEnabled = true;
-    lastHeartbeat = millis();
 }
 
 void setup() {

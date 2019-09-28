@@ -5,61 +5,46 @@
 
 #include "SerialBridge.h"
 
-SerialBridge::SerialBridge(HardwareSerial &serial, long linkSpeed,
-                           int statusLed)
+SerialBridge::SerialBridge(HardwareSerial &serial, long linkSpeed, int statusLed, unsigned long heartbeatWindow)
     : serial(serial) {
     this->linkSpeed = linkSpeed;
     this->statusLed = statusLed;
+    this->heartbeatWindow = heartbeatWindow;
 }
 
 void SerialBridge::start() { serial.begin(linkSpeed); }
 
 void SerialBridge::stop() { serial.end(); }
 
-//bool SerialBridge::isDisabled() { return digitalRead(READY_PIN); }
-bool SerialBridge::isDisabled() { return false; }
-
-void SerialBridge::waitUntilReady() {
-    while (isDisabled()) {
-        digitalWrite(statusLed, HIGH);
-        delay(BRIDGE_DOWN_BLINK_RATE_MS);
-        digitalWrite(statusLed, LOW);
-        delay(BRIDGE_DOWN_BLINK_RATE_MS);
-    }
+void SerialBridge::heartbeat() {
+    heartbeatEnabled = true;
+    lastHeartbeat = millis();
 }
 
-void SerialBridge::check() {
-    if (isDisabled()) {
-        // Serial.println("Bridge disabled");
-        stop();
-        waitUntilReady();
-        start();
-        // Serial.println("Bridge enabled");
-    }
+bool SerialBridge::isActive() {
+    boolean withinHeartbeatWindow = millis() - lastHeartbeat < heartbeatWindow;
+    return heartbeatEnabled && withinHeartbeatWindow;
 }
 
 void SerialBridge::blink() {
     unsigned long currentMillis = millis();
     if (currentMillis > nextBlink) {
         nextBlink = currentMillis + BRIDGE_UP_BLINK_RATE_MS;
-        ledState = !ledState;
+        ledState = isActive() && !ledState;
         digitalWrite(statusLed, ledState);
     }
 }
 
 void SerialBridge::begin() {
-    pinMode(READY_PIN, INPUT_PULLUP);
     pinMode(statusLed, OUTPUT);
     digitalWrite(statusLed, HIGH);
     delay(2500);
     start();
     digitalWrite(statusLed, LOW);
-    check();
 }
 
 void SerialBridge::end() { stop(); }
 
 void SerialBridge::loop() {
-    check();
     blink();
 }
