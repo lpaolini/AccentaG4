@@ -254,7 +254,7 @@
                     var type = msg.substring(0, 3)
                     var data = msg.substring(4)
                     switch (type) {
-                    case '*': // heartbeat
+                    case '+': // heartbeat
                         $('.lcd').addClass('heartbeat')
                         setTimeout(() => $('.lcd').removeClass('heartbeat'), 100)
                         break

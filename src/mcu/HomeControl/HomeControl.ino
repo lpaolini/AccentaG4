@@ -11,7 +11,7 @@
 #define LINK_SPEED 115200
 #define CONSOLE_SPEED 115200
 #define SENSORS_INTERVAL_MS 5000
-#define ENABLE_CHAR '*'
+#define ENABLE_CHAR '+'
 #define DISABLE_CHAR '-'
 #define ENABLE_GRACE_MS 1500
 

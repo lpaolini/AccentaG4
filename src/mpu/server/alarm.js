@@ -12,6 +12,9 @@ const WebSocket = require('ws')
 const Status = require('./status')
 const Notify = require('./notify')
 
+const ENABLE_CHAR = '+'
+// const DISABLE_CHAR = '-'
+
 var config = {}
 
 if (process.argv.length > 2) {
@@ -166,19 +169,19 @@ const mergeHeartbeat = (heartbeatDelay, heartbeatValue) =>
         )
 
 const upstreamWithHeartbeat$ = upstream$.pipe(
-    mergeHeartbeat(1000, '*')
+    mergeHeartbeat(1000, ENABLE_CHAR)
 )
 
 upstreamWithHeartbeat$.subscribe(
     data => {
-        data !== '*' && console.log('Upstream message:', {data})
+        data !== ENABLE_CHAR && console.log('Upstream message:', {data})
         sendToSerial(data)
     }
 )
 
 downstream$.subscribe(
     data => {
-        data !== '*' && console.log('Downstream message:', {data})
+        data !== ENABLE_CHAR && console.log('Downstream message:', {data})
         broadcastToWebsocket(data)
     }
 )
