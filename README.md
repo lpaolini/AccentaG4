@@ -159,52 +159,10 @@ They are absolutely crucial for this project as some critical alert conditions (
 ## The project
 
 The objective of this project is to build a keypad emulator running in a standard browser.
-For the hardware/software platform I've explored a few different options:
 
-1. [GLI GL-AR150 PoE](https://www.gl-inet.com/ar150/)
-   - Pros:
-     - Runs OpenWRT
-     - Has GPIO ports
-     - PoE version availble
-   - Cons:
-     - PoE version has not enough GPIO ports for handling all signals
-     - Neither node-serialport or node-ws available as native packages in the OpenWRT repository
-     
-2. [Raspberry PI](https://www.raspberrypi.org/)
-   - Pros:
-     - Runs Debian
-   - Cons:
-     - node-serialport module not available as native package in the Debian repository
-     
-3. [Arduino Yún](https://www.arduino.cc/en/Main/ArduinoBoardYun)
-   - Pros:
-     - Runs OpenWRT
-     - Both node-serialport and node-ws available as native packages in the OpenWRT repository
-     - PoE version availble
-   - Cons:
-     - Expensive 
+# Hardware stack
 
-After some thinking, I went for Arduino Yún.
-
-## Arduino Yún
-
-The variant of [Arduino](https://www.arduino.cc/) chosen for this project is [Arduino Yún](https://www.arduino.cc/en/Main/ArduinoBoardYun), combining an ATmega32u4 MCU (same as Arduino Leonardo) with an Atheros AR9331 MPU, internally connected via serial port (*Serial1* on MCU, */dev/ttyATH0* on MPU).
-
-### MCU (Arduino)
-
-The MCU is responsible for the following tasks:
-
-- monitor panel hardware signals (PA, INT, SET, ABORT), transmit updates to MPU and update local status
-- listen to the keypad bus for incoming messages, transmit updates to MPU and update local status
-- listen to MPU for virtual keystrokes and transmit emulated keypad messages over the keypad bus
-- listen to MPU for status queries and reply local status
-- generate heartbeat messages to be propagated to the clients, to prove end-to-end connection is alive
-
-[Arduino code](src/yun/mcu/AccentaG4) is written in C/C++ and it's built around the [SoftwareSerial9](https://github.com/lpaolini/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library used for enqueuing and throttling outgoing commands.
-
-**WARNING**: the original version of SoftwareSerial9 by [addible](https://github.com/addibble/SoftwareSerial9) had a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst/SoftwareSerial9) in his fork and now fixed by addible too. Both work fine, just make sure to use the latest version.
-
-### MPU (OpenWRT)
+## Linux MPU: [Raspberry Pi 3+](https://www.raspberrypi.org/products/raspberry-pi-3-model-b-plus/)
 
 The MPU is responsible for the following tasks:
 
@@ -215,9 +173,23 @@ The MPU is responsible for the following tasks:
 - listen to websockets clients for incoming messages and forward to MCU
 - send email notifications for critical events
 
-[Server-side code](src/yun/mpu/server) is written in Javascript and runs under NodeJS (v.0.10.33), with the help of the additional modules [node-serialport (v.1.4.6)](https://github.com/EmergingTechnologyAdvisors/node-serialport/tree/v1.4.6) and [node-ws (v.0.4.32)](https://github.com/websockets/ws/tree/0.4.32).
+[Server-side code](src/mpu/server) is written in Javascript and runs under latest NodeJS and depends on the modules [serialport](https://github.com/serialport/node-serialport), [ws](https://github.com/websockets/ws) and [rxjs](https://rxjs-dev.firebaseapp.com/)
 
-[Client-side code](src/yun/mpu/client) is a HTML5/CSS3/Javascript application running in the browser.
+[Client-side code](src/mpu/client) is a HTML5/CSS3/Javascript application running in the browser.
+
+## Arduino MCU: [Watterott RPI-UNO-HAT](https://learn.watterott.com/hats/rpi-uno-hat/)
+
+The Arduino UNO compatible board is responsible for the following tasks:
+
+- monitor panel hardware signals (PA, INT, SET, ABORT), transmit updates to MPU and update local status
+- listen to the keypad bus for incoming messages, transmit updates to MPU and update local status
+- listen to MPU for virtual keystrokes and transmit emulated keypad messages over the keypad bus
+- listen to MPU for status queries and reply local status
+- respond to heartbeat messages to be broadcasted to the clients, to prove end-to-end connection is alive
+
+[Arduino code](src/mcu/HomeControl) is written in C/C++ and it's built around the [SoftwareSerial9](https://github.com/lpaolini/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library used for enqueuing and throttling outgoing commands.
+
+**WARNING**: the original version of SoftwareSerial9 by [addible](https://github.com/addibble/SoftwareSerial9) had a bug in the recv() method, fixed by [edreanernst](https://github.com/edreanernst/SoftwareSerial9) in his fork, then fixed by addible too. Both work fine, just make sure to use the latest version.
 
 ## Custom hardware
 
