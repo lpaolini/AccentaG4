@@ -2,7 +2,7 @@ const fs = require('fs')
 const https = require('https')
 
 const {Subject, timer, merge} = require('rxjs')
-const {mapTo} = require('rxjs/operators')
+const {filter, mapTo, throttleTime} = require('rxjs/operators')
 
 const SerialPort = require('serialport')
 const Delimiter = require('@serialport/parser-delimiter')
@@ -105,14 +105,16 @@ parser.on('data', buffer => {
 })
 
 // react to websockets messages
-wss.on('connection', ws =>
+wss.on('connection', ws => {
+    console.log('new client connection')
     handleWebsocketConnection(ws)
-)
+})
 
 const handleWebsocketConnection = ws =>
-    ws.on('message', message =>
+    ws.on('message', message => {
+        console.log('client message:', message)
         handleWebsocketMessage(message)
-    )
+    })
 
 const handleWebsocketMessage = message => {
     if (message.substring(0, 5) === '#ARM=') {
@@ -179,7 +181,17 @@ upstreamWithHeartbeat$.subscribe(
     }
 )
 
-downstream$.subscribe(
+const downstreamWithThrottledHeartbeats$ = merge(
+    downstream$.pipe(
+        filter(data => data !== ENABLE_CHAR)
+    ),
+    downstream$.pipe(
+        filter(data => data === ENABLE_CHAR),
+        throttleTime(3000)
+    )
+)
+
+downstreamWithThrottledHeartbeats$.subscribe(
     data => {
         data !== ENABLE_CHAR && console.log('Downstream message:', {data})
         broadcastToWebsocket(data)

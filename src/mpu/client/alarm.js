@@ -1,137 +1,5 @@
-(function () {
+(() => {
  
-    var Timer = (callback, timeout) => {
-        var timer
-        function start () {
-            if (!timer) {
-                timer = setTimeout(callback, timeout)
-            }
-        }
-        function stop () {
-            if (timer) {
-                clearTimeout(timer)
-                timer = null
-            }
-        }
-        function restart () {
-            stop()
-            start()
-        }
-        return {
-            start: start,
-            stop: stop,
-            restart: restart
-        }
-    }
-
-    var Lcd = callback => {
-    // https://dawes.wordpress.com/2010/01/05/hd44780-instruction-set/
-        var display
-        var pos
-        var cmd = false
-        var cursor = false
-        var timer
-        function show () {
-            callback(display)
-        }
-        function write (char) {
-            if (char >= ' ') {
-                var row, col
-                if (pos < 16) {
-                    row = 0
-                    col = pos
-                } else {
-                    row = 1
-                    col = pos - 64
-                }
-                var previousChar = display[row].substr(col, 1)
-                display[row] = display[row].substr(0, col) + char + display[row].substr(col + 1)
-                return previousChar
-            }
-        }
-        function advance () {
-            pos++
-        }
-        function start () {
-            var cursorChar = '_'
-            if (cursor) {
-                timer = setInterval(function () {
-                    cursorChar = write(cursorChar)
-                    show()
-                }, 400)
-            }
-        }
-        function stop () {
-            if (timer) {
-                clearInterval(timer)
-            }
-        }
-        function refresh () {
-            stop()
-            show()
-            start()
-        }
-        function offline () {
-            display = ['Connecting...   ', '                ']
-            show()
-        }
-        function reset () {
-            display = ['                ', '                ']
-            pos = 0
-            refresh()
-        }
-        function ingest (data) {
-            for (var i = 0; i < data.length; i++) {
-                var char = data.charCodeAt(i)
-                if (cmd) {
-                    if (char >= 0x80) { // set position
-                        pos = char - 0x80
-                    } else {
-                        console.log('unknown command: ', char.toString(16))
-                    }
-                    cmd = false
-                } else {
-                    switch (char) {
-                    // case 0x03: // unknown
-                    //   break;
-                    case 0x04: // command
-                        cmd = true; break
-                    case 0x05: // hide cursor
-                        cursor = false; break
-                    case 0x06: // show cursor
-                        cursor = true; break
-                    case 0x07: // cursor right
-                        pos++; break
-                    case 0x0a: // newline
-                        pos = 64; break
-                    case 0x0c: // clear
-                        reset(); break
-                        // case 0x0d: // unknown
-                        //   break;
-                        // case 0x10: // unknown
-                        //   break;
-                        // case 0x16: // unknown
-                        //   break;
-                    default:
-                        if (char >= 0x20 && char <= 0x7f) {
-                            write(data.charAt(i))
-                            advance()
-                        } else {
-                            console.log('unprintable character: ', char.toString(16))
-                        }
-                    }
-                }
-            }
-            refresh()
-        }
-        reset()
-        return {
-            offline: offline,
-            ingest: ingest,
-            reset: reset
-        }
-    }
-
     var Connection = (url, handlers) => {
         offline()
         var ws
@@ -139,7 +7,7 @@
             console.log('connection timeout')
             ws.close()
             start()
-        }, 3000)
+        }, 5000)
         var keepAlive = Timer(() => {
             console.log('connection lost')
             offline()
@@ -205,8 +73,140 @@
         }
     }
 
-    var Led = (attr, values) => {
-        var length = values.length
+    const Timer = (callback, timeout) => {
+        let timer
+        const start = () => {
+            if (!timer) {
+                timer = setTimeout(callback, timeout)
+            }
+        }
+        const stop = () => {
+            if (timer) {
+                clearTimeout(timer)
+                timer = null
+            }
+        }
+        const restart = () => {
+            stop()
+            start()
+        }
+        return {
+            start: start,
+            stop: stop,
+            restart: restart
+        }
+    }
+
+    const Lcd = callback => {
+    // https://dawes.wordpress.com/2010/01/05/hd44780-instruction-set/
+        var display
+        var pos
+        var cmd = false
+        var cursor = false
+        var timer
+        const show = () => {
+            callback(display)
+        }
+        const write = char => {
+            if (char >= ' ') {
+                var row, col
+                if (pos < 16) {
+                    row = 0
+                    col = pos
+                } else {
+                    row = 1
+                    col = pos - 64
+                }
+                var previousChar = display[row].substr(col, 1)
+                display[row] = display[row].substr(0, col) + char + display[row].substr(col + 1)
+                return previousChar
+            }
+        }
+        const advance = () => {
+            pos++
+        }
+        const start = () => {
+            var cursorChar = '_'
+            if (cursor) {
+                timer = setInterval(function () {
+                    cursorChar = write(cursorChar)
+                    show()
+                }, 400)
+            }
+        }
+        const stop = () => {
+            if (timer) {
+                clearInterval(timer)
+            }
+        }
+        const refresh = () => {
+            stop()
+            show()
+            start()
+        }
+        const offline = () => {
+            display = ['Connecting...   ', '                ']
+            show()
+        }
+        const reset = () => {
+            display = ['                ', '                ']
+            pos = 0
+            refresh()
+        }
+        const ingest = data => {
+            for (var i = 0; i < data.length; i++) {
+                var char = data.charCodeAt(i)
+                if (cmd) {
+                    if (char >= 0x80) { // set position
+                        pos = char - 0x80
+                    } else {
+                        console.log('unknown command: ', char.toString(16))
+                    }
+                    cmd = false
+                } else {
+                    switch (char) {
+                    // case 0x03: // unknown
+                    //   break;
+                    case 0x04: // command
+                        cmd = true; break
+                    case 0x05: // hide cursor
+                        cursor = false; break
+                    case 0x06: // show cursor
+                        cursor = true; break
+                    case 0x07: // cursor right
+                        pos++; break
+                    case 0x0a: // newline
+                        pos = 64; break
+                    case 0x0c: // clear
+                        reset(); break
+                        // case 0x0d: // unknown
+                        //   break;
+                        // case 0x10: // unknown
+                        //   break;
+                        // case 0x16: // unknown
+                        //   break;
+                    default:
+                        if (char >= 0x20 && char <= 0x7f) {
+                            write(data.charAt(i))
+                            advance()
+                        } else {
+                            console.log('unprintable character: ', char.toString(16))
+                        }
+                    }
+                }
+            }
+            refresh()
+        }
+        reset()
+        return {
+            offline: offline,
+            ingest: ingest,
+            reset: reset
+        }
+    }
+
+    const Led = (attr, values) => {
+        const length = values.length
         return {
             ingest: data => {
                 for (var i = 0; i < length; i++) {
@@ -220,7 +220,7 @@
         }
     }
 
-    var Auto = attr => {
+    const Auto = attr => {
         return {
             ingest: data => {
                 const hour = parseInt(data)
@@ -303,10 +303,10 @@
         })
 
         // connect/disconnect based on page visibility
-        $(document).on({
-            show: connection.start,
-            hide: connection.stop
-        })
+        // $(document).on({
+        //     show: connection.start,
+        //     hide: connection.stop
+        // })
 
         $('.lcd').on('click', () => {
             $('.keyboard').toggle()
@@ -317,4 +317,4 @@
         connection.start()
     })
 
-}())
+})()
