@@ -11,7 +11,6 @@
 #include <Arduino.h>
 #include <Adafruit_SHT31.h>
 #include <Adafruit_SGP30.h>
-// #include <ClosedCube_SHT31D.h>
 
 struct Status {
     float temperature;
@@ -27,7 +26,6 @@ class Sensors {
     void (*sendMessage)(String msg);
 
     Adafruit_SHT31 sht31;
-    // ClosedCube_SHT31D sht31;
     bool sht31_enabled;
     void begin_sht31();
     void sample_sht31();

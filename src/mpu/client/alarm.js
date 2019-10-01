@@ -235,11 +235,10 @@
     const Air = callback => {
         return {
             ingest: data => {
-                const [temperature, relativeHumidity, absoluteHumidity, tvoc, co2] = data.split(':')
+                const [temperature, relativeHumidity, tvoc, co2] = data.split(':')
                 callback({
                     temperature: parseFloat(temperature).toFixed(1),
                     relativeHumidity: parseFloat(relativeHumidity).toFixed(1),
-                    absoluteHumidity: parseFloat(absoluteHumidity).toFixed(1),
                     tvoc: parseInt(tvoc),
                     co2: parseInt(co2)
                 })

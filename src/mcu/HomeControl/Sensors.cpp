@@ -19,15 +19,6 @@ void Sensors::begin_sht31() {
     } else {
         sendMessage("SEN:SHT31 not detected");
     }
-    // if (sht31.begin(0x44) == SHT3XD_NO_ERROR) {
-    //     sendMessage("SEN:SHT31 detected " + String(sht31.readSerialNumber()));
-    //     if (sht31.periodicStart(SHT3XD_REPEATABILITY_HIGH, SHT3XD_FREQUENCY_1HZ) == SHT3XD_NO_ERROR) {
-    //         sendMessage("SEN:SHT31 set to periodic reading mode");
-    //         sht31_enabled = true;
-    //     }
-    // } else {
-    //     sendMessage("SEN:SHT31 not detected");
-    // }
 }
 
 void Sensors::begin_sgp30() {
@@ -89,7 +80,6 @@ void Sensors::sample() {
     sample_sgp30();
     sendMessage("AIR:" + String(status.temperature) + ":" +
                 String(status.relativeHumidity) + ":" +
-                String(status.absoluteHumidity) + ":" +
                 String(status.TVOC) + ":" + 
                 String(status.eCO2));
 }
@@ -103,20 +93,6 @@ void Sensors::sample_sht31() {
         } else {
             status.absoluteHumidity = NAN;
         }
-        // SHT31D result = sht31.periodicFetchData();
-        // if (result.error == SHT3XD_NO_ERROR) {
-        //     status.temperature = result.t;
-        //     status.relativeHumidity = result.rh;
-        //     if (!isnan(status.temperature) && !isnan(status.relativeHumidity)) {
-        //         status.absoluteHumidity = getAbsoluteHumidity(status.temperature, status.relativeHumidity);
-        //     } else {
-        //         status.absoluteHumidity = NAN;
-        //     }
-        // } else {
-        //     sendMessage("SEN: SHT31 error " + String(result.error));
-        //     status.temperature = NAN;
-        //     status.relativeHumidity = NAN;
-        // }
     }
 }
 
