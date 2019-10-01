@@ -232,10 +232,33 @@
         }
     }
 
+    const Air = callback => {
+        return {
+            ingest: data => {
+                const [temperature, relativeHumidity, absoluteHumidity, tvoc, co2] = data.split(':')
+                console.log({temperature, relativeHumidity, absoluteHumidity, tvoc, co2})
+                callback({
+                    temperature: parseFloat(temperature).toFixed(1),
+                    relativeHumidity: parseFloat(relativeHumidity).toFixed(0),
+                    absoluteHumidity: parseFloat(absoluteHumidity).toFixed(0),
+                    tvoc: parseInt(tvoc),
+                    co2: parseInt(co2)
+                })
+            }
+        }
+    }
+
     $(() => {
         var lcd = Lcd(rows => {
             $('#row0', '.lcd').html(rows[0])
             $('#row1', '.lcd').html(rows[1])
+        })
+
+        var air = Air(({temperature, relativeHumidity, tvoc, co2}) => {
+            $('#temperature').html(temperature)
+            $('#relativeHumidity').html(relativeHumidity)
+            $('#tvoc').html(tvoc)
+            $('#co2').html(co2)
         })
 
         var keypadLed = Led('data-keypad', '12345678UTSP')
@@ -268,8 +291,8 @@
                     case 'LCD': // LCD messages
                         lcd.ingest(data)
                         break
-                    case 'SEN': // sensors
-                        console.log('Air sensors', data)
+                    case 'AIR': // sensors
+                        air.ingest(data)
                         break
                     case 'ARM': // auto arm
                         autoArm.ingest(data)

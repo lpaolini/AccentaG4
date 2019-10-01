@@ -163,6 +163,14 @@ body.active {
     margin: .5rem;
 }
 
+.lcd pre.air > * {
+    display: flex;
+}
+
+.unit {
+    opacity: .5;
+}
+
 .button,
 .led {
     border-radius: 1rem;
