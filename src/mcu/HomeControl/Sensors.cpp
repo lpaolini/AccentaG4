@@ -15,7 +15,7 @@ Sensors::Sensors(unsigned long interval, void (*sendMessage)(String msg)) {
 void Sensors::begin_sht31() {
     if (sht31.begin(0x44) == SHT3XD_NO_ERROR) {
         sendMessage("SEN:SHT31 detected " + String(sht31.readSerialNumber()));
-        if (sht31.periodicStart(SHT3XD_REPEATABILITY_HIGH, SHT3XD_FREQUENCY_1HZ) != SHT3XD_NO_ERROR) {
+        if (sht31.periodicStart(SHT3XD_REPEATABILITY_HIGH, SHT3XD_FREQUENCY_1HZ) == SHT3XD_NO_ERROR) {
             sendMessage("SEN:SHT31 set to periodic reading mode");
             sht31_enabled = true;
         }
