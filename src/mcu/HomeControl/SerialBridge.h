@@ -17,8 +17,8 @@ class SerialBridge {
     char enableChar;
     char disableChar;
     unsigned long enableGraceMillis;
-    void (*enableHandler)(HardwareSerial &serial, char enableChar);
-    void (*disableHandler)(HardwareSerial &serial, char disableChar);
+    void (*enableHandler)(HardwareSerial &serial, char enableChar, boolean justEnabled);
+    void (*disableHandler)(HardwareSerial &serial, char disableChar, boolean justDisabled);
     void (*readHandler)(HardwareSerial &serial, char c);
     
     boolean enabled = false;

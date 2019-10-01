@@ -15,18 +15,36 @@
 #define DISABLE_CHAR '-'
 #define ENABLE_GRACE_MS 1500
 
-void enableHandler(HardwareSerial serial, char enableChar) {
-    serial.println(enableChar);
-}
-
-void disableHandler(HardwareSerial serial, char disableChar) {
-    serial.println(disableChar);
-}
-
+void enableHandler(HardwareSerial serial, char enableChar, boolean justEnabled);
+void disableHandler(HardwareSerial serial, char disableChar, boolean justDisabled);
 void readHandler(HardwareSerial serial, char c);
+void sendMessage(String msg);
 
 SerialBridge bridge(Serial, LINK_SPEED, LED_BUILTIN, ENABLE_CHAR, DISABLE_CHAR,
                     ENABLE_GRACE_MS, enableHandler, disableHandler, readHandler);
+
+AccentaG4 accentaG4(COMMS_RX_PIN, COMMS_TX_PIN, SIG_SET_PIN, SIG_ABORT_PIN,
+                SIG_INT_PIN, SIG_PA_PIN, sendMessage);
+
+Sensors sensors(SENSORS_INTERVAL_MS, sendMessage);
+
+void enableHandler(HardwareSerial serial, char enableChar, boolean justEnabled) {
+    serial.println(enableChar);
+    if (justEnabled) {
+        sensors.begin();
+    }
+}
+
+void disableHandler(HardwareSerial serial, char disableChar, boolean justDisabled) {
+    serial.println(disableChar);
+    if (justDisabled) {
+        sensors.end();
+    }
+}
+
+void readHandler(HardwareSerial serial, char c) {
+    accentaG4.sendKey(c);
+}
 
 void sendMessage(String msg) {
     if (bridge.isEnabled()) {
@@ -34,23 +52,14 @@ void sendMessage(String msg) {
     }
 }
 
-AccentaG4 alarm(COMMS_RX_PIN, COMMS_TX_PIN, SIG_SET_PIN, SIG_ABORT_PIN,
-                SIG_INT_PIN, SIG_PA_PIN, sendMessage);
-
-void readHandler(HardwareSerial serial, char c) {
-    alarm.sendKey(c);
-}
-
-Sensors sensors(SENSORS_INTERVAL_MS, sendMessage);
-
 void setup() {
     bridge.begin();
-    alarm.begin();
+    accentaG4.begin();
     sensors.begin();
 }
 
 void loop() {
     bridge.loop();
-    alarm.loop();
+    accentaG4.loop();
     sensors.loop();
 }

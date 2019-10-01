@@ -38,18 +38,20 @@ bool SerialBridge::isEnabled() {
 void SerialBridge::read() {
     int c = serial.read();
     if (c == enableChar) {
+        boolean wasEnabled = enabled;
         enabled = true;
         lastEnabled = millis();
         resetBlink();
         if (enableHandler) {
-            enableHandler(serial, enableChar);
+            enableHandler(serial, enableChar, wasEnabled == false);
         }
         return;
     }
     if (c == disableChar) {
+        boolean wasEnabled = enabled;
         enabled = false;
         if (disableHandler) {
-            disableHandler(serial, disableChar);
+            disableHandler(serial, disableChar, wasEnabled == true);
         }
         return;
     }

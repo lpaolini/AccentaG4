@@ -13,12 +13,13 @@ Sensors::Sensors(unsigned long interval, void (*sendMessage)(String msg)) {
 }
 
 void Sensors::begin_sht31() {
-    if (sht31.begin(0x44)) {
+    // if (sht31.begin(0x44)) {
+        sht31.begin(0x44);
         sht31_enabled = true;
         sendMessage("SEN:SHT31 detected " + String(sht31.readSerialNumber()));
-    } else {
-        sendMessage("SEN:SHT31 not detected");
-    }
+    // } else {
+        // sendMessage("SEN:SHT31 not detected");
+    // }
 }
 
 void Sensors::begin_sgp30() {
@@ -80,8 +81,9 @@ void Sensors::sample() {
     sample_sgp30();
     sendMessage("AIR:" + String(status.temperature) + ":" +
                 String(status.relativeHumidity) + ":" +
-                String(status.absoluteHumidity) + ":" + String(status.TVOC) +
-                ":" + String(status.eCO2));
+                String(status.absoluteHumidity) + ":" +
+                String(status.TVOC) + ":" + 
+                String(status.eCO2));
 }
 
 void Sensors::sample_sht31() {
