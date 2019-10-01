@@ -78,10 +78,7 @@ void Sensors::loop() {
 void Sensors::sample() {
     sample_sht31();
     sample_sgp30();
-    sendMessage("AIR:" + String(status.temperature) + ":" +
-                String(status.relativeHumidity) + ":" +
-                String(status.TVOC) + ":" + 
-                String(status.eCO2));
+    queryStatus();
 }
 
 void Sensors::sample_sht31() {
@@ -105,9 +102,16 @@ void Sensors::sample_sgp30() {
             status.TVOC = sgp30.TVOC;
             status.eCO2 = sgp30.eCO2;
         } else {
-            sendMessage("SEN: SGP30 error");
+            sendMessage("SEN:SGP30 error");
             status.TVOC = NAN;
             status.eCO2 = NAN;
         }
     }
+}
+
+void Sensors::queryStatus() {
+    sendMessage("AIR:" + String(status.temperature) + ":" +
+                String(status.relativeHumidity) + ":" +
+                String(status.TVOC) + ":" + 
+                String(status.eCO2));
 }

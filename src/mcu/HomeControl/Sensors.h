@@ -47,6 +47,7 @@ class Sensors {
     void begin();
     void end();
     void loop();
+    void queryStatus();
 };
 
 #endif

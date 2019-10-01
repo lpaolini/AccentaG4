@@ -99,6 +99,10 @@ parser.on('data', buffer => {
         status.update('intruder', signals.charAt(2) === 'I')
         status.update('pa', signals.charAt(3) === 'P')
         break
+    case 'AIR:':
+        var airQuality = data.substring(4)
+        status.update('air', airQuality)
+        break
     default:
     }
     downstream$.next(data)

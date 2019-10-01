@@ -43,7 +43,12 @@ void disableHandler(HardwareSerial serial, char disableChar, boolean justDisable
 }
 
 void readHandler(HardwareSerial serial, char c) {
-    accentaG4.sendKey(c);
+    if (c == '?') {
+        accentaG4.queryStatus();
+        sensors.queryStatus();
+    } else {
+        accentaG4.sendKey(c);
+    }
 }
 
 void sendMessage(String msg) {

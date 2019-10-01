@@ -81,9 +81,9 @@ void AccentaG4::sendKey(char key) {
     case '!':
         tx.queue.push(K_SOS);
         break;
-    case '?':
-        queryStatus();
-        break;
+    // case '?':
+    //     queryStatus();
+    //     break;
     }
 }
 
@@ -174,7 +174,9 @@ void AccentaG4::setLcdStatus(struct Rx rx) {
     sendLcdStatus();
 }
 
-void AccentaG4::sendLcdStatus() { sendMessage("LCD:" + String(status.lcd)); }
+void AccentaG4::sendLcdStatus() {
+    sendMessage("LCD:" + String(status.lcd));
+}
 
 void AccentaG4::sendCommand(char key) {
     serial.stopListening();                  // half-duplex bus
