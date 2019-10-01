@@ -13,15 +13,21 @@ Sensors::Sensors(unsigned long interval, void (*sendMessage)(String msg)) {
 }
 
 void Sensors::begin_sht31() {
-    if (sht31.begin(0x44) == SHT3XD_NO_ERROR) {
-        sendMessage("SEN:SHT31 detected " + String(sht31.readSerialNumber()));
-        if (sht31.periodicStart(SHT3XD_REPEATABILITY_HIGH, SHT3XD_FREQUENCY_1HZ) == SHT3XD_NO_ERROR) {
-            sendMessage("SEN:SHT31 set to periodic reading mode");
-            sht31_enabled = true;
-        }
+    if (sht31.begin(0x44)) {
+        sendMessage("SEN:SHT31 detected");
+        sht31_enabled = true;
     } else {
         sendMessage("SEN:SHT31 not detected");
     }
+    // if (sht31.begin(0x44) == SHT3XD_NO_ERROR) {
+    //     sendMessage("SEN:SHT31 detected " + String(sht31.readSerialNumber()));
+    //     if (sht31.periodicStart(SHT3XD_REPEATABILITY_HIGH, SHT3XD_FREQUENCY_1HZ) == SHT3XD_NO_ERROR) {
+    //         sendMessage("SEN:SHT31 set to periodic reading mode");
+    //         sht31_enabled = true;
+    //     }
+    // } else {
+    //     sendMessage("SEN:SHT31 not detected");
+    // }
 }
 
 void Sensors::begin_sgp30() {
@@ -90,20 +96,27 @@ void Sensors::sample() {
 
 void Sensors::sample_sht31() {
     if (sht31_enabled) {
-        SHT31D result = sht31.periodicFetchData();
-        if (result.error == SHT3XD_NO_ERROR) {
-            status.temperature = result.t;
-            status.relativeHumidity = result.rh;
-            if (!isnan(status.temperature) && !isnan(status.relativeHumidity)) {
-                status.absoluteHumidity = getAbsoluteHumidity(status.temperature, status.relativeHumidity);
-            } else {
-                status.absoluteHumidity = NAN;
-            }
+        status.temperature = sht31.readTemperature();
+        status.relativeHumidity = sht31.readHumidity();
+        if (!isnan(status.temperature) && !isnan(status.relativeHumidity)) {
+            status.absoluteHumidity = getAbsoluteHumidity(status.temperature, status.relativeHumidity);
         } else {
-            sendMessage("SEN: SHT31 error " + String(result.error));
-            status.temperature = NAN;
-            status.relativeHumidity = NAN;
+            status.absoluteHumidity = NAN;
         }
+        // SHT31D result = sht31.periodicFetchData();
+        // if (result.error == SHT3XD_NO_ERROR) {
+        //     status.temperature = result.t;
+        //     status.relativeHumidity = result.rh;
+        //     if (!isnan(status.temperature) && !isnan(status.relativeHumidity)) {
+        //         status.absoluteHumidity = getAbsoluteHumidity(status.temperature, status.relativeHumidity);
+        //     } else {
+        //         status.absoluteHumidity = NAN;
+        //     }
+        // } else {
+        //     sendMessage("SEN: SHT31 error " + String(result.error));
+        //     status.temperature = NAN;
+        //     status.relativeHumidity = NAN;
+        // }
     }
 }
 
