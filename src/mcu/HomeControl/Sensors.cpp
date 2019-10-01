@@ -100,7 +100,7 @@ void Sensors::sample_sht31() {
                 status.absoluteHumidity = NAN;
             }
         } else {
-            sendMessage("SEN: SHT31 " + String(result.error));
+            sendMessage("SEN: SHT31 error " + String(result.error));
             status.temperature = NAN;
             status.relativeHumidity = NAN;
         }
