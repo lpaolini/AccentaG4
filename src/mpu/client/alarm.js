@@ -265,7 +265,7 @@
         var autoDisarm = Auto('data-autodisarm')
 
         var url = location.protocol === 'https:' ?
-            'wss://' + location.hostname + ':8443' :
+            'wss://' + location.hostname + ':10444' :
             'ws://' + location.hostname + ':8080'
 
         var connection = Connection(url, {
