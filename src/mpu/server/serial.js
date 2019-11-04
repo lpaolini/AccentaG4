@@ -3,9 +3,6 @@ const {mapTo} = require('rxjs/operators')
 const SerialPort = require('serialport')
 const Delimiter = require('@serialport/parser-delimiter')
 
-const ENABLE_CHAR = '+'
-const DISABLE_CHAR = '-'
-
 module.exports = config => {
     const port = new SerialPort(config.serial, {
         baudRate: 115200
@@ -45,7 +42,7 @@ module.exports = config => {
             )
     
     send$.pipe(
-        mergeHeartbeat(1000, ENABLE_CHAR)
+        mergeHeartbeat(1000, config.ENABLE_CHAR)
     ).subscribe(
         data => {
             // data !== ENABLE_CHAR && console.log('Upstream message:', {data})

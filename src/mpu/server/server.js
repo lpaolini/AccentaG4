@@ -6,9 +6,6 @@ const WebSocket = require('ws')
 const {Subject, merge} = require('rxjs')
 const {filter, throttleTime} = require('rxjs/operators')
 
-const ENABLE_CHAR = '+'
-const DISABLE_CHAR = '-'
-
 module.exports = config => {
     const app = express()
 
@@ -36,17 +33,15 @@ module.exports = config => {
     const listen = callback =>
         wss.on('connection', callback)
 
-    const downstreamWithThrottledHeartbeats$ = merge(
+    merge(
         send$.pipe(
-            filter(data => data !== ENABLE_CHAR)
+            filter(data => data !== config.ENABLE_CHAR)
         ),
         send$.pipe(
-            filter(data => data === ENABLE_CHAR),
+            filter(data => data === config.ENABLE_CHAR),
             throttleTime(3000)
         )
-    )
-        
-    downstreamWithThrottledHeartbeats$.subscribe(
+    ).subscribe(
         data => {
             // data !== ENABLE_CHAR && console.log('Downstream message:', {data})
             wss.clients.forEach(function (client) {
