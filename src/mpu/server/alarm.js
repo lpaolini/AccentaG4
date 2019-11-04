@@ -23,46 +23,43 @@ const status = new Status({
 status.update('autoArm', config.autoArmHour)
 status.update('autoDisarm', config.autoDisarmHour)
 
-serial.listen(buffer => {
-    const data = buffer.toString('binary')
-    switch (data.substr(0, 4)) {
+serial.listen(message => {
+    switch (message.substr(0, 4)) {
     case 'HBT:':
-        var staleness = parseInt(data.substring(4), 10)
+        var staleness = parseInt(message.substring(4), 10)
         status.update('link', staleness < 120)
         break
     case 'SIG:':
-        var signals = data.substring(4)
+        var signals = message.substring(4)
         status.update('set', signals.charAt(0) === 'S')
         status.update('abort', signals.charAt(1) === 'A')
         status.update('intruder', signals.charAt(2) === 'I')
         status.update('pa', signals.charAt(3) === 'P')
         break
     case 'AIR:':
-        var airQuality = data.substring(4)
+        var airQuality = message.substring(4)
         status.update('air', airQuality)
         break
     default:
     }
-    server.send(data)
+    server.send(message)
 })
 
-server.listen(ws => {
-    ws.on('message', message => {
-        // console.log('client message:', message)
-        if (message.substring(0, 5) === '#ARM=') {
-            status.update('autoArm', parseInt(message.split('=')[1]))
+server.listen(message => {
+    // console.log('client message:', message)
+    if (message.substring(0, 5) === '#ARM=') {
+        status.update('autoArm', parseInt(message.split('=')[1]))
+        server.send('ARM:' + status.read('autoArm'))
+    } else if (message.substring(0, 5) === '#DIS=') {
+        status.update('autoDisarm', parseInt(message.split('=')[1]))
+        server.send('DIS:' + status.read('autoDisarm'))
+    } else {
+        if (message === '?') {
             server.send('ARM:' + status.read('autoArm'))
-        } else if (message.substring(0, 5) === '#DIS=') {
-            status.update('autoDisarm', parseInt(message.split('=')[1]))
             server.send('DIS:' + status.read('autoDisarm'))
-        } else {
-            if (message === '?') {
-                server.send('ARM:' + status.read('autoArm'))
-                server.send('DIS:' + status.read('autoDisarm'))
-            }
-            serial.send(message)
         }
-    })
+        serial.send(message)
+    }
 })
 
 setInterval(function() {

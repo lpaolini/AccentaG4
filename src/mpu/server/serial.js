@@ -30,7 +30,9 @@ module.exports = config => {
     )
  
     const listen = callback =>
-        parser.on('data', callback)
+        parser.on('data', buffer =>
+            callback(buffer.toString('binary'))
+        )
 
     const mergeHeartbeat = (heartbeatDelay, heartbeatValue) =>
         observable$ =>

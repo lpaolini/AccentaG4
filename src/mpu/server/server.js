@@ -31,7 +31,11 @@ module.exports = config => {
     })
 
     const listen = callback =>
-        wss.on('connection', callback)
+        wss.on('connection', ws =>
+            ws.on('message', message =>
+                callback(message)
+            )
+        )
 
     merge(
         send$.pipe(
