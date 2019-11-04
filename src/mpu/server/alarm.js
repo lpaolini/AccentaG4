@@ -1,5 +1,7 @@
 const fs = require('fs')
 const https = require('https')
+const express = require('express')
+const path = require('path')
 
 const {Subject, timer, merge} = require('rxjs')
 const {filter, mapTo, throttleTime} = require('rxjs/operators')
@@ -67,19 +69,20 @@ const {port, parser} = (() => {
     return {port, parser}
 })()
 
-// initialize websocket servers
-const wss = (() => {
-    const httpsServer = https.createServer({
-        key: fs.readFileSync(config.ssl.key || __dirname + '/key.pem'),
-        cert: fs.readFileSync(config.ssl.cert || __dirname + '/cert.pem')
-    }, (req, res) => {
-        res.writeHead(200)
-        res.end('WebSocket')
-    }).listen(config.port)
-    return new WebSocket.Server({
-        server: httpsServer
-    })
-})()
+const app = express()
+
+app.use(express.static(path.join(__dirname, '../client')))
+
+const server = https.createServer({
+    key: fs.readFileSync(config.ssl.key || __dirname + '/key.pem'),
+    cert: fs.readFileSync(config.ssl.cert || __dirname + '/cert.pem')
+}, app)
+
+const wss = new WebSocket.Server({server})
+
+server.listen(config.port, () => {
+    console.info(`Server started on port ${config.port}`)
+})
 
 const upstream$ = new Subject()
 const downstream$ = new Subject()
