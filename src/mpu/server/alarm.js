@@ -77,12 +77,12 @@ app.get('/', function(req, res) {
     res.render('index.html')
 })
 
-const sslCredentials =
-
-const server = https.createServer({
+const sslCredentials = {
     key: fs.readFileSync(config.ssl.key || __dirname + '/key.pem'),
     cert: fs.readFileSync(config.ssl.cert || __dirname + '/cert.pem')
-}, app)
+}
+
+const server = https.createServer(sslCredentials, app)
 
 const wss = new WebSocket.Server({server})
 
