@@ -73,6 +73,10 @@ const app = express()
 
 app.use(express.static(path.join(__dirname, '../client')))
 
+app.get('/', function(req, res) {
+    res.render('index.html')
+})
+
 const server = https.createServer({
     key: fs.readFileSync(config.ssl.key || __dirname + '/key.pem'),
     cert: fs.readFileSync(config.ssl.cert || __dirname + '/cert.pem')
