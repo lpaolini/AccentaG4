@@ -77,6 +77,8 @@ app.get('/', function(req, res) {
     res.render('index.html')
 })
 
+const sslCredentials =
+
 const server = https.createServer({
     key: fs.readFileSync(config.ssl.key || __dirname + '/key.pem'),
     cert: fs.readFileSync(config.ssl.cert || __dirname + '/cert.pem')
