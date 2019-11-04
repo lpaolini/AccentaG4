@@ -117,13 +117,13 @@ parser.on('data', buffer => {
 
 // react to websockets messages
 wss.on('connection', ws => {
-    console.log('new client connection')
+    // console.log('new client connection')
     handleWebsocketConnection(ws)
 })
 
 const handleWebsocketConnection = ws =>
     ws.on('message', message => {
-        console.log('client message:', message)
+        // console.log('client message:', message)
         handleWebsocketMessage(message)
     })
 
@@ -187,7 +187,7 @@ const upstreamWithHeartbeat$ = upstream$.pipe(
 
 upstreamWithHeartbeat$.subscribe(
     data => {
-        data !== ENABLE_CHAR && console.log('Upstream message:', {data})
+        // data !== ENABLE_CHAR && console.log('Upstream message:', {data})
         sendToSerial(data)
     }
 )
@@ -204,7 +204,7 @@ const downstreamWithThrottledHeartbeats$ = merge(
 
 downstreamWithThrottledHeartbeats$.subscribe(
     data => {
-        data !== ENABLE_CHAR && console.log('Downstream message:', {data})
+        // data !== ENABLE_CHAR && console.log('Downstream message:', {data})
         broadcastToWebsocket(data)
     }
 )
