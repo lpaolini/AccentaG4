@@ -3,6 +3,11 @@ const https = require('https')
 const express = require('express')
 const path = require('path')
 const WebSocket = require('ws')
+const {Subject, merge} = require('rxjs')
+const {filter, throttleTime} = require('rxjs/operators')
+
+const ENABLE_CHAR = '+'
+const DISABLE_CHAR = '-'
 
 module.exports = config => {
     const app = express()
@@ -12,6 +17,8 @@ module.exports = config => {
     app.get('/', function(req, res) {
         res.render('index.html')
     })
+
+    const send$ = new Subject()
     
     const sslCredentials = {
         key: fs.readFileSync(config.ssl.key || __dirname + '/key.pem'),
@@ -26,15 +33,32 @@ module.exports = config => {
         console.info(`Server started on port ${config.port}`)
     })
 
-    const send = data =>
-        wss.clients.forEach(function (client) {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(data)
-            }
-        })
-
     const listen = callback =>
         wss.on('connection', callback)
 
-    return {send, listen}
+    const downstreamWithThrottledHeartbeats$ = merge(
+        send$.pipe(
+            filter(data => data !== ENABLE_CHAR)
+        ),
+        send$.pipe(
+            filter(data => data === ENABLE_CHAR),
+            throttleTime(3000)
+        )
+    )
+        
+    downstreamWithThrottledHeartbeats$.subscribe(
+        data => {
+            // data !== ENABLE_CHAR && console.log('Downstream message:', {data})
+            wss.clients.forEach(function (client) {
+                if (client.readyState === WebSocket.OPEN) {
+                    client.send(data)
+                }
+            })
+        }
+    )
+    
+    const send = data =>
+        send$.next(data)
+
+    return {listen, send}
 }

@@ -1,18 +1,11 @@
-const {Subject, timer, merge} = require('rxjs')
-const {filter, mapTo, throttleTime} = require('rxjs/operators')
-
 const config = require('./config')()
 const Serial = require('./serial')
 const Server = require('./server')
 const Status = require('./status')
 const Notify = require('./notify')
 
-const ENABLE_CHAR = '+'
-// const DISABLE_CHAR = '-'
-
 const serial = Serial(config)
 const server = Server(config)
-
 const notify = Notify(config.notify)
 
 notify('Alarm controller started')
@@ -30,10 +23,6 @@ const status = new Status({
 status.update('autoArm', config.autoArmHour)
 status.update('autoDisarm', config.autoDisarmHour)
 
-const upstream$ = new Subject()
-const downstream$ = new Subject()
-
-// react to serial messages
 serial.listen(buffer => {
     const data = buffer.toString('binary')
     switch (data.substr(0, 4)) {
@@ -54,7 +43,7 @@ serial.listen(buffer => {
         break
     default:
     }
-    downstream$.next(data)
+    server.send(data)
 })
 
 server.listen(ws => {
@@ -62,16 +51,16 @@ server.listen(ws => {
         // console.log('client message:', message)
         if (message.substring(0, 5) === '#ARM=') {
             status.update('autoArm', parseInt(message.split('=')[1]))
-            downstream$.next('ARM:' + status.read('autoArm'))
+            server.send('ARM:' + status.read('autoArm'))
         } else if (message.substring(0, 5) === '#DIS=') {
             status.update('autoDisarm', parseInt(message.split('=')[1]))
-            downstream$.next('DIS:' + status.read('autoDisarm'))
+            server.send('DIS:' + status.read('autoDisarm'))
         } else {
             if (message === '?') {
-                downstream$.next('ARM:' + status.read('autoArm'))
-                downstream$.next('DIS:' + status.read('autoDisarm'))
+                server.send('ARM:' + status.read('autoArm'))
+                server.send('DIS:' + status.read('autoDisarm'))
             }
-            upstream$.next(message)
+            serial.send(message)
         }
     })
 })
@@ -83,51 +72,14 @@ setInterval(function() {
             && date.getHours() === status.read('autoDisarm')
             && date.getMinutes() === 0) {
             console.info('alarm auto-disarmed')
-            upstream$.next(config.autoDisarmCode)
+            serial.send(config.autoDisarmCode)
         }
     } else {
         if (config.autoArmCode
             && date.getHours() === status.read('autoArm')
             && date.getMinutes() === 0) {
             console.info('alarm auto-armed')
-            upstream$.next(config.autoArmCode)
+            serial.send(config.autoArmCode)
         }
     }
 }, 60000)
-
-const mergeHeartbeat = (heartbeatDelay, heartbeatValue) =>
-    observable$ =>
-        merge(
-            observable$,
-            timer(heartbeatDelay, heartbeatDelay).pipe(
-                mapTo(heartbeatValue)
-            )
-        )
-
-const upstreamWithHeartbeat$ = upstream$.pipe(
-    mergeHeartbeat(1000, ENABLE_CHAR)
-)
-
-upstreamWithHeartbeat$.subscribe(
-    data => {
-        // data !== ENABLE_CHAR && console.log('Upstream message:', {data})
-        serial.send(data)
-    }
-)
-
-const downstreamWithThrottledHeartbeats$ = merge(
-    downstream$.pipe(
-        filter(data => data !== ENABLE_CHAR)
-    ),
-    downstream$.pipe(
-        filter(data => data === ENABLE_CHAR),
-        throttleTime(3000)
-    )
-)
-
-downstreamWithThrottledHeartbeats$.subscribe(
-    data => {
-        // data !== ENABLE_CHAR && console.log('Downstream message:', {data})
-        server.send(data)
-    }
-)
