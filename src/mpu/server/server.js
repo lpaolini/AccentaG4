@@ -5,8 +5,9 @@ const path = require('path')
 const WebSocket = require('ws')
 const {Subject, merge} = require('rxjs')
 const {filter, throttleTime} = require('rxjs/operators')
+const {ENABLE_CHAR} = require('./constants')
 
-module.exports = config => {
+module.exports = ({port, ssl}) => {
     const app = express()
 
     app.use(express.static(path.join(__dirname, '../client')))
@@ -18,16 +19,16 @@ module.exports = config => {
     const send$ = new Subject()
     
     const sslCredentials = {
-        key: fs.readFileSync(config.ssl.key || __dirname + '/key.pem'),
-        cert: fs.readFileSync(config.ssl.cert || __dirname + '/cert.pem')
+        key: fs.readFileSync(ssl.key || __dirname + '/key.pem'),
+        cert: fs.readFileSync(ssl.cert || __dirname + '/cert.pem')
     }
     
     const server = https.createServer(sslCredentials, app)
     
     const wss = new WebSocket.Server({server})
     
-    server.listen(config.port, () => {
-        console.info(`Server started on port ${config.port}`)
+    server.listen(port, () => {
+        console.info(`Server started on port ${port}`)
     })
 
     const listen = callback =>
@@ -39,10 +40,10 @@ module.exports = config => {
 
     merge(
         send$.pipe(
-            filter(data => data !== config.ENABLE_CHAR)
+            filter(data => data !== ENABLE_CHAR)
         ),
         send$.pipe(
-            filter(data => data === config.ENABLE_CHAR),
+            filter(data => data === ENABLE_CHAR),
             throttleTime(3000)
         )
     ).subscribe(

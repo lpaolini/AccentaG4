@@ -4,8 +4,16 @@ const Server = require('./server')
 const Status = require('./status')
 const Notify = require('./notify')
 
-const serial = Serial(config)
-const server = Server(config)
+const serial = Serial({
+    port: config.serial,
+    baudRate: 115200
+})
+
+const server = Server({
+    port: config.port,
+    ssl: config.ssl
+})
+
 const notify = Notify(config.notify)
 
 notify('Alarm controller started')
@@ -46,7 +54,6 @@ serial.listen(message => {
 })
 
 server.listen(message => {
-    // console.log('client message:', message)
     if (message.substring(0, 5) === '#ARM=') {
         status.update('autoArm', parseInt(message.split('=')[1]))
         server.send('ARM:' + status.read('autoArm'))

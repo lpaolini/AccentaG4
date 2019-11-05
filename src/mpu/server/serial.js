@@ -2,22 +2,23 @@ const {Subject, timer, merge} = require('rxjs')
 const {mapTo} = require('rxjs/operators')
 const SerialPort = require('serialport')
 const Delimiter = require('@serialport/parser-delimiter')
+const {ENABLE_CHAR} = require('./constants')
 
-module.exports = config => {
-    const port = new SerialPort(config.serial, {
-        baudRate: 115200
+module.exports = ({port, baudRate}) => {
+    const serial = new SerialPort(port, {
+        baudRate
     })
     
     const parser = new Delimiter({
         delimiter: '\r\n'
     })
     
-    port.pipe(parser)
+    serial.pipe(parser)
             
     const send$ = new Subject()
 
     // handle opening
-    port.on('open', err => {
+    serial.on('open', err => {
         if (err) {
             return console.error('Error opening port: ', err.message)
         }
@@ -25,7 +26,7 @@ module.exports = config => {
     })
  
     // handle errors
-    port.on('error', err =>
+    serial.on('error', err =>
         console.error('Error: ', err.message)
     )
  
@@ -44,11 +45,11 @@ module.exports = config => {
             )
     
     send$.pipe(
-        mergeHeartbeat(1000, config.ENABLE_CHAR)
+        mergeHeartbeat(1000, ENABLE_CHAR)
     ).subscribe(
         data => {
             // data !== ENABLE_CHAR && console.log('Upstream message:', {data})
-            port.write(data)
+            serial.write(data)
         }
     )
 
