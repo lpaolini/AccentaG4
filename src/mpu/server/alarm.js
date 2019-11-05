@@ -1,4 +1,4 @@
-const config = require('./config')()
+const config = require('./config')
 const Serial = require('./serial')
 const Server = require('./server')
 const Status = require('./status')
