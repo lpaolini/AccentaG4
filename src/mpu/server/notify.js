@@ -6,7 +6,8 @@ function Notify(config) {
     if (config) {
         console.log('email notifications sent to: ' + config.to)
         return function (message) {
-            var mail = spawn('msmtp', ['--from=dummy', '--read-recipients'], {stdio: ['pipe', process.stdout, process.stderr]})
+            // var mail = spawn('msmtp', ['--from=dummy', '--read-recipients'], {stdio: ['pipe', process.stdout, process.stderr]})
+            var mail = spawn('sendmail', [config.to], {stdio: ['pipe', process.stdout, process.stderr]})
             mail.stdin.write('To: ' + config.to + '\n')
             mail.stdin.write('Subject: ' + message + '\n')
             mail.stdin.write('\n')
