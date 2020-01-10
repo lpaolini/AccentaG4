@@ -41,7 +41,7 @@ void SerialBridge::read() {
         boolean wasEnabled = enabled;
         enabled = true;
         lastEnabled = millis();
-        resetBlink();
+        blink();
         if (enableHandler) {
             enableHandler(serial, enableChar, wasEnabled == false);
         }
@@ -62,16 +62,15 @@ void SerialBridge::read() {
     };
 }
 
-void SerialBridge::resetBlink() {
-    nextBlink = millis();
-    ledState = LOW;
+void SerialBridge::blink() {
+    nextBlink = millis() + BLINK_DURATION_MS;
+    ledState = HIGH;
+    digitalWrite(statusLed, ledState);
 }
 
-void SerialBridge::blink() {
-    unsigned long currentMillis = millis();
-    if (currentMillis >= nextBlink) {
-        nextBlink = currentMillis + BLINK_RATE_MS;
-        ledState = isEnabled() && !ledState;
+void SerialBridge::resetBlink() {
+    if (ledState == HIGH && millis() >= nextBlink) {
+        ledState = LOW;
         digitalWrite(statusLed, ledState);
     }
 }
@@ -91,5 +90,5 @@ void SerialBridge::end() {
 
 void SerialBridge::loop() {
     read();
-    blink();
+    resetBlink();
 }

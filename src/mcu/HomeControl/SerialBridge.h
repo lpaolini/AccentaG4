@@ -7,6 +7,7 @@
 #define SerialBridge_h
 
 #define BLINK_RATE_MS 500
+#define BLINK_DURATION_MS 100
 
 #include <Arduino.h>
 
