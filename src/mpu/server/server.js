@@ -38,15 +38,17 @@ module.exports = ({port, ssl}) => {
             )
         )
 
-    merge(
-        send$.pipe(
-            filter(data => data !== ENABLE_CHAR)
-        ),
-        send$.pipe(
-            filter(data => data === ENABLE_CHAR),
-            throttleTime(3000)
-        )
-    ).subscribe(
+    // const data$ = merge(
+    //     send$.pipe(
+    //         filter(data => data !== ENABLE_CHAR)
+    //     ),
+    //     send$.pipe(
+    //         filter(data => data === ENABLE_CHAR),
+    //         throttleTime(3000)
+    //     )
+    // )
+    
+    send$.subscribe(
         data => {
             // data !== ENABLE_CHAR && console.log('Downstream message:', {data})
             wss.clients.forEach(function (client) {
