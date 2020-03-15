@@ -22,7 +22,7 @@ AccentaG4::AccentaG4(uint8_t rxPin, uint8_t txPin, uint8_t setPin,
 
 void AccentaG4::begin() {
     serial.begin(BUS_SPEED);
-    tx.next = millis();
+    tx.start = millis();
     queryStatus();
 }
 
@@ -185,9 +185,11 @@ void AccentaG4::sendCommand(char key) {
 
 void AccentaG4::sendCommands() {
     // send keypad commands
-    if (tx.queue.count() && millis() > tx.next) { // throttle tx
+    unsigned long now = millis();
+    unsigned long elapsed = now - tx.start;
+    if (tx.queue.count() && elapsed >= K_DELAY_MS) { // throttle tx
         sendCommand(tx.queue.pop());
-        tx.next = millis() + K_DELAY_MS;
+        tx.start = now;
     }
 }
 
