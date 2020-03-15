@@ -179,9 +179,14 @@ The MPU is responsible for the following tasks:
 
 ## Arduino MCU: [Watterott RPI-UNO-HAT](https://learn.watterott.com/hats/rpi-uno-hat/)
 
-The Arduino UNO compatible board is responsible for the following tasks:
+[RPI-UNO-HAT](https://shop.watterott.com/RPi-UNO-HAT-Raspberry-Pi-Arduino-Erweiterung_1) is a very nice Raspberry Pi HAT fully compatible with Arduino UNO. It features standard headers and serial communication between Raspberry Pi and Arduino, so it's possible to program and reset the Atmel MCU from the Raspberry.
 
-- monitor panel hardware signals (PA, INT, SET, ABORT), update local state and send updates to MPU
+In practice, Raspberry Pi + RPI-UNO-HAT = **Arduino Yún on steroids**!
+
+The MCU is responsible for the following tasks:
+
+- monitor Accenta G4 panel hardware signals (PA, INT, SET, ABORT), update local state and send updates to MPU
+- provide bidirectional serial connectivity with Accenta G4 keypad bus
 - listen to the keypad bus for incoming messages, update local state and send updates to MPU
 - listen to MPU for virtual keystrokes and send emulated keypad messages over the keypad bus
 - listen to MPU for status queries and send local status
