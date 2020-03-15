@@ -63,15 +63,18 @@ void SerialBridge::read() {
 }
 
 void SerialBridge::blink() {
-    nextBlink = millis() + BLINK_DURATION_MS;
+    lastBlink = millis();
     ledState = HIGH;
     digitalWrite(statusLed, ledState);
 }
 
 void SerialBridge::resetBlink() {
-    if (ledState == HIGH && millis() >= nextBlink) {
+    unsigned long now = millis();
+    unsigned long duration = now - lastBlink;
+    if (ledState == HIGH && duration > BLINK_DURATION_MS) {
         ledState = LOW;
         digitalWrite(statusLed, ledState);
+        lastBlink = now;
     }
 }
 

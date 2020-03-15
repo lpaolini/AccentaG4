@@ -25,7 +25,7 @@ class SerialBridge {
     boolean enabled = false;
     unsigned long lastEnabled;
     int ledState = LOW;
-    unsigned long nextBlink = 0;
+    unsigned long lastBlink = 0;
     
     void start();
     void stop();
