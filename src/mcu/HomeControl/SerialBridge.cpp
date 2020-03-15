@@ -8,9 +8,9 @@
 SerialBridge::SerialBridge(
     HardwareSerial &serial, long linkSpeed, int statusLed, 
     char enableChar, char disableChar, unsigned long enableGraceMillis, 
-    void (*enableHandler)(HardwareSerial &serial, char enableChar),
-    void (*disableHandler)(HardwareSerial &serial, char disableChar),
-    void (*readHandler)(HardwareSerial &serial, char readChar)
+    void (*enableHandler)(HardwareSerial serial, char enableChar, boolean justEnabled),
+    void (*disableHandler)(HardwareSerial serial, char disableChar, boolean justEnabled),
+    void (*readHandler)(HardwareSerial serial, char readChar)
 ) : serial(serial) {
     this->linkSpeed = linkSpeed;
     this->statusLed = statusLed;
@@ -30,7 +30,7 @@ void SerialBridge::stop() {
     serial.end();
 }
 
-bool SerialBridge::isEnabled() {
+boolean SerialBridge::isEnabled() {
     boolean withinGracePeriod = (enableGraceMillis == 0) || (millis() - lastEnabled < enableGraceMillis);
     return enabled && withinGracePeriod;
 }
