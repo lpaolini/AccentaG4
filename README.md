@@ -169,23 +169,28 @@ The MPU is responsible for the following tasks:
 - expose a HTTPS server for serving the web application
 - expose a secure websockets server (used by the web application)
 - accept and manage websockets connections
-- listen to MCU for incoming messages and forward to websockets clients
+- listen to MCU for incoming messages and broadcast to websockets clients
 - listen to websockets clients for incoming messages and forward to MCU
-- send email notifications for critical events
+- send email notifications
 
-[Server-side code](src/mpu/server) is written in Javascript and runs under latest NodeJS and depends on the modules [serialport](https://github.com/serialport/node-serialport), [ws](https://github.com/websockets/ws) and [rxjs](https://rxjs-dev.firebaseapp.com/)
+[Server-side code](src/mpu/server) is written in Javascript and runs under latest NodeJS and depends on [express](https://github.com/expressjs/express) [serialport](https://github.com/serialport/node-serialport), [ws](https://github.com/websockets/ws) and [rxjs](https://github.com/ReactiveX/rxjs)
 
 [Client-side code](src/mpu/client) is a HTML5/CSS3/Javascript application running in the browser.
 
 ## Arduino MCU: [Watterott RPI-UNO-HAT](https://learn.watterott.com/hats/rpi-uno-hat/)
 
-The Arduino UNO compatible board is responsible for the following tasks:
+[RPI-UNO-HAT](https://shop.watterott.com/RPi-UNO-HAT-Raspberry-Pi-Arduino-Erweiterung_1) is a very nice Raspberry Pi HAT fully compatible with Arduino UNO. It features standard headers and serial communication between Raspberry Pi and Arduino, so it's possible to program and reset the Atmel MCU from the Raspberry.
 
-- monitor panel hardware signals (PA, INT, SET, ABORT), transmit updates to MPU and update local status
-- listen to the keypad bus for incoming messages, transmit updates to MPU and update local status
-- listen to MPU for virtual keystrokes and transmit emulated keypad messages over the keypad bus
-- listen to MPU for status queries and reply local status
-- respond to heartbeat messages to be broadcasted to the clients, to prove end-to-end connection is alive
+In practice, Raspberry Pi + RPI-UNO-HAT = **Arduino Yún on steroids**!
+
+The MCU is responsible for the following tasks:
+
+- monitor Accenta G4 panel hardware signals (PA, INT, SET, ABORT), update local state and send updates to MPU
+- provide bidirectional serial connectivity with Accenta G4 keypad bus
+- listen to the keypad bus for incoming messages, update local state and send updates to MPU
+- listen to MPU for virtual keystrokes and send emulated keypad messages over the keypad bus
+- listen to MPU for status queries and send local status
+- reply to heartbeat messages to be broadcasted to the clients, to prove end-to-end connection is alive
 
 [Arduino code](src/mcu/HomeControl) is written in C/C++ and it's built around the [SoftwareSerial9](https://github.com/lpaolini/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library used for enqueuing and throttling outgoing commands.
 
@@ -195,19 +200,19 @@ The Arduino UNO compatible board is responsible for the following tasks:
 
 Interfacing the panel with Arduino is pretty simple.
 
-In fact, two digital I/O pins and a diode is all you need for connecting the single-wire keypad bus to distinct RX and TX ports.
+In theory, two digital I/O pins and a diode is all you need for connecting the single-wire keypad bus to distinct RX and TX ports.
 
 ![minimal keypad bus interface](images/minimal-keypad-bus-interface.png "Minimal keypad bus interface")
 
-An additional resistor and a zener diode can help limiting voltage and current across Arduino's I/O pins.
+In practice, adding an additional resistor and a zener diode is a safe choice for limiting voltage and current across Arduino's I/O pins.
 
 ![improved keypad bus interface](images/improved-keypad-bus-interface.png "Improved keypad bus interface")
 
-Panel signals (SET, ABORT, INT, PA) can either source or sink current. If Arduino's input is configured as INPUT_PULLUP, a diode is enough to pull the input down to LOW logical level when the corresponding panel output is active (LOW).
+Panel signals (SET, ABORT, INT, PA) are active-low (12v on, 0v on). If Arduino's input is configured as INPUT_PULLUP, a diode is enough to pull the input down to LOW logical level when the corresponding panel output is active (LOW).
 
 ![minimal panel signals interface](images/minimal-panel-signals-interface.png "Minimal panel signals interface")
 
-However, the keypad bus might be tampered with or be subject to interferences potentially harmful to Arduino. For this reasons, an opto-isolated design it's a safer choice as it provides full electrical isolation between Arduino and the panel itself.
+However, the keypad bus might be tampered with or be subject to interferences potentially harmful to Arduino. For these reasons, I have designed an opto-isolated circuit which provides full electrical isolation between Arduino and the panel itself.
 
 ![enhanced keypad bus interface](images/enhanced-interface.png "Enhanced (opto-isolated) keypad bus and panel signals interface")
 
