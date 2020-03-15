@@ -200,19 +200,19 @@ The MCU is responsible for the following tasks:
 
 Interfacing the panel with Arduino is pretty simple.
 
-In fact, two digital I/O pins and a diode is all you need for connecting the single-wire keypad bus to distinct RX and TX ports.
+In theory, two digital I/O pins and a diode is all you need for connecting the single-wire keypad bus to distinct RX and TX ports.
 
 ![minimal keypad bus interface](images/minimal-keypad-bus-interface.png "Minimal keypad bus interface")
 
-An additional resistor and a zener diode can help limiting voltage and current across Arduino's I/O pins.
+In practice, adding an additional resistor and a zener diode is a safe choice for limiting voltage and current across Arduino's I/O pins.
 
 ![improved keypad bus interface](images/improved-keypad-bus-interface.png "Improved keypad bus interface")
 
-Panel signals (SET, ABORT, INT, PA) can either source or sink current. If Arduino's input is configured as INPUT_PULLUP, a diode is enough to pull the input down to LOW logical level when the corresponding panel output is active (LOW).
+Panel signals (SET, ABORT, INT, PA) are active-low (12v on, 0v on). If Arduino's input is configured as INPUT_PULLUP, a diode is enough to pull the input down to LOW logical level when the corresponding panel output is active (LOW).
 
 ![minimal panel signals interface](images/minimal-panel-signals-interface.png "Minimal panel signals interface")
 
-However, the keypad bus might be tampered with or be subject to interferences potentially harmful to Arduino. For this reasons, an opto-isolated design it's a safer choice as it provides full electrical isolation between Arduino and the panel itself.
+However, the keypad bus might be tampered with or be subject to interferences potentially harmful to Arduino. For these reasons, an opto-isolated design it's a safer choice as it provides full electrical isolation between Arduino and the panel itself.
 
 ![enhanced keypad bus interface](images/enhanced-interface.png "Enhanced (opto-isolated) keypad bus and panel signals interface")
 
