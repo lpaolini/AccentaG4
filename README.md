@@ -212,7 +212,7 @@ Panel signals (SET, ABORT, INT, PA) are active-low (12v on, 0v on). If Arduino's
 
 ![minimal panel signals interface](images/minimal-panel-signals-interface.png "Minimal panel signals interface")
 
-However, the keypad bus might be tampered with or be subject to interferences potentially harmful to Arduino. For these reasons, an opto-isolated design it's a safer choice as it provides full electrical isolation between Arduino and the panel itself.
+However, the keypad bus might be tampered with or be subject to interferences potentially harmful to Arduino. For these reasons, I have designed an opto-isolated circuit which provides full electrical isolation between Arduino and the panel itself.
 
 ![enhanced keypad bus interface](images/enhanced-interface.png "Enhanced (opto-isolated) keypad bus and panel signals interface")
 
