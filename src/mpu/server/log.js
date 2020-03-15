@@ -1,9 +1,12 @@
 const timestamp = () => new Date().toISOString()
 
+const foo = (method, level, args) =>
+    console[method](`${timestamp()} [${level}]`, ...args)
+
 const log = {
-    debug: (...args) => console.log(timestamp(), ...args),
-    info: (...args) => console.info(timestamp(), ...args),
-    error: (...args) => console.error(timestamp(), ...args)
+    debug: (...args) => foo('log', 'DEBUG', args),
+    info: (...args) => foo('info', 'INFO', args),
+    error: (...args) => foo('error', 'ERROR', args)
 }
 
 module.exports = log
