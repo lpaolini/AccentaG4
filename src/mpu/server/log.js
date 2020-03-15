@@ -1,12 +1,16 @@
 const timestamp = () => new Date().toISOString()
 
-const foo = (method, level, args) =>
-    console[method](`${timestamp()} [${level}]`, ...args)
-
-const log = {
-    debug: (...args) => foo('log', 'DEBUG', args),
-    info: (...args) => foo('info', 'INFO', args),
-    error: (...args) => foo('error', 'ERROR', args)
+const logger = {
+    debug: console.log,
+    info: console.info,
+    error: console.error
 }
 
-module.exports = log
+const log = (level, args) =>
+    logger[level](`${timestamp()} [${level.toUpperCase()}]`, ...args)
+
+module.exports = {
+    debug: (...args) => log('debug', args),
+    info: (...args) => log('info', args),
+    error: (...args) => log('error', args)
+}
