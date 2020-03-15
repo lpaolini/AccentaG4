@@ -169,11 +169,11 @@ The MPU is responsible for the following tasks:
 - expose a HTTPS server for serving the web application
 - expose a secure websockets server (used by the web application)
 - accept and manage websockets connections
-- listen to MCU for incoming messages and forward to websockets clients
+- listen to MCU for incoming messages and broadcast to websockets clients
 - listen to websockets clients for incoming messages and forward to MCU
-- send email notifications for critical events
+- send email notifications
 
-[Server-side code](src/mpu/server) is written in Javascript and runs under latest NodeJS and depends on the modules [serialport](https://github.com/serialport/node-serialport), [ws](https://github.com/websockets/ws) and [rxjs](https://rxjs-dev.firebaseapp.com/)
+[Server-side code](src/mpu/server) is written in Javascript and runs under latest NodeJS and depends on [express](https://github.com/expressjs/express) [serialport](https://github.com/serialport/node-serialport), [ws](https://github.com/websockets/ws) and [rxjs](https://github.com/ReactiveX/rxjs)
 
 [Client-side code](src/mpu/client) is a HTML5/CSS3/Javascript application running in the browser.
 
@@ -181,11 +181,11 @@ The MPU is responsible for the following tasks:
 
 The Arduino UNO compatible board is responsible for the following tasks:
 
-- monitor panel hardware signals (PA, INT, SET, ABORT), transmit updates to MPU and update local status
-- listen to the keypad bus for incoming messages, transmit updates to MPU and update local status
-- listen to MPU for virtual keystrokes and transmit emulated keypad messages over the keypad bus
-- listen to MPU for status queries and reply local status
-- respond to heartbeat messages to be broadcasted to the clients, to prove end-to-end connection is alive
+- monitor panel hardware signals (PA, INT, SET, ABORT), update local state and send updates to MPU
+- listen to the keypad bus for incoming messages, update local state and send updates to MPU
+- listen to MPU for virtual keystrokes and send emulated keypad messages over the keypad bus
+- listen to MPU for status queries and send local status
+- reply to heartbeat messages to be broadcasted to the clients, to prove end-to-end connection is alive
 
 [Arduino code](src/mcu/HomeControl) is written in C/C++ and it's built around the [SoftwareSerial9](https://github.com/lpaolini/SoftwareSerial9) library, capable of sending and receiving 9-bit messages, and [QueueArray](http://playground.arduino.cc/Code/QueueArray), a FIFO library used for enqueuing and throttling outgoing commands.
 
