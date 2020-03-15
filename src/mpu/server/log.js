@@ -1,5 +1,9 @@
-const log4js = require('log4js')
-const log = log4js.getLogger()
-log.level = 'debug'
+const timestamp = () => new Date().toISOString()
+
+const log = {
+    debug: (...args) => console.log(timestamp(), ...args),
+    info: (...args) => console.info(timestamp(), ...args),
+    error: (...args) => console.error(timestamp(), ...args)
+}
 
 module.exports = log
