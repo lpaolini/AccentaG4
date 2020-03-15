@@ -3,6 +3,7 @@ const {mapTo} = require('rxjs/operators')
 const SerialPort = require('serialport')
 const Delimiter = require('@serialport/parser-delimiter')
 const {ENABLE_CHAR} = require('./constants')
+const log = require('./log')
 
 module.exports = ({port, baudRate}) => {
     const serial = new SerialPort(port, {
@@ -20,14 +21,14 @@ module.exports = ({port, baudRate}) => {
     // handle opening
     serial.on('open', err => {
         if (err) {
-            return console.error('Error opening port: ', err.message)
+            return log.error('Error opening port: ', err.message)
         }
-        console.info('Serial port opened')
+        log.info('Serial port opened')
     })
  
     // handle errors
     serial.on('error', err =>
-        console.error('Error: ', err.message)
+        log.error('Error: ', err.message)
     )
  
     const listen = callback =>

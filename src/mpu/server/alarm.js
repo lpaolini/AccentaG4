@@ -3,6 +3,7 @@ const Serial = require('./serial')
 const Server = require('./server')
 const Status = require('./status')
 const Notify = require('./notify')
+const log = require('./log')
 
 const serial = Serial({
     port: config.serial,
@@ -24,8 +25,8 @@ const status = new Status({
     abort: on => notify(on ? 'Alarm aborted' : 'Alarm reset'),
     intruder: on => notify(on ? 'Alarm activated: INTRUDER [!]' : 'Alarm deactivated: INTRUDER'),
     pa: on => notify(on ? 'Alarm activated: PANIC [!]' : 'Alarm deactivated: PANIC'),
-    autoArm: hour => console.info(hour === -1 ? 'Auto-arm disabled' : 'Auto-arm enabled at ' + hour + ':00'),
-    autoDisarm: hour => console.info(hour === -1 ? 'Auto-disarm disabled' : 'Auto-disarm enabled at ' + hour + ':00')
+    autoArm: hour => log.info(hour === -1 ? 'Auto-arm disabled' : 'Auto-arm enabled at ' + hour + ':00'),
+    autoDisarm: hour => log.info(hour === -1 ? 'Auto-disarm disabled' : 'Auto-disarm enabled at ' + hour + ':00')
 })
 
 status.update('autoArm', config.autoArmHour)
@@ -75,14 +76,14 @@ setInterval(function() {
         if (config.autoDisarmCode
             && date.getHours() === status.read('autoDisarm')
             && date.getMinutes() === 0) {
-            console.info('alarm auto-disarmed')
+            log.info('alarm auto-disarmed')
             serial.send(config.autoDisarmCode)
         }
     } else {
         if (config.autoArmCode
             && date.getHours() === status.read('autoArm')
             && date.getMinutes() === 0) {
-            console.info('alarm auto-armed')
+            log.info('alarm auto-armed')
             serial.send(config.autoArmCode)
         }
     }

@@ -1,10 +1,9 @@
-var spawn = require('child_process').spawn
+const spawn = require('child_process').spawn
+const log = require('./log')
 
-module.exports = Notify
-
-function Notify(config) {
+const Notify = config => {
     if (config) {
-        console.log('email notifications sent to: ' + config.to)
+        log.debug('email notifications sent to: ' + config.to)
         return function (message) {
             // var mail = spawn('msmtp', ['--from=dummy', '--read-recipients'], {stdio: ['pipe', process.stdout, process.stderr]})
             var mail = spawn('sendmail', [config.to], {stdio: ['pipe', process.stdout, process.stderr]})
@@ -14,11 +13,13 @@ function Notify(config) {
             mail.stdin.write('\n')
             mail.stdin.write(message + '\n')
             mail.stdin.end()
-            console.log('notification: ' + message)
+            log.debug('notification: ' + message)
         }
     } else {
         return function (message) {
-            console.log('notification: ' + message)
+            log.debug('notification: ' + message)
         }
     }
 }
+
+module.exports = Notify

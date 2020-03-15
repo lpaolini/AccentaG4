@@ -6,6 +6,7 @@ const WebSocket = require('ws')
 const {Subject, merge} = require('rxjs')
 const {filter, throttleTime} = require('rxjs/operators')
 const {ENABLE_CHAR} = require('./constants')
+const log = require('./log')
 
 module.exports = ({port, ssl}) => {
     const app = express()
@@ -28,7 +29,7 @@ module.exports = ({port, ssl}) => {
     const wss = new WebSocket.Server({server})
     
     server.listen(port, () => {
-        console.info(`Server started on port ${port}`)
+        log.info(`Server started on port ${port}`)
     })
 
     const listen = callback =>
@@ -50,7 +51,7 @@ module.exports = ({port, ssl}) => {
     
     send$.subscribe(
         data => {
-            // data !== ENABLE_CHAR && console.log('Downstream message:', {data})
+            // data !== ENABLE_CHAR && log.log('Downstream message:', {data})
             wss.clients.forEach(function (client) {
                 if (client.readyState === WebSocket.OPEN) {
                     client.send(data)
