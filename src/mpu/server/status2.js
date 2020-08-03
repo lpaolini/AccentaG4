@@ -76,7 +76,7 @@ const toggleAutoDay = day => {
 }
 
 const getAutoDays = () =>
-    status.autoDays.map(day => day ? '1' : '0').join()
+    status.autoDays.map(day => day ? '1' : '0').join('')
 
 const setAirQuality = value =>
     update('airQuality', value)
