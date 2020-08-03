@@ -71,12 +71,15 @@ const getAutoDisarm = () =>
     status.autoDisarm
 
 const toggleAutoDay = day => {
-    status.autoDays[day - 1] = !status.autoDays[day - 1]
+    status.autoDays[day] = !status.autoDays[day]
     console.info(`Auto-arm/disarm days: ${getAutoDays()}`)
 }
 
 const getAutoDays = () =>
     status.autoDays.map(day => day ? '1' : '0').join('')
+
+const isAutoDay = day =>
+    status.autoDays[day]
 
 const setAirQuality = value =>
     update('airQuality', value)
@@ -92,6 +95,6 @@ module.exports = {
     setPanic, getPanic,
     setAutoArm, getAutoArm,
     setAutoDisarm, getAutoDisarm,
-    toggleAutoDay, getAutoDays,
+    toggleAutoDay, getAutoDays, isAutoDay,
     setAirQuality, getAirQuality
 }

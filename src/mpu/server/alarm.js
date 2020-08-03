@@ -90,6 +90,7 @@ setInterval(function() {
     var date = new Date()
     if (status.getArmed()) {
         if (config.autoDisarmCode
+            && status.isAutoDay(date.getDay())
             && date.getHours() === status.getAutoDisarm()
             && date.getMinutes() === 0) {
             log.info('alarm auto-disarmed')
@@ -97,6 +98,7 @@ setInterval(function() {
         }
     } else {
         if (config.autoArmCode
+            && status.isAutoDay(date.getDay())
             && date.getHours() === status.getAutoArm()
             && date.getMinutes() === 0) {
             log.info('alarm auto-armed')

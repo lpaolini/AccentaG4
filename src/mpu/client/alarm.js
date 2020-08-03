@@ -233,13 +233,11 @@
     }
 
     const Days = () => {
-        const weekDays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+        const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
         return {
             ingest: data => {
                 const days = data
-                console.log('days', days)
                 for (let i = 0; i < 7; i++) {
-                    console.log('#' + weekDays[i], days.charAt(i) === '1')
                     if (days.charAt(i) === '1') {
                         $('#' + weekDays[i]).removeClass('inactive')
                     } else {
