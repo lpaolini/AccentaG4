@@ -118,7 +118,7 @@ body.active {
 
 .lcd {
     width: 100%;
-    height: 8.5rem;
+    height: 9.5rem;
     border-radius: 1rem;
     padding: 0.5rem;
     margin-bottom: .5rem;
@@ -156,18 +156,22 @@ body.active {
     opacity: 0.6;
 }
 
-.lcd pre.air {
+.lcd pre.sub {
     display: flex;
     justify-content: space-between;
     font-size: 1.15rem;
     margin: .5rem;
 }
 
-.lcd pre.air > * {
+.lcd pre.sub > * {
     display: flex;
 }
 
 .unit {
+    opacity: .5;
+}
+
+.inactive {
     opacity: .5;
 }
 

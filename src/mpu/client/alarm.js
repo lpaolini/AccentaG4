@@ -232,6 +232,22 @@
         }
     }
 
+    const Days = () => {
+        const weekDays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN']
+        return {
+            ingest: data => {
+                const days = data
+                for (const i = 0; i < 7; i++) {
+                    if (days.charAt(i) === '1') {
+                        $('#' + weekDays[i]).removeClass('inactive')
+                    } else {
+                        $('#' + weekDays[i]).addClass('inactive')
+                    }
+                }
+            }
+        }
+    }
+
     const Air = callback => {
         return {
             ingest: data => {
@@ -263,6 +279,7 @@
         var panelLed = Led('data-panel', 'SAIP')
         var autoArm = Auto('data-autoarm')
         var autoDisarm = Auto('data-autodisarm')
+        var days = Days()
 
         var url = location.protocol === 'https:' ?
             'wss://' + location.hostname + ':10443' :
@@ -297,6 +314,9 @@
                         break
                     case 'DIS': // auto disarm
                         autoDisarm.ingest(data)
+                        break
+                    case 'DAY': // auto arm/disarm days
+                        days.ingest(data)
                         break
                     default:
                         break
