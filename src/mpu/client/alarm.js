@@ -237,7 +237,9 @@
         return {
             ingest: data => {
                 const days = data
+                console.log('days', days)
                 for (const i = 0; i < 7; i++) {
+                    console.log('#' + weekDays[i], days.charAt(i) === '1')
                     if (days.charAt(i) === '1') {
                         $('#' + weekDays[i]).removeClass('inactive')
                     } else {
