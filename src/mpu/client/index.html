@@ -11,12 +11,21 @@
 		<div class="lcd">
 			<pre id="row0"></pre>
 			<pre id="row1"></pre>
-			<pre class="air">
+			<pre class="sub">
 				<div id="auto-arm" data-autoarm></div>
 				<div>Auto arm/disarm</div>
 				<div id="auto-disarm" data-autodisarm></div>
 			</pre>
-			<pre class="air">
+			<pre class="sub">
+				<div id="MON" class="inactive">MON</div>
+				<div id="TUE" class="inactive">TUE</div>
+				<div id="WED" class="inactive">WED</div>
+				<div id="THU" class="inactive">THU</div>
+				<div id="FRI" class="inactive">FRI</div>
+				<div id="SAT" class="inactive">SAT</div>
+				<div id="SUN" class="inactive">SUN</div>
+			</pre>
+			<pre class="sub">
 				<div>
                     <div id="temperature"></div>
                     <div class="unit">&deg;C</div>
@@ -97,6 +106,7 @@
 					<h4>Arm</h4>
 					<ul class="arm">
 						<li class="button" data-click="#ARM=-1">OFF</li>
+						<li class="button" data-click="#ARM=15">15:00</li>
 						<li class="button" data-click="#ARM=18">18:00</li>
 						<li class="button" data-click="#ARM=21">21:00</li>
 						<li class="button" data-click="#ARM=0">00:00</li>
@@ -113,6 +123,19 @@
 						<li class="button" data-click="#DIS=8">08:00</li>
 						<li class="button" data-click="#DIS=10">10:00</li>
 						<li class="button" data-click="#DIS=12">12:00</li>
+						<li class="button" data-click="#DIS=15">15:00</li>
+					</ul>
+				</div>
+				<div>
+					<h4>Days</h4>
+					<ul class="disarm">
+						<li class="button" data-click="#DAY=1">MON</li>
+						<li class="button" data-click="#DAY=2">TUE</li>
+						<li class="button" data-click="#DAY=3">WED</li>
+						<li class="button" data-click="#DAY=4">THU</li>
+						<li class="button" data-click="#DAY=5">FRI</li>
+						<li class="button" data-click="#DAY=6">SAT</li>
+						<li class="button" data-click="#DAY=7">SUN</li>
 					</ul>
 				</div>
 			</div>
