@@ -13,11 +13,11 @@ const Notify = config => {
             mail.stdin.write('\n')
             mail.stdin.write(message + '\n')
             mail.stdin.end()
-            log.debug('notification: ' + message)
+            log.info(message)
         }
     } else {
         return function (message) {
-            log.debug('notification: ' + message)
+            log.info(message)
         }
     }
 }

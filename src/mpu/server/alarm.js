@@ -1,8 +1,7 @@
 const config = require('./config')
 const Serial = require('./serial')
 const Server = require('./server')
-// const Status = require('./status')
-const status = require('./status2')
+const status = require('./status')
 const Notify = require('./notify')
 const log = require('./log')
 
@@ -20,18 +19,32 @@ const notify = Notify(config.notify)
 
 notify('Alarm controller started')
 
-// const status = new Status({
-//     link: on => notify(on ? 'Alarm panel link up' : 'Alarm panel link down [!]'),
-//     set: on => notify(on ? 'Alarm set' : 'Alarm unset'),
-//     abort: on => notify(on ? 'Alarm aborted' : 'Alarm reset'),
-//     intruder: on => notify(on ? 'Alarm activated: INTRUDER [!]' : 'Alarm deactivated: INTRUDER'),
-//     pa: on => notify(on ? 'Alarm activated: PANIC [!]' : 'Alarm deactivated: PANIC'),
-//     autoArm: hour => log.info(hour === -1 ? 'Auto-arm disabled' : 'Auto-arm enabled at ' + hour + ':00'),
-//     autoDisarm: hour => log.info(hour === -1 ? 'Auto-disarm disabled' : 'Auto-disarm enabled at ' + hour + ':00')
-// })
+status
+    .on('link', state =>
+        notify(`Alarm panel link ${state ? 'up' : 'down'}`)
+    )
+    .on('armed', state =>
+        notify(`Alarm ${state ? 'armed' : 'disarmed'}`)
+    )
+    .on('abort', state =>
+        notify(`Alarm ${state ? 'aborted' : 'reset'}`)
+    )
+    .on('intruder', state =>
+        notify(`INTRUDER alarm ${state ? 'activated [!]' : 'deactivated'}`)
+    )
+    .on('panic', state =>
+        notify(`PANIC alarm ${state ? 'activated [!]' : 'deactivated'}`)
+    )
+    .on('autoArm', hour =>
+        log.info(`Auto-arm ${hour === -1 ? 'disabled' : `enabled at ${hour}:00`}`)
+    )
+    .on('autoDisarm', hour =>
+        log.info(`Auto-disarm ${hour === -1 ? 'disabled' : `enabled at ${hour}:00`}`)
+    )
+    .on('autoDays', days =>
+        log.info(`Auto-arm/disarm days: ${status.getAutoDays()}`)
+    )
 
-// status.update('autoArm', config.autoArmHour)
-// status.update('autoDisarm', config.autoDisarmHour)
 status.setAutoArm(config.autoArmHour)
 status.setAutoDisarm(config.autoDisarmHour)
 
@@ -44,10 +57,6 @@ serial.listen(message => {
         break
     case 'SIG:':
         var signals = message.substring(4)
-        // status.update('set', signals.charAt(0) === 'S')
-        // status.update('abort', signals.charAt(1) === 'A')
-        // status.update('intruder', signals.charAt(2) === 'I')
-        // status.update('pa', signals.charAt(3) === 'P')
         status.setArmed(signals.charAt(0) === 'S')
         status.setAbort(signals.charAt(1) === 'A')
         status.setIntruder(signals.charAt(2) === 'I')
@@ -55,7 +64,6 @@ serial.listen(message => {
         break
     case 'AIR:':
         var airQuality = message.substring(4)
-        // status.update('air', airQuality)
         status.setAirQuality(airQuality)
         break
     default:
@@ -65,15 +73,12 @@ serial.listen(message => {
 
 server.listen(message => {
     if (message.substring(0, 5) === '#ARM=') {
-        // status.update('autoArm', parseInt(message.split('=')[1]))
         status.setAutoArm(parseInt(message.split('=')[1]))
         server.send('ARM:' + status.getAutoArm())
     } else if (message.substring(0, 5) === '#DIS=') {
-        // status.update('autoDisarm', parseInt(message.split('=')[1]))
         status.setAutoDisarm(parseInt(message.split('=')[1]))
         server.send('DIS:' + status.getAutoDisarm())
     } else if (message.substring(0, 5) === '#DAY=') {
-        // status.update('autoDisarm', parseInt(message.split('=')[1]))
         status.toggleAutoDay(parseInt(message.split('=')[1]))
         server.send('DAY:' + status.getAutoDays())
     } else {
