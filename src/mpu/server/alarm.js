@@ -30,10 +30,10 @@ status
         notify(`Alarm ${state ? 'aborted' : 'reset'}`)
     )
     .on('intruder', state =>
-        notify(state ? 'INTRUDER [!]' : 'no intruder')
+        notify(state ? 'INTRUDER [!]' : 'Intruder alarm deactivated')
     )
     .on('panic', state =>
-        notify(state ? 'PANIC [!]' : 'no panic')
+        notify(state ? 'PANIC [!]' : 'Panic alarm deactivated')
     )
     .on('autoArm', hour =>
         log.info(`Auto-arm ${hour === -1 ? 'disabled' : `enabled at ${hour}:00`}`)
