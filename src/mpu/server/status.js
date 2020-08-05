@@ -17,7 +17,9 @@ const update = (prop, newState) => {
     const prevState = status[prop]
     status[prop] = newState
     const stateChanged = prevState !== undefined && newState !== prevState
-    stateChanged && eventEmitter.emit(prop, newState)
+    if (stateChanged) {
+        eventEmitter.emit(prop, newState)
+    }
 }
 
 const setLink = state =>
@@ -87,5 +89,5 @@ module.exports = {
     setAutoDisarm, getAutoDisarm,
     toggleAutoDay, getAutoDays, isAutoDay,
     setAirQuality, getAirQuality,
-    on: eventEmitter.on
+    on: (...args) => eventEmitter.on(...args)
 }
