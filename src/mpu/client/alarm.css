@@ -152,14 +152,14 @@ body.active {
 
 .lcd pre {
     margin: 0;
-    font-size: 2.0rem;
+    font-size: 1.7rem;
     opacity: 0.6;
 }
 
 .lcd pre.sub {
     display: flex;
     justify-content: space-between;
-    font-size: 1.15rem;
+    font-size: 0.9rem;
     margin: .5rem;
 }
 
