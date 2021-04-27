@@ -81,6 +81,8 @@ void AccentaG4::sendKey(char key) {
     case '!':
         tx.queue.push(K_SOS);
         break;
+    case 't':
+        tx.queue.push(K_ARM_DISARM);
     }
 }
 

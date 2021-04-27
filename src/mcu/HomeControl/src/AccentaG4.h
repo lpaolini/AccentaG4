@@ -33,6 +33,7 @@
 #define K_CONFIRM 62
 #define K_SELECT 63
 #define K_SOS 170
+#define K_ARM_DISARM 183
 
 #define L_COMMAND 76
 #define P_COMMAND 80

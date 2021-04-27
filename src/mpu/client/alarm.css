@@ -14,7 +14,7 @@
 
 body {
     --width: 22rem;
-    --height: 38rem;
+    --height: 43rem;
     position: relative;
     margin: auto;
     background: #383838;
@@ -241,4 +241,8 @@ body.active {
 
 #keyCancel {
     color: darkred;
+}
+
+#armToggle {
+    flex-grow: 1;
 }

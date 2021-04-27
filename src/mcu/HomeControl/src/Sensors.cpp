@@ -103,8 +103,8 @@ void Sensors::sample_sgp30() {
             status.eCO2 = sgp30.eCO2;
         } else {
             sendMessage("SEN:SGP30 error");
-            status.TVOC = NAN;
-            status.eCO2 = NAN;
+            status.TVOC = 0;
+            status.eCO2 = 0;
         }
     }
 }
