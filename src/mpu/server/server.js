@@ -2,7 +2,7 @@ const fs = require('fs')
 const https = require('https')
 const express = require('express')
 const path = require('path')
-const WebSocket, {WebSocketServer} = require('ws')
+const WebSocket = require('ws')
 const {Subject, merge} = require('rxjs')
 const {filter, throttleTime} = require('rxjs/operators')
 const {ENABLE_CHAR} = require('./constants')
@@ -26,7 +26,7 @@ module.exports = ({port, ssl}) => {
     
     const server = https.createServer(sslCredentials, app)
     
-    const wss = new WebSocketServer({server})
+    const wss = new WebSocket.Server({server})
     
     server.listen(port, () => {
         log.info(`Server started on port ${port}`)
