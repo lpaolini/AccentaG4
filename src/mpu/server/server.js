@@ -35,7 +35,7 @@ module.exports = ({port, ssl}) => {
     const listen = callback =>
         wss.on('connection', ws =>
             ws.on('message', message =>
-                callback(message)
+                callback(message.toString('utf-8'))
             )
         )
 
