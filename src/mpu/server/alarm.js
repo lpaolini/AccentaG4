@@ -17,7 +17,7 @@ const server = Server({
 
 const notify = Notify(config.notify)
 
-notify('Alarm controller started')
+// notify('Alarm controller started')
 
 status
     .on('link', state =>
